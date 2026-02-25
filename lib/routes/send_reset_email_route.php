@@ -7,15 +7,15 @@ if(isset($_POST['email']) && isset($_POST['nic'])){
     $nic = $_POST['nic'];
 
     $forgotPwd = new ForgotPasswordController();
-    $isEmailAndNicExist = $forgotPwd->search_user($email,$nic);
+    $isEmailSent = $forgotPwd->send_reset_email($email,$nic);
     
-    if($isEmailAndNicExist){
-        echo "match";
+    if($isEmailSent){
+        echo "sent";
     }
     else{
-        echo "not_match";
+        echo "error";
     }
 }
-
+exit();
 
 ?>

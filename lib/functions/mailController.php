@@ -25,6 +25,8 @@ function generateMail($to, $toName, $subject, $bodyHtml) {
         $mail->SMTPSecure = false; // PHPMailer::ENCRYPTION_STARTTLS - for gmail
         $mail->Port       = 25; // 587 - for gmail
 
+        // $mail->SMTPDebug = 2; // for testing to see email credentials, SMTP conversation
+
         $mail->setFrom('anjalee362@gmail.com', 'Gampola Urban Council');
         $mail->addAddress($to, $toName);
 

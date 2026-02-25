@@ -7,14 +7,15 @@ class MainController
 
     protected $conn;
 
-    public function _construct()
+    public function __construct()
     {
-        // $this->connObj = new Connection("127.0.0.1", "root", "", "cemetery_db");
-        // $this->conn = $this->connObj->conn();
-        // return $this->conn;
+        $this->connObj = new Connection("127.0.0.1", "root", "", "cemetery_db");
+        $this->conn = $this->connObj->conn();
+        return $this->conn;
 
-        $db = new Connection("127.0.0.1", "root", "", "cemetery_db");
-        $this->conn = $db->conn();
+        // $db = new Connection("127.0.0.1", "root", "", "cemetery_db");
+        // $this->conn = $db->conn();
+        // return $this->conn;
     }
 }
 

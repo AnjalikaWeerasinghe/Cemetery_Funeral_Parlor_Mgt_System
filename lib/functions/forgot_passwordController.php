@@ -6,28 +6,55 @@ include_once('mailController.php');
 
 class ForgotPasswordController extends MainController{
 
-    public function __construct() {
-        parent::__construct();
+    // public function __construct() {
+    //     parent::__construct();
+    // }
+
+    public function search_user($email, $nic) {
+
+        $result_sql = $this->conn->prepare("SELECT id FROM user_table WHERE email=? AND nic=?");
+
+        $result_sql->bind_param("ss", $email, $nic);
+
+        $result_sql->execute();
+
+        $result = $result_sql->get_result();
+
+        return $result->num_rows;
+
     }
 
-   public function search_email($email){
+    public function send_reset_email($email,$nic){
 
-       $sql = "SELECT * FROM user_table WHERE email = '$email' AND user_status = 1;";
+        $reset_email_sql = $this->conn->prepare("SELECT id FROM user_table WHERE email=? AND nic=?");
        
-       $result = $this->conn->query($sql);
+        $reset_email_sql->bind_param("ss", $email, $nic);
+
+        $reset_email_sql->execute();
+
+        $result = $reset_email_sql->get_result();
+
+        // $result = $this->conn->query($sql);
        
-       $nor = $result->num_rows;
+        if ($result->num_rows == 0) {
+            return false;
+        }
 
-       if($nor > 0){
-
+        // if($nor > 0){
+        //     generateMail($email,"Test User","Password Reset","http://127.0.0.1:8080/Cemetery_Funeral_Parlor_Mgt_System/");
+        //     return true;   
+        // }
+     
         $token = bin2hex(random_bytes(32));
+        // $tokenHash = hash('sha256', $token);
         $expiry = date('Y-m-d H:i:s', strtotime('+15 minutes'));
 
-        $update = "UPDATE user_table SET reset_token='$token', reset_token_expiry='$expiry' WHERE email='$email'";
+        $update =  $this->conn->prepare("UPDATE user_table SET reset_token=?, reset_token_expiry=? WHERE email=? AND nic=?");
 
-        $this->conn->query($update);
+        $update->bind_param("ssss",$token,$expiry,$email,$nic);
+        $update->execute();
 
-        $resetLink = "http://127.0.0.1:8080/CFPMS/reset_password.php?token=$token";
+        $resetLink = "http://127.0.0.1/Cemetery_Funeral_Parlor_Mgt_System/reset_password.php?token=$token";
 
         // when using gmail
         // $bodyHtml = "
@@ -48,6 +75,7 @@ class ForgotPasswordController extends MainController{
         // </html>
         // ";
 
+        
         // when using Papercut SMTP
         $bodyHtml = "
             <h3>Password Reset</h3>
@@ -55,18 +83,16 @@ class ForgotPasswordController extends MainController{
             <p>
                 <a href='$resetLink'>$resetLink</a>
             </p>
-            <p>This link will expire in 1 hour.</p>
+            <p>This link will expire in 15 minutes.</p>
         ";
 
-        generateMail($email, "User", "Password Reset", $bodyHtml);
+        $mailSent = generateMail($email, "User", "Password Reset", $bodyHtml);
 
-        return true;
-       }
-
-       else{
-           return false;
-       }
-
-   }
-}
+        if($mailSent){
+            return true;
+        } else {
+            return false;
+        }
+    }
+ }
 ?>
