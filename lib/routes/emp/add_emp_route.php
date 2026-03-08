@@ -21,7 +21,7 @@ function sanitize_input($data) {
 // }
 
 $requiredFields = [
-    'first_name', 'last_name', 'nic', 'email', 'password', 'system_role'
+    'first_name', 'last_name', 'nic', 'email', 'password_hash', 'system_role'
 ];
 
 foreach ($requiredFields as $field) {
@@ -34,11 +34,11 @@ foreach ($requiredFields as $field) {
 //Image Upload
 $imageName = '';
 
-if (!empty($_FILES['image']['name'])) {
+if (!empty($_FILES['image_sample']['name'])) {
 
     $allowedExts = ['jpg', 'jpeg', 'png', 'gif'];
-    $originalName = $_FILES['image']['name'];
-    $tmpName = $_FILES['image']['tmp_name'];
+    $originalName = $_FILES['image_sample']['name'];
+    $tmpName = $_FILES['image_sample']['tmp_name'];
     $imageExt = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
 
     if (!in_array($imageExt, $allowedExts)) {
@@ -72,7 +72,7 @@ if (!empty($_FILES['image']['name'])) {
 
 // Sanitize input data
 $data = [
-    'staff_code' => $staff_code,
+    // 'staff_code' => $staff_code,
     'first_name' => sanitize_input($_POST['first_name']),
     'middle_name' => sanitize_input($_POST['middle_name'] ?? ''),
     'last_name' => sanitize_input($_POST['last_name']),
@@ -87,8 +87,8 @@ $data = [
     'staff_status' => sanitize_input($_POST['staff_status'] ?? ''),
     'salary' => sanitize_input($_POST['salary'] ?? ''),
     'email' => sanitize_input($_POST['email']),
-    'password' => sanitize_input($_POST['password']),
-    'image' => sanitize_input($_POST['image'] ?? ''),
+    'password_hash' => sanitize_input($_POST['password_hash']),
+    'image' => $imageName,
     'system_role' => sanitize_input($_POST['system_role'])
 ];
 

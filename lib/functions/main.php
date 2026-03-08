@@ -9,7 +9,7 @@ class MainController
 
     public function __construct()
     {
-        $this->connObj = new Connection("127.0.0.1", "root", "", "cemetery_db");
+        $this->connObj = new Connection("127.0.0.1", "root", "newStrongPassword123!", "cemetery_db");
         $this->conn = $this->connObj->conn();
         return $this->conn;
 

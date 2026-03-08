@@ -23,9 +23,9 @@
 <div class="container-fluid">
   <div class="card shadow-sm border-0">
     <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
-      <h5 class="mb-0">Add New Staff Member</h5>
+      <h5 class="mb-0">Add New Members</h5>
 
-      <a href="admin.php?page=staff" class="btn btn-light btn-sm bg-warning">
+      <a href="admin.php?page=member" class="btn btn-light btn-sm bg-warning">
         <i class="fa-solid fa-arrow-left"></i>
         Back
       </a>
@@ -84,49 +84,6 @@
           <textarea name="address" id="address" rows="2" class="form-control"></textarea>
         </div>
 
-        <h6 class="border-bottom pb-2 mb-3 text-primary">Employment Details</h6>
-
-        <div class="row">
-          <div class="col-md-4 mb-3">
-            <label for="role_id" class="form-label">Position</label>
-            <select name="role_id" id="role_id" class="form-select">
-              <option value="">Select</option>
-              <option value="1">Cemetery Manager</option>
-              <option value="2">Clerk</option>
-            </select>
-          </div>
-
-          <div class="col-md-4 mb-3">
-            <label class="form-label">Employement Type</label>
-            <select name="employement_type" id="employment_type" class="form-select">
-              <option value="">Select</option>
-              <option value="Full-time">Full-time</option>
-              <option value="Part-time">Part-time</option>
-              <option value="Contract">On Contract</option>
-            </select>
-          </div>
-
-          <div class="col-md-4 mb-3">
-              <label class="form-label">Date Joined</label>
-              <input type="date" name="date_joined" class="form-control">
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col-md-4 mb-3">
-            <label class="form-label">Status</label>
-            <select name="staff_status" class="form-select">
-              <option value="Active">Active</option>
-              <option value="Inactive">Inactive</option>
-            </select>
-          </div>
-
-          <div class="col-md-4 mb-3">
-            <label class="form-label">Salary (Optional)</label>
-            <input type="number" name="salary" class="form-control">
-          </div>
-        </div>
-
         <h6 class="border-bottom pb-2 mb-3 text-primary">Account Details</h6>
 
         <div class="row">
@@ -137,18 +94,17 @@
 
           <div class="col-md-4 mb-3">
             <label class="form-label">Password *</label>
-            <input type="password" class="form-control" name="password_hash" autocomplete="new-password" placeholder="Enter password" required>
+            <input type="password" class="form-control" name="password" autocomplete="new-password" placeholder="Enter password" required>
           </div>
 
-          <div class="col-md-3 mb-3">
-            <label class="form-label">System Role *</label>
-            <select class="form-select" name="system_role" required>
-              <option value="">Select role</option>
-              <option value="Admin">Admin</option>
-              <option value="Manager">Manager</option>
-              <option value="Staff">Staff</option>
+          <div class="col-md-4 mb-3">
+            <label class="form-label">Status</label>
+            <select name="staff_status" class="form-select">
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
             </select>
           </div>
+
         </div>
 
         <div class="row">
@@ -158,8 +114,8 @@
           </div>
 
           <div class="col-md-4 mb-3">
-            <label for="emp_code" class="form-label">Employee Code</label>
-            <input type="text" name="staff_code" id="emp_code" class="form-control" readonly>
+            <label for="member_code" class="form-label">Member Code</label>
+            <input type="text" name="member_code" id="member_code" class="form-control" readonly>
           </div>
         </div>
 
@@ -188,15 +144,14 @@
   </div>
 </div>
 
-
 <script>
 $(document).ready(function(){
 
   $.ajax({
-    url: "../routes/emp/generate_staff_code.php",
+    url: "../routes/member/generate_member_code.php",
     type: "GET",
     success: function (response) {
-      $("#emp_code").val(response);
+      $("#member_code").val(response);
     }
   });
 
@@ -257,5 +212,3 @@ $(document).ready(function(){
 
 });
 </script>
-
-

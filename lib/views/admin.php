@@ -32,7 +32,7 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
             <form class="mt-3 mb-3 me-4" role="search">
                 <div class="input-group">
                     <input class="form-control border-end-0" type="search" placeholder="Search" aria-label="Search"/>
-                    <button class="btn input-group-text bg-white border-start-0" type="submit">
+                    <button class="btn input-group-text bg-white border-start-0" type="search_submit">
                         <i class="fa-solid fa-magnifying-glass"></i>
                     </button>
                 </div>
@@ -63,10 +63,27 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
                     case 'staff':
                         include 'emp/emp_details.php';
                         break;
-
                     case 'addStaff':
                         include 'emp/emp_add.php';
-                        break;    
+                        break; 
+                        
+                    case 'member':
+                        include 'member/member_view.php';
+                        break;
+                    case 'addMember':
+                        include 'member/member_add.php';
+                        break;
+
+                    case 'funeralBookings':
+                        include 'funeral_booking/funeral_booking_details.php';
+                        break;
+                    case 'addNewBooking':
+                        include 'funeral_booking/add_booking.php';
+                        break;
+
+                    case 'roleSettings':
+                        include 'system_settings/role_settings.php';
+                        break;
 
                     default:
                         include 'dashboard.php';

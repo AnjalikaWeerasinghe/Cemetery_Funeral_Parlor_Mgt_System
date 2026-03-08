@@ -54,8 +54,11 @@ if (session_status() === PHP_SESSION_NONE) {
             <a class="nav-link text-dark fw-semibold" href="#" id="">Plot & Grave Management</a>
         </li>
 
-        <li class="nav-item">
-            <a class="nav-link text-dark fw-semibold" href="#" id="">Funeral & Services</a>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle text-dark fw-semibold" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Funeral & Services</a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="admin.php?page=funeralBookings" id="funeral_booking_details">Funeral Bookings</a></li>
+            </ul>
         </li>
 
         <li class="nav-item">
@@ -66,7 +69,7 @@ if (session_status() === PHP_SESSION_NONE) {
           <a class="nav-link dropdown-toggle fw-semibold text-dark" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">User Management</a>
           <ul class="dropdown-menu">
             <li><a class="dropdown-item" href="admin.php?page=staff" id="emp_details">Staff Details</a></li>
-            <li><a class="dropdown-item" href="#" id="mem_edit">Member Details</a></li>
+            <li><a class="dropdown-item" href="admin.php?page=member" id="mem_edit">Member Details</a></li>
           </ul>
         </li>
 
@@ -74,8 +77,11 @@ if (session_status() === PHP_SESSION_NONE) {
             <a class="nav-link text-dark fw-semibold" href="#" id="">Reports</a>
         </li>
 
-        <li class="nav-item">
-            <a class="nav-link text-dark fw-semibold" href="#" id="">System Settings</a>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle text-dark fw-semibold" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">System Settings</a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="admin.php?page=roleSettings" id="role_settings">Manage Roles</a></li>
+          </ul>
         </li>
     </ul>
 </div>

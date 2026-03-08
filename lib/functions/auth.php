@@ -7,7 +7,7 @@ include_once('connection.php');
 class Auth {
 
     public function __construct(){
-        $this->connObj = new Connection("127.0.0.1", "root", "", "cemetery_db");
+        $this->connObj = new Connection("127.0.0.1", "root", "newStrongPassword123!", "cemetery_db");
         $this->conn = $this->connObj->conn();
     }
 
@@ -25,10 +25,10 @@ class Auth {
 
             if ($rec['user_status'] == 1) {
 
-                // ✅ CORRECT PASSWORD CHECK
+                
                 if (password_verify($userPwd, $rec['login_password'])) {
 
-                    if ($rec['user_role'] === 'admin') {
+                    if ($rec['user_role'] === 'Admin') {
                         session_start();
                         $_SESSION['username'] = $rec['user_name'];
                         $_SESSION['user_id'] = $rec['user_id'];

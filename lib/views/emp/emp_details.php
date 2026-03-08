@@ -41,14 +41,15 @@
         <table class="table table-striped table-bordered">
             <thead class="table-dark">
                 <tr>
-                    <th>ID</th>
+                    <th>Staff Code</th>
                     <th>Name</th>
                     <th>Email</th>
                     <th>Role</th>
+                    <th>Status</th>
                     <th width="150">Actions</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="emp_data">
                 <!-- Load from database -->
             </tbody>
         </table>
@@ -151,5 +152,11 @@
 <script>
     $(document).on("click", ".addStaffBtn", function(){
     $("#content").load("emp_add.php");
-});
+    });
+
+    $(document).ready(function(){
+        $.get('../routes/emp/view_emp_route.php', function(data){
+            $("#emp_data").html(data);
+        })
+    });
 </script>
