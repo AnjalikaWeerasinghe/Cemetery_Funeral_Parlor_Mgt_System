@@ -40,49 +40,78 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 ?> -->
 
-<div id="sidebar" class="bg-success border-end vh-100 p-2">
-    <ul class="nav flex-column gap-1">
+<div id="sidebar" class="vh-100 p-3" style="width: 220px; background: linear-gradient(to bottom, #8b6f47, #d4af7a);">
+
+    <ul class="nav flex-column gap-2">
+
         <li class="nav-item">
-            <a class="nav-link text-dark fw-semibold" href="admin.php?page=dashboard">Dashboard</a>
+            <a class="nav-link text-dark fw-semibold" href="admin.php?page=dashboard">
+                <!-- <i class="fa-solid fa-gauge-high me-2"></i> --> 
+                Dashboard
+            </a>
         </li>
 
         <li class="nav-item">
-            <a class="nav-link text-dark fw-semibold" href="#" id="">Deceased Records</a>
+            <a class="nav-link text-dark fw-semibold" href="#">
+                <!-- <i class="fa-solid fa-file me-2"></i>-->
+                Deceased Records
+            </a>
         </li>
 
         <li class="nav-item">
-            <a class="nav-link text-dark fw-semibold" href="#" id="">Plot & Grave Management</a>
+            <a class="nav-link text-dark fw-semibold" href="#">
+                <!-- <i class="fa-solid fa-square-parking me-2"></i>  -->
+                Plot & Grave Management
+            </a>
         </li>
 
-        <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle text-dark fw-semibold" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Funeral & Services</a>
+        <li class="nav-item dropdown-container">
+            <a class="nav-link dropdown-toggle text-dark fw-semibold" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <!-- <i class="fa-solid fa-candle-holder me-2"></i>  -->
+                Funeral & Services
+            </a>
             <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="admin.php?page=funeralBookings" id="funeral_booking_details">Funeral Bookings</a></li>
+                <li>
+                    <a class="dropdown-item" href="admin.php?page=funeralBookings">Funeral Bookings</a>
+                </li>
             </ul>
         </li>
 
         <li class="nav-item">
-            <a class="nav-link text-dark fw-semibold" href="#" id="">Payments & Billing</a>
+            <a class="nav-link text-dark fw-semibold" href="#">
+                <!-- <i class="fa-solid fa-money-bill-wave me-2"></i>  -->
+                Payments & Billing
+            </a>
         </li>
 
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle fw-semibold text-dark" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">User Management</a>
-          <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="admin.php?page=staff" id="emp_details">Staff Details</a></li>
-            <li><a class="dropdown-item" href="admin.php?page=member" id="mem_edit">Member Details</a></li>
-          </ul>
+        <li class="nav-item dropdown-container">
+            <a class="nav-link dropdown-toggle fw-semibold text-dark" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <!-- <i class="fa-solid fa-users me-2"></i>  -->
+                User Management
+            </a>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="admin.php?page=staff">Staff Details</a></li>
+                <li><a class="dropdown-item" href="admin.php?page=member">Member Details</a></li>
+            </ul>
         </li>
 
         <li class="nav-item">
-            <a class="nav-link text-dark fw-semibold" href="#" id="">Reports</a>
+            <a class="nav-link text-dark fw-semibold" href="#">
+                <!-- <i class="fa-solid fa-chart-line me-2"></i>  -->
+                Reports
+            </a>
         </li>
 
         <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle text-dark fw-semibold" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">System Settings</a>
+            <a class="nav-link dropdown-toggle text-dark fw-semibold" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <!-- <i class="fa-solid fa-gear me-2"></i>  -->
+                System Settings
+            </a>
             <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="admin.php?page=roleSettings" id="role_settings">Manage Roles</a></li>
-          </ul>
+                <li><a class="dropdown-item" href="admin.php?page=roleSettings">Manage Roles</a></li>
+            </ul>
         </li>
+
     </ul>
 </div>
 

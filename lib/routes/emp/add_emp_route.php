@@ -34,11 +34,11 @@ foreach ($requiredFields as $field) {
 //Image Upload
 $imageName = '';
 
-if (!empty($_FILES['image_sample']['name'])) {
+if (!empty($_FILES['image']['name'])) {
 
     $allowedExts = ['jpg', 'jpeg', 'png', 'gif'];
-    $originalName = $_FILES['image_sample']['name'];
-    $tmpName = $_FILES['image_sample']['tmp_name'];
+    $originalName = $_FILES['image']['name'];
+    $tmpName = $_FILES['image']['tmp_name'];
     $imageExt = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
 
     if (!in_array($imageExt, $allowedExts)) {
@@ -77,17 +77,17 @@ $data = [
     'middle_name' => sanitize_input($_POST['middle_name'] ?? ''),
     'last_name' => sanitize_input($_POST['last_name']),
     'nic' => sanitize_input($_POST['nic']),
-    'gender' => sanitize_input($_POST['gender'] ?? ''),
-    'date_of_birth' => sanitize_input($_POST['date_of_birth'] ?? ''),
+    'gender' => !empty($_POST['gender']) ? sanitize_input($_POST['gender']) : null,
+    'date_of_birth' => !empty($_POST['date_of_birth']) ? sanitize_input($_POST['date_of_birth']) : null,
     'contact_number' => sanitize_input($_POST['contact_number'] ?? ''),
     'address' => sanitize_input($_POST['address'] ?? ''),
-    'role_id' => sanitize_input($_POST['role_id'] ?? ''),
+    'role_id' => !empty($_POST['role_id']) ? (int)$_POST['role_id'] : null,
     'employement_type' => sanitize_input($_POST['employement_type'] ?? ''),
-    'date_joined' => sanitize_input($_POST['date_joined'] ?? ''),
+    'date_joined' => !empty($_POST['date_joined']) ? $_POST['date_joined'] : null,
     'staff_status' => sanitize_input($_POST['staff_status'] ?? ''),
-    'salary' => sanitize_input($_POST['salary'] ?? ''),
+    'salary' => !empty($_POST['salary']) ? $_POST['salary'] : 0,
     'email' => sanitize_input($_POST['email']),
-    'password_hash' => sanitize_input($_POST['password_hash']),
+    'password_hash' => !empty($_POST['password_hash']) ? $_POST['password_hash'] : null,
     'image' => $imageName,
     'system_role' => sanitize_input($_POST['system_role'])
 ];

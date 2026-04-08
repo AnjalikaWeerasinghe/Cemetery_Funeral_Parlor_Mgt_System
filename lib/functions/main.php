@@ -17,6 +17,10 @@ class MainController
         // $this->conn = $db->conn();
         // return $this->conn;
     }
+
+    public function getConnection() {
+        return $this->conn;
+    }
 }
 
 ?>

@@ -24,8 +24,8 @@
                     <th width="150">Actions</th>
                 </tr>
             </thead>
-            <tbody id="emp_data">
-                <!-- Load from database -->
+            <tbody id="booking_data">
+                
             </tbody>
         </table>
     </div>

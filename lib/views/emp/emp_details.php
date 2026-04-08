@@ -156,7 +156,14 @@
 
     $(document).ready(function(){
         $.get('../routes/emp/view_emp_route.php', function(data){
+
             $("#emp_data").html(data);
+
+            $(".edit").click(function(){
+                
+            })
+
+
         })
     });
 </script>

@@ -1,26 +1,10 @@
-<style>
-#preview {
-    width: 150px;
-    height: 150px;
-    border: 2px dashed #ced4da;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    border-radius: 10px;
-    background-color: #f8f9fa;
-    color: #6c757d;
-    font-size: 14px;
-}
+<div>
+    <a href="admin.php?page=funeralBookings" class="btn btn-light btn-sm bg-warning" data-bs-toggle="tooltip" data-bs-placement="top" title="Go Back to Funeral Bookings">
+        <i class="fa-solid fa-arrow-left"></i>
+    </a>
+</div>
 
-#preview img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-</style>
-
-<div class="container-fluid">
+<!-- <div class="container-fluid">
     <div class="card shadow-sm border-0">
         <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Add New Funeral Reservation</h5>
@@ -132,9 +116,9 @@
             </form>
         </div>
     </div>
-</div>
+</div> -->
 
-<script>
+<!-- <script>
     $(document).ready(function() {
         $(".service_type").change(function(){
             let service_type = $(this).val();
@@ -176,5 +160,59 @@
 
         });
         
+    });
+</script> -->
+
+<div class="container mt-4">
+
+    <div class="steps text-center mb-4">
+
+        <button class="btn btn-primary step-btn" data-step="1">
+            Deceased Information
+        </button>
+        <span>→</span>
+
+        <button class="btn btn-secondary step-btn" data-step="2">
+            Document Information
+        </button>
+        <span>→</span>
+
+        <button class="btn btn-secondary step-btn" data-step="3">
+            Cremation Information
+        </button>
+
+    </div>
+
+    <div id="bookingContent">
+
+    </div>
+
+</div>
+
+<script>
+    $(document).ready(function(){
+
+        loadStep(1);
+
+    });
+
+    function loadStep(step){
+
+        const routes = {
+        1: "funeral_booking/deceased_information.php",
+        2: "funeral_booking/document_information.php",
+        3: "funeral_booking/cremation_information.php"
+        };
+
+        $("#bookingContent").load(routes[step]);
+
+    }
+
+    $(document).on("click",".step-btn",function(){
+
+        let step = $(this).data("step");
+
+        loadStep(step);
+
     });
 </script>

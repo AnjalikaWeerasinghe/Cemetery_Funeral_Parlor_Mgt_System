@@ -11,12 +11,17 @@ class EmpController extends MainController{
     }
     
     public function insert_staff($data) {
+
+        if (!$this->conn) {
+        die("Database connection is NULL");
+        }
+
         $number = new Numbering();
         $staffCode = $number->generateUniqueNumber("staff_code", "staff_table", "CEM-STF-");
 
         $hashedPassword = password_hash($data['password_hash'], PASSWORD_DEFAULT);
 
-        $data['salary'] = !empty($data['salary']) ? $data['salary'] : 0;
+        // $data['salary'] = !empty($data['salary']) ? $data['salary'] : 0;
 
         $sql_query = "INSERT INTO staff_table (staff_code, first_name, middle_name, last_name, nic, gender, date_of_birth, 
             contact_number, address, role_id, employement_type, date_joined, staff_status, salary, email, password_hash, image, system_role)
@@ -24,13 +29,24 @@ class EmpController extends MainController{
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
         ;
 
-        $sql = $this->conn->prepare($sql_query);
+        $result = $this->conn->prepare($sql_query);
 
-        $sql->bind_param("sssssssssisssdssss",
+        if (!$result) {
+        die("Prepare failed: " . $this->conn->error);
+        }
+
+        $result->bind_param("sssssssssisssdssss",
             $staffCode, $data['first_name'], $data['middle_name'], $data['last_name'], $data['nic'], $data['gender'], $data['date_of_birth'],
             $data['contact_number'], $data['address'], $data['role_id'], $data['employement_type'], $data['date_joined'], $data['staff_status'],
             $data['salary'], $data['email'], $hashedPassword, $data['image'], $data['system_role']
         );
+
+        $success = $result->execute();
+        $result->close();
+
+        // if (!$success) {
+        //  return "error: ". $result->error;
+        // }
 
         if ($sql->execute()) {
             return "success";
@@ -38,7 +54,9 @@ class EmpController extends MainController{
             return "error";
         }
 
-        $sql->close();
+        
+
+        return "success";
     }
 
     public function view_Staff_Data() {
