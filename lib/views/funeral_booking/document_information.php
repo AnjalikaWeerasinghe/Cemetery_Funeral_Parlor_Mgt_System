@@ -22,8 +22,8 @@
 
 <div class="container-fluid">
     <div class="card shadow-sm border-0">
-        <div class="card-body" id="document_info">
-            <form id="document_info_form" autocomplete="off" enctype="multipart/form-data">
+        <div class="card-body">
+            <form id="document_info" autocomplete="off" enctype="multipart/form-data">
                 <div>
                     <h6 class="border-bottom pb-2 mb-3 text-primary">Document Information</h6>
                     <p>Please upload the soft copies of the orginal documents to confirm the death of the deceased and 
@@ -77,14 +77,16 @@
                 </div>
 
                 <div class="mb-3">
-                    <label for="cremation_permission" class="form-label pe-2">Is the body permitted for Cremation? *</label>
+                    <label class="form-label pe-2">Is the body permitted for Cremation? *</label>
+
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1">
-                        <label class="form-check-label" for="inlineCheckbox1">Yes</label>
+                        <input class="form-check-input" type="radio" name="cremation_permission" value="1" required>
+                        <label class="form-check-label">Yes</label>
                     </div>
+
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="checkbox" id="inlineCheckbox2" value="option2">
-                        <label class="form-check-label" for="inlineCheckbox2">No</label>
+                        <input class="form-check-input" type="radio" name="cremation_permission" value="0">
+                        <label class="form-check-label">No</label>
                     </div>
                 </div>
 
@@ -92,11 +94,12 @@
                     <label for="family_consent_letter" class="form-label">Family Consent Letter *</label>
                     <input type="file" name="family_consent_letter" id="family_consent_letter" class="form-control" required>
                 </div>
-            </form>
 
-            <div>
-                <button type="submit" class="btn btn-success">Next</button>
-            </div>
+                <div>
+                    <button type="submit" class="btn btn-success">Next</button>
+                </div>
+            </form>
+ 
         </div>
     </div>
 </div>

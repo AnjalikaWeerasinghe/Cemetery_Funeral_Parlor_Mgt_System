@@ -27,7 +27,7 @@ $deceasedinfo = new BookingController();
 
 $deceasedinfo->saveDeceasedInformation($_POST);
 
-$_SESSION['booking'] = [
+$_SESSION['booking']['step1'] = [
     "full_name" => $full_name,
     "nic" => $nic,
     "gender" => $gender,

@@ -22,16 +22,17 @@
 }
 
 .contact-form {
-    background: rgba(30,30,30,0.85);
-    padding: 30px;
+    background: #ffffff;
+    color: #333;
     border-radius: 15px;
-    border: 1px solid rgba(212,175,122,0.2);
+    padding: 35px;
+    border: 3px solid rgba(212,175,122,0.3);
 }
 
 .form-control {
     background: transparent;
     border: 1px solid #555;
-    color: white;
+    color: #333;
 }
 
 .form-control:focus {

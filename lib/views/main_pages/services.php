@@ -25,9 +25,10 @@ section {
     overflow: hidden;
 }
 
-.btn-gold:hover {
-    background: #d4af7a;
-    color: black;
+.btn-gold span {
+    position: relative;
+    z-index: 2;
+    color: #d4af7a;
 }
 
 .btn-gold::after {
@@ -39,16 +40,15 @@ section {
     left: 0;
     top: 0;
     transition: 0.3s;
-    z-index: 0;
+    z-index: 1;
 }
 
 .btn-gold:hover::after {
     width: 100%;
 }
 
-.btn-gold span {
-    position: relative;
-    z-index: 1;
+.btn-gold:hover span {
+    color: #1a1a1a;
 }
 
 .about-service-text {
@@ -164,6 +164,34 @@ section {
     animation: fadeUp 0.8s ease forwards;
 }
 
+#sidebar-wrapper {
+    background: none;
+    border-radius: 10px;
+    border:  none;
+    color: black;
+}
+
+#sidebar-wrapper .nav-link {
+    color: black;
+    padding: 10px;
+    transition: 0.3s;
+}
+
+#sidebar-wrapper .nav-link:hover {
+    background: rgba(212,175,122,0.2);
+    color: rgba(30,30,30,0.85);
+}
+
+.active-link {
+    background: #d4af7a;
+    color: black !important;
+    border-radius: 8px;
+}
+
+#root {
+    transition: opacity 0.3s ease;
+}
+
 @keyframes fadeUp {
     to {
         opacity: 1;
@@ -185,9 +213,9 @@ section {
             </div>
 
             <div class="col-md-6 text-end">
-                <button class="btn btn-gold">
-                    <span><i class="fa-solid fa-fire me-2"></i>Book Now</span>
-                </button>
+                <a href="index.php?page=selectbookingtype" class="btn btn-gold">
+                    <span><i class="fa-solid fa-fire me-2"></i> Book Now</span>
+                </a>
             </div>
 
         </div>  
@@ -379,12 +407,65 @@ section {
         <h2 class="fw-bold text-gold">Help & Advice</h2>
     </div>
 
-    <div class="vh-100 p-3" style="background: none;">
-        <ul class="nav flex-column gap-2">
-            <a class="nav-link" href="index.php?help_page=home">Registration of a Death Occured At Home</a>
-            <a class="nav-link" href="index.php?help_page=history">Registration of a Death Occured At General Hospital</a>
-            <a class="nav-link" href="index.php?help_page=about"></a>
-        </ul>
+    <div class="row">
+
+        <div class="col-md-5" id="sidebar-wrapper">
+            <div class="p-3">
+                <ul class="nav flex-column gap-2">
+
+                    <a href="javascript:void(0)" class="nav-link" onclick="setActive(this); loadPage('death_athome')">
+                        <i class="fa-solid fa-house me-2"></i> Registration of a Death Occurred At Home
+                    </a>
+
+                    <a href="javascript:void(0)" class="nav-link" onclick="setActive(this); loadPage('death_athospital')">
+                        <i class="fa-solid fa-hospital me-2"></i> Registration of a Death Occurred At General Hospital
+                    </a>
+
+                    <a href="javascript:void(0)" class="nav-link" onclick="setActive(this); loadPage('death_atprivatehospital')">
+                        <i class="fa-solid fa-hospital-user me-2"></i> Registration of a Death Occurred At Private Hospital
+                    </a>
+
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-md-7" id="root">
+            <div class="p-4">
+
+            </div>
+        </div>
+
     </div>
 
 </section>
+
+<script>
+
+window.onload = function() {
+    const firstLink = document.querySelector('#sidebar-wrapper .nav-link');
+    if (firstLink) {
+        firstLink.classList.add('active-link');
+    }
+    loadPage('death_athome');
+};
+
+function loadPage(page) {
+    const root = document.getElementById('root');
+
+    root.style.opacity = 0;
+
+    fetch('lib/views/main_pages/' + page + '.php')
+        .then(response => response.text())
+        .then(data => {
+            root.innerHTML = data;
+            root.style.opacity = 1;
+        });
+}
+
+function setActive(el) {
+    document.querySelectorAll('#sidebar-wrapper .nav-link')
+        .forEach(link => link.classList.remove('active-link'));
+
+    el.classList.add('active-link');
+}
+</script>

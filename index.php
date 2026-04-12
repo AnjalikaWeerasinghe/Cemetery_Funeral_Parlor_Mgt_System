@@ -1,3 +1,19 @@
+<?php
+// session_start();
+
+// if (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin') {
+//     header("Location: lib/views/admin.php");
+//     exit;
+// }
+
+include_once('lib/functions/auth.php');
+
+if(isset($_POST['login'])){
+    $auth = new Auth();
+    $auth->login($_POST['email'], $_POST['pwd']);
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,6 +23,9 @@
 
     <link rel="stylesheet" href="styles/css/bootstrap.min.css">
     <link rel="stylesheet" href="styles/css/all.min.css">
+
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="js/jquery.js"></script>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg fixed-top shadow opacity-80" style="background: linear-gradient(to right, #8b6f47, #d4af7a);">
@@ -34,8 +53,49 @@
             </div>
 
             <div class="d-flex ms-auto">
-                <a href="login.php" class="btn btn-outline-dark me-2">Login</a>
-                <a href="signup.html" class="btn btn-dark">Sign Up</a>
+
+            <?php if(isset($_SESSION['username'])): ?>
+
+                <div class="dropdown">
+                    <button type="button" class="btn btn-dark dropdown-toggle text-white" data-bs-toggle="dropdown">
+                        <i class="fa-solid fa-user me-1"></i>
+                        <?php echo $_SESSION['username']; ?>
+                    </button>
+
+                    <ul class="dropdown-menu dropdown-menu-end">
+
+                        <li>
+                            <a class="dropdown-item" href="index.php?page=profile">
+                                <i class="fa-solid fa-user me-2"></i>Profile
+                            </a>
+                        </li>
+
+                        <?php if($_SESSION['role'] === 'Admin'): ?>
+                            <li>
+                                <a class="dropdown-item" href="lib/views/admin.php">
+                                    <i class="fa-solid fa-user-gear me-2"></i>Admin Panel
+                                </a>
+                            </li>
+                        <?php endif; ?>
+
+                        <li><hr class="dropdown-divider"></li>
+
+                        <li>
+                            <a class="dropdown-item text-danger" href="lib/routes/logout.php">
+                                <i class="fa-solid fa-arrow-right-from-bracket me-2"></i>Sign out
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+
+                <?php else: ?>
+
+                    <a href="index.php?page=login" class="btn btn-outline-dark me-2">Login</a>
+                    <a href="index.php?page=signup" class="btn btn-dark">Sign Up</a>
+
+                <?php endif; ?>
+
             </div>
         </div>
     </nav>
@@ -62,6 +122,30 @@
             case 'contact':
                 include 'lib/views/main_pages/contact.php';
                 break;
+
+            case 'signup':
+                include 'signup.php';
+                break;
+
+            case 'login':
+                include 'login.php';
+                break;
+
+            case 'selectbookingtype':
+                include 'lib/views/funeral_booking/booking_mainpage.php';
+                break;
+            case 'add_cremation_booking':
+                include 'lib/views/funeral_booking/add_cremation_booking.php';
+                break;
+            case 'deceasedInfo':
+                include 'lib/views/funeral_booking/deceased_information.php';
+                break;
+            case 'docInfo':
+                include 'lib/views/funeral_booking/document_information.php';
+                break;
+            case 'cremationInfo':
+                include 'lib/views/funeral_booking/cremation_information.php';
+                break; 
 
             default:
                 include 'lib/views/main_pages/home.php';

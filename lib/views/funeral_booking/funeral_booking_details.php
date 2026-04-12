@@ -4,7 +4,7 @@
 
         <div>
             <input type="text" id="searchBookings" class="form-control d-inline-block w-auto" placeholder="Search Bookings...">
-            <a href="admin.php?page=addNewBooking" class="btn btn-primary ms-2 mb-1" id="add_booking">
+            <a href="admin.php?page=selectbookingtype" class="btn btn-primary ms-2 mb-1" id="select_booking_type">
                 <i class="fa-regular fa-calendar"></i>
                 Add New Booking
             </a>

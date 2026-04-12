@@ -29,10 +29,15 @@
                     <h6 class="border-bottom pb-2 mb-3 text-primary">Deceased Information</h6>
 
                     <div class="row">
-                        <div class="col-md-12 mb-3">
+                        <div class="col-md-8 mb-3">
                             <label for="full_name" class="form-label">Full Name *</label>
                             <input type="text" name="full_name" id="full_name" class="form-control" required>
                         </div>   
+
+                        <div class="col-md-4 mb-3">
+                            <label for="booking_code" class="form-label">Booking Code</label>
+                            <input type="text" name="booking_code" id="booking_code" class="form-control" readonly>
+                        </div>
                     </div>
 
                     <div class="row">
@@ -121,6 +126,22 @@
 </div>
 
 <script>
+    $(document).ready(function(){
+        function loadBookingCode(){
+            $("#booking_code").val("Generating..");
+
+            $.ajax({
+                url: "../routes/funeral_booking/generate_booking_code.php",
+                type: "GET",
+                success: function (response) {
+                    $("#booking_code").val(response);
+                }
+            });
+        }
+
+        loadBookingCode();
+    });
+
     $("#deceased_info").on("submit", function(e) {
         e.preventDefault();
 

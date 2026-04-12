@@ -28,16 +28,19 @@ class Auth {
                 
                 if (password_verify($userPwd, $rec['login_password'])) {
 
-                    if ($rec['user_role'] === 'Admin') {
-                        session_start();
-                        $_SESSION['username'] = $rec['user_name'];
-                        $_SESSION['user_id'] = $rec['user_id'];
-                        $_SESSION['role'] = $rec['user_role'];
+                    $_SESSION['username'] = $rec['user_name'];
+                    $_SESSION['user_id'] = $rec['user_id'];
+                    $_SESSION['role'] = $rec['user_role'];
 
+                    if ($rec['user_role'] === 'Admin') {
                         header('Location: lib/views/admin.php');
                         exit;
+
+                    } else if ($rec['user_role'] === 'Member'){
+                        header("Location: index.php?page=member");
+                        exit;
                     } else {
-                        echo "Please check your role!";
+                        echo "Invalid role!";
                     }
 
                 } else {

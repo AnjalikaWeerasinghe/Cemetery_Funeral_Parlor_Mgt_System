@@ -1,7 +1,9 @@
 <?php
 session_start();
-if(empty($_SESSION['user_id'])){
-    header('location:../../index.php');
+
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'Admin') {
+    header("Location: ../../index.php?page=login");
+    exit;
 }
 
 //include header page 
@@ -83,11 +85,36 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
                 </button>
             </form>
 
-            <form action="../routes/logout.php" method="post" class="d-flex mt-2 mb-2">
-                <button type="submit" class="btn btn-dark text-white" data-bs-toggle="tooltip" data-bs-placement="top" title="Logout">
-                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+            <div class="dropdown d-inline-block ms-2">
+                <button class="btn btn-dark text-white dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false" data-bs-placement="bottom" title="User Profile">
+                    <i class="fa-solid fa-user"></i>
+                    <?php echo $_SESSION['username']; ?>
                 </button>
-            </form>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                    <li><a class="dropdown-item" href="profile.php">
+                            <i class="fa-solid fa-user me-2"></i>profile
+                        </a>
+                    </li>
+
+                    <!-- <?php if($_SESSION['role'] === 'Admin'): ?>
+                        <li><a class="dropdown-item" href="admin.php">
+                                <i class="fa-solid fa-user-gear me-2"></i>Admin Panel
+                            </a>
+                        </li>
+                    <?php endif; ?> -->
+
+                    <li><a class="dropdown-item" href="settings.php">
+                            <i class="fa-solid fa-gear me-2"></i>Settings
+                        </a>
+                    </li>
+
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="../routes/logout.php">
+                            <i class="fa-solid fa-arrow-right-from-bracket me-2"></i>Sign out
+                        </a>
+                    </li>
+                </ul>
+            </div>
 
         </div>
     
@@ -122,8 +149,11 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
                     case 'funeralBookings':
                         include 'funeral_booking/funeral_booking_details.php';
                         break;
-                    case 'addNewBooking':
-                        include 'funeral_booking/add_booking.php';
+                    case 'selectbookingtype':
+                        include 'funeral_booking/booking_mainpage.php';
+                        break;
+                    case 'add_cremation_booking':
+                        include 'funeral_booking/add_cremation_booking.php';
                         break;
                     case 'deceasedInfo':
                         include 'funeral_booking/deceased_information.php';
