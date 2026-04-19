@@ -71,9 +71,8 @@ if (session_status() === PHP_SESSION_NONE) {
                 Funeral & Services
             </a>
             <ul class="dropdown-menu">
-                <li>
-                    <a class="dropdown-item" href="admin.php?page=funeralBookings">Funeral Bookings</a>
-                </li>
+                <li><a class="dropdown-item" href="admin.php?page=funeralBookings">Funeral Bookings</a></li>
+                <li><a class="dropdown-item" href="admin.php?page=cremationTimeSlots">Manage Cremation Time Slots</a></li>
             </ul>
         </li>
 

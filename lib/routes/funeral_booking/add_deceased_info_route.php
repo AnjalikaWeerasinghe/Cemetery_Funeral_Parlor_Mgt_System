@@ -1,6 +1,11 @@
 <?php
 require_once("../../functions/bookingController.php");
 
+// var_dump($_POST['service_type']);
+// exit;
+
+$service_type = $_POST['service_type'] ?? '';
+
 $full_name = $_POST['full_name'] ?? '';
 $nic = $_POST['nic'] ?? '';
 $gender = $_POST['gender'] ?? '';
@@ -28,6 +33,7 @@ $deceasedinfo = new BookingController();
 $deceasedinfo->saveDeceasedInformation($_POST);
 
 $_SESSION['booking']['step1'] = [
+    "service_type" => $service_type,
     "full_name" => $full_name,
     "nic" => $nic,
     "gender" => $gender,

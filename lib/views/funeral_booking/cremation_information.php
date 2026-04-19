@@ -1,3 +1,4 @@
+
 <div class="container-fluid">
     <div class="card shadow-sm border-0">
         <div class="card-body">
@@ -12,28 +13,13 @@
                                 <input type="date" name="cremation_date" id="cremation_date" class="form-control" required>
                             </div>
 
-                            <div class="mb-3">
-                                <label for="time_slot" class="form-label">Time Slot *</label>
-                                <input type="time" name="time_slot" id="time_slot" class="form-control" required>
-                            </div>
                         </div>
 
-                        <div class="col-md-7">
-                            <h6>Daily Schedule</h5>
-                            <table class="table table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th>Time Slot</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="schedule_table">
-                                    <tr>
-                                        <td colspan="2">Select a date to view schedule</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                        <label for="time_slot" class="form-label">Available Time Slots *</label>
+
+                        <div id="timeSlotsContainer" class="d-flex flex-wrap gap-2"></div>
+
+                        <input type="hidden" id="selected_slot_id">
                     </div>
 
                     <div>
@@ -78,7 +64,12 @@
     </div>
 </div>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 <script>
+    console.log("JS Loaded");
+    
     $(document).ready(function() {
         $.ajax({
             url: "../routes/funeral_booking/generate_booking_code.php",
@@ -89,19 +80,36 @@
             }
         });
 
-        $("#schedule_date").change(function(){
+        $("#cremation_date").change(function(){
 
             let selectedDate = $(this).val();
+            console.log("Selected Date:", selectedDate);
 
-            $.ajax({
-                url: "get_schedule.php",
-                method: "POST",
-                data: {date:selectedDate},
-                success:function(data){
-                    $("#schedule_table").html(data);
-                }
+            let dayOfWeek = new Date(selectedDate).toLocaleDateString('en-US', { weekday: 'long' });
+            console.log("Day:", dayOfWeek);
 
+            $.post("../routes/funeral_booking/get_time_slots_route.php", {
+                date: dayOfWeek
+            }, function(res) {
+                console.log("Response:", res);
+                $("#timeSlotsContainer").html(res);
             });
+
+        });
+
+        $(document).on("click", ".slot-card", function(){
+
+            if($(this).hasClass("bg-secondary")) return;
+
+            $(".slot-card").removeClass("border-primary");
+
+            $(this).addClass("border-primary");
+
+            let slotId = $(this).data("id");
+
+            $("#selected_slot_id").val(slotId);
+
+            console.log("Selected Slot ID:", slotId);
 
         });
     });

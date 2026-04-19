@@ -51,33 +51,37 @@
         <p class="text-muted">Choose a service to continue your booking</p>
     </div>
 
-        <div class="row" id="booking_cards">
+    <div class="row" id="booking_service_types">
 
-            <div class="col-md-4 mb-4">
-                <div class="card booking-card text-center p-4 booking-option" data-service-type="Cremation" data-page="add_cremation_booking">
-                    <i class="fa-solid fa-fire"></i>
-                    <h5>Crematorium</h5>
-                    <p>Reserve cremation services and available time slots.</p>
-                </div>
+        <div class="col-md-4 mb-4">
+            <div class="card booking-card text-center p-4" data-service-type="Cremation" data-page="add_cremation_booking">
+                <i class="fa-solid fa-fire"></i>
+                <h5>Crematorium</h5>
+                <p>Reserve cremation services and available time slots.</p>
             </div>
-
-            <div class="col-md-4 mb-4">
-                <div class="card booking-card text-center p-4 booking-option" data-service-type="Burial" data-page="burial_booking">
-                    <i class="fa-solid fa-cross"></i>
-                    <h5>Burial</h5>
-                    <p>Book burial plots and cemetery services.</p>
-                </div>
-            </div>
-
-            <div class="col-md-4 mb-4">
-                <div class="card booking-card text-center p-4 booking-option" data-service-type="Parlor" data-page="parlor_booking">
-                    <i class="fa-solid fa-building-columns"></i>
-                    <h5>Funeral Parlor</h5>
-                    <p>Reserve parlor facilities for funeral arrangements.</p>
-                </div>
-            </div>
-
         </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card booking-card text-center p-4" data-service-type="Burial" data-page="add_burial_booking">
+                <i class="fa-solid fa-cross"></i>
+                <h5>Burial</h5>
+                <p>Book burial plots and cemetery services.</p>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card booking-card text-center p-4" data-service-type="Parlor" data-page="add_parlor_booking">
+                <i class="fa-solid fa-building-columns"></i>
+                <h5>Funeral Parlor</h5>
+                <p>Reserve parlor facilities for funeral arrangements.</p>
+            </div>
+        </div>
+
+    </div>  
+
+    <div>
+
+    </div>
 
 </div>
 
@@ -85,46 +89,37 @@
 
 const userRole = "<?php echo $_SESSION['role'] ?? 'Guest'; ?>";
 
-function goToBooking(type) {
+const bookingStorageKey = "selectedBookingService";
 
+document.querySelectorAll(".booking-card").forEach(card => {
+
+    card.addEventListener("click", function () {
+
+        const serviceType = this.getAttribute("data-service-type");
+        const bookingPage = this.getAttribute("data-page");
+
+        console.log("Selected service type:", serviceType);
+
+        localStorage.setItem("selectedBookingService", serviceType);
+
+        goToBooking(bookingPage);
+    });
+});
+
+function goToBooking(type) {
     if (userRole === "Admin") {
         window.location.href = "admin.php?page=" + type;
     } else {
         window.location.href = "index.php?page=" + type;
     }
-
 }
 
-function saveServiceType(serviceType, page) {
-    $.ajax({
-        url: "lib/routes/funeral_booking/add_booking_service_type_route.php",
-        type: "POST",
-        data: { service_type: serviceType },
-        success: function(response) {
-            if (response.trim() === "success") {
-                goToBooking(page);
-            } else {
-                alert("Unable to save service type: " + response);
-            }
-        },
-        error: function(xhr) {
-            alert("Error saving service type: " + xhr.responseText);
-        }
-    });
-}
+const serviceTypePrefix = {
+    "Cremation": "CEM-CRM-",
+    "Burial": "CEM-BRL-",
+    "Parlor": "CEM-PRL-"
+};
 
-$(document).ready(function() {
-    $(".booking-option").on("click", function() {
-        const serviceType = $(this).data("service-type");
-        const page = $(this).data("page");
-
-        if (!serviceType || !page) {
-            alert("Invalid booking selection.");
-            return;
-        }
-
-        saveServiceType(serviceType, page);
-    });
-});
+const savedService = localStorage.getItem(bookingStorageKey);
 
 </script>

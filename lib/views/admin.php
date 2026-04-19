@@ -166,7 +166,11 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
                         break; 
                     case 'memorialInfo':
                         include 'funeral_booking/memorial_service_information.php';
-                        break;  
+                        break; 
+                        
+                    case 'cremationTimeSlots':
+                        include 'funeral_booking/scheduling_cremation_slots.php';
+                        break;
 
                     case 'roleSettings':
                         include 'system_settings/role_settings.php';

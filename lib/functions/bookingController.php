@@ -13,33 +13,10 @@ class BookingController extends MainController{
         } else if($service_type == "Burial") {
             $prefix = "CEM-BRL-";
         } else {
-            $prefix = "CEM-PRL";
+            $prefix = "CEM-PRL-";
         }
 
         return $number->generateUniqueNumber("booking_code", "funeral_service_table", $prefix);
-    }
-
-    public function saveServiceType($data) {
-
-        $service_type = $data['service_type'] ?? '';
-
-        if (empty($service_type)) {
-            return "Service type is required.";
-        }
-
-        $query = "INSERT INTO funeral_service_table (service_type) VALUES (?)";
-
-        $stmt = $this->conn->prepare($query);
-        if (!$stmt) {
-            return "Prepare failed: " . $this->conn->error;
-        }
-
-        $stmt->bind_param("s", $service_type);
-
-        $success = $stmt->execute();
-        $stmt->close();
-
-        return $success ? "success" : "error";
     }
 
     public function saveDeceasedInformation($data) {
@@ -82,6 +59,23 @@ class BookingController extends MainController{
         $_SESSION['booking']['step2'] = $data;
 
         return "success";
+    }
+
+    public function getSlotsByDate($date) {
+
+        $sql = "SELECT slot_id, day_of_the_week, start_time, end_time, is_active FROM schedule_slots_table WHERE day_of_the_week = ? ORDER BY start_time ASC";
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("s", $date);
+        $stmt->execute();
+
+        $result = $stmt->get_result();
+
+        $slots = [];
+        while($row = $result->fetch_assoc()){
+            $slots[] = $row;
+        }
+        return $slots;
     }
 
 }

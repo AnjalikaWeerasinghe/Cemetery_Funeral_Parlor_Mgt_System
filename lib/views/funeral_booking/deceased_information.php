@@ -26,6 +26,8 @@
         <div class="card-body">
             <form id="deceased_info" autocomplete="off" enctype="multipart/form-data">
                 <div>
+                    <input type="hidden" name="service_type" id="service_type">
+
                     <h6 class="border-bottom pb-2 mb-3 text-primary">Deceased Information</h6>
 
                     <div class="row">
@@ -127,23 +129,43 @@
 
 <script>
     $(document).ready(function(){
+
         function loadBookingCode(){
+            const serviceType = localStorage.getItem("selectedBookingService");
+
+            // console.log("DEBUG serviceType:", serviceType);
+
+            if(!serviceType){
+                alert("No service type selected. Please select a service first.");
+                return;
+            }
+
             $("#booking_code").val("Generating..");
 
             $.ajax({
                 url: "../routes/funeral_booking/generate_booking_code.php",
-                type: "GET",
+                type: "POST",
+                data: { service_type: serviceType },
                 success: function (response) {
-                    $("#booking_code").val(response);
+                    // console.log("PHP RESPONSE:", response);
+                    $("#booking_code").val(response.trim());
+
+                    // localStorage.setItem("bookingCode", response);
+                },
+                error: function (xhr) {
+                    console.log("AJAX ERROR:", xhr.responseText);
                 }
             });
         }
 
         loadBookingCode();
+
     });
 
     $("#deceased_info").on("submit", function(e) {
         e.preventDefault();
+
+        $("#service_type").val(localStorage.getItem("selectedBookingService"));
 
         var formData = new FormData(this);
 
