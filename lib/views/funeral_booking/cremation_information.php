@@ -1,95 +1,433 @@
+<?php
+    header('Content-Type: text/html; charset=UTF-8');
+?>
+
+<style>
+:root {
+    --gold-main: #c9a44c;
+    --gold-soft: #e8d9a3;
+    --gold-dark: #a8892f;
+}
+
+body {
+    background: #f4f6fb;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.card {
+    background: #ffffff;
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+    padding: 10px;
+}
+
+h6 {
+    font-weight: 600;
+    color: var(--gold-main);
+    border-left: 4px solid var(--gold-main);
+    padding-left: 12px;
+    letter-spacing: 0.4px;
+}
+
+.form-control, .form-select {
+    border-radius: 10px;
+    padding: 10px 12px;
+    border: 1px solid #e0e6ed;
+    transition: all 0.2s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 3px rgba(13,110,253,0.1);
+}
+
+.form-label {
+    font-weight: 500;
+    color: #444;
+}
+
+.slot-card {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.slot-card:hover {
+    border-color: #c9a44c;
+    color: #c9a44c;
+    background: #fffdf6;
+}
+
+.slot-selected {
+    background: linear-gradient(135deg, var(--gold-main), var(--gold-soft));
+    color: #2b2b2b;
+    border: none;
+    box-shadow: 0 6px 18px rgba(201,164,76,0.35);
+    transform: scale(1.05);
+}
+
+.slot-card.bg-secondary {
+    background: #eee !important;
+    color: #999 !important;
+    cursor: not-allowed;
+    border: 1px solid #ddd;
+}
+
+.tablet-preview {
+    width: 260px;
+    height: 180px;
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    background: linear-gradient(145deg, #f8f8f8, #eaeaea);
+    color: #333;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+    font-family: "Georgia", serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.form-control,
+.form-select,
+.slot-card,
+button {
+    transition: all 0.25s ease;
+}
+
+input[type="file"] {
+    border: 2px dashed #d0d7de;
+    background: #f9fbfd;
+    padding: 10px;
+    cursor: pointer;
+}
+
+input[type="file"]:hover {
+    border-color: #0d6efd;
+}
+
+#previewName {
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-shadow: 0 1px 1px rgba(255,255,255,0.2),
+                 0 -1px 1px rgba(0,0,0,0.6);
+}
+
+#previewMessage {
+    font-size: 14px;
+    color: #000;
+    text-shadow: 0 1px 1px rgba(255,255,255,0.1);
+}
+
+#previewIcon {
+    margin-bottom: 5px;
+}
+
+#previewImage {
+    border-radius: 4px;
+    border: 1px solid #aaa;
+    align-self: center;
+}
+
+#load_step4 {
+    background: linear-gradient(135deg, var(--gold-main), var(--gold-soft));
+    color: #2b2b2b;
+    border: none;
+    border-radius: 12px;
+    padding: 12px 28px;
+    font-weight: 600;
+    letter-spacing: 0.6px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+#load_step4::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(120deg, transparent, rgba(255,255,255,0.4), transparent);
+    transition: 0.5s;
+}
+
+#load_step4:hover::after {
+    left: 100%;
+}
+
+#load_step4:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(201,164,76,0.4);
+}
+
+#load_step4:active {
+    transform: scale(0.98);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+}
+
+#load_step4:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(201,164,76,0.3);
+}
+
+.price-card {
+    background: linear-gradient(145deg, #ffffff, #f9fafc);
+    border-radius: 16px;
+    padding: 22px;
+    border: 1px solid rgba(201,164,76,0.2);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+    position: sticky;
+    top: 20px;
+}
+
+.price-card:hover {
+    transform: translateY(-3px);
+    transition: 0.3s;
+}
+
+.price-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    font-size: 15px;
+    color: #555;
+}
+
+.price-total {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 700;
+    font-size: 20px;
+    color: var(--gold-main);
+    padding-top: 10px;
+}
+
+.price-card hr {
+    border: none;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #ddd, transparent);
+}
+
+@font-face {
+    font-family: 'Yaldevi';
+    src: url('/../../styles/webfonts/yaldevi/Yaldevi[wght].ttf') format('ttf'),
+    font-weight: normal;
+    font-style: normal;
+}
+
+</style>
 
 <div class="container-fluid">
     <div class="card shadow-sm border-0">
         <div class="card-body">
-            <form id="submit_form" autocomplete="off" enctype="multipart/form-data">
-                <div>
-                    <h6 class="border-bottom pb-2 mb-3 text-primary">Cremation Information</h6>
+            <form id="cremation_info" autocomplete="off">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="mb-4 p-3 bg-light rounded-3">
+                            <h6 class="mb-3">Cremation Information</h6>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="cremation_date" class="form-label">Date of Cremation *</label>
+                                    <input type="date" name="cremation_date" id="cremation_date" class="form-control" required>
+                                </div>
+                            </div>
 
-                    <div class="row">
-                        <div class="col-md-4 ">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="area_type" class="form-label">Area Type *</label>
+                                    <select name="area_type" id="area_type" class="form-select" required>
+                                        <option value="">Select Area</option>
+                                        <option value="municipal_limit">Municipal Limit Area</option>
+                                        <option value="outside_municipal_limit">Outside Municipal Area</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <label for="time_slot" class="form-label">Available Time Slots *</label>
+
+                            <div id="timeSlotsContainer" class="d-flex flex-wrap gap-2">
+                                
+                            </div>
+
+                            <input type="hidden" id="selected_slot_id" name="cremation_time_slot">
+                        </div>
+
+                        <div>
+                            <div class="mb-3 pe-3">
+                                <label for="ash_collection" class="form-label pe-2">Are you collecting the Ash after cremation? *</label>
+
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="cremation_permission" value="1" required>
+                                    <label class="form-check-label">Yes</label>
+                                </div>
+
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="cremation_permission" value="0">
+                                    <label class="form-check-label">No</label>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="ash_collection_method" class="form-label">Ash collection method</label>
+                                <select name="ash_collection_method" id="ash_collection_method" class="form-select">
+                                    <option value="">Select</option>
+                                    <option value="collect">Collect</option>
+                                    <option value="memorial">Memorial</option>
+                                </select>
+                            </div>
+
+                            <!-- Display only if Memorial is selected -->
+                            <div class="row mt-6">
+                                <div class="col-md-7">
+                                    <div id="memorialSection" style="display:none;" class="border rounded p-3 mt-3">
+
+                                        <div class="mb-2 p-2 bg-light rounded-3">
+                                            <h6 class="mb-3">Memorial Tablet Customization</h6>
+                                        </div>
+
+                                        <!-- <div class="mb-2">
+                                            <label for="language_type" class="form-label">Select the Language you want to appear in the memorial</label>
+                                            <select class="form-select" id="language_type">
+                                                <option value="en">English</option>
+                                                <option value="si">සිංහල</option>
+                                                <option value="ta">தமிழ்</option>
+                                            </select>
+                                        </div> -->
+
+                                        <div class="mb-2">
+                                            <label class="form-label">Name on Tablet</label>
+                                            <input type="text" class="form-control" name="memorial_name">
+                                        </div>
+
+                                        <div class="mb-2">
+                                            <label class="form-label">Message</label>
+                                            <textarea class="form-control" name="memorial_message" rows="3"></textarea>
+                                        </div>
+
+                                        <div class="mb-2">
+                                            <label class="form-label">Add a Symbol</label>
+                                            <select class="form-select" id="memorial_icon">
+                                                <option value="">None</option>
+                                                <option value="cross">Cross</option>
+                                                <option value="flower">Flower</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="mb-2">
+                                            <label class="form-label">Upload Image (Optional)</label>
+                                            <input type="file" id="memorial_image" class="form-control" accept="image/*">
+                                        </div>
+
+                                        <div class="mb-2">
+                                            <label class="form-label">Font Style</label>
+                                            <select class="form-select" name="font_style">
+                                                <option value="classic">Classic</option>
+                                                <option value="modern">Modern</option>
+                                                <option value="elegant">Elegant</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="mb-2">
+                                            <label class="form-label">Theme</label>
+                                            <select id="tablet_theme" class="form-select">
+                                                <option value="dark">Granite</option>
+                                                <option value="light">Marble</option>
+                                                <option value="gold">Gold</option>
+                                            </select>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <!-- Preview of Memorial  -->
+                                <div class="col-md-4 text-center mt-6">
+                                    <div id="previewWrapper" class="mt-4" style="display:none;">
+                                        <div class="m-4 p-3 bg-light rounded-3">
+                                            <h6 class="mb-3">Live Preview</h6>
+                                        </div>
+
+                                        <div id="memorialPreview" class="tablet-preview mx-auto text-center p-4">
+                                            <div id="previewIcon" style="font-size:24px;" class="text-center"></div>
+                                            <img id="previewImage" style="max-width:60px; display:none; margin-bottom:5px;" />
+                                            <h5 id="previewName">Name</h5>
+                                            <p id="previewMessage">Your message will appear here</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+
+                        <div class="row">
                             <div class="mb-3">
-                                <label for="cremation_date" class="form-label">Date of Cremation *</label>
-                                <input type="date" name="cremation_date" id="cremation_date" class="form-control" required>
-                            </div>
-
-                        </div>
-
-                        <label for="time_slot" class="form-label">Available Time Slots *</label>
-
-                        <div id="timeSlotsContainer" class="d-flex flex-wrap gap-2"></div>
-
-                        <input type="hidden" id="selected_slot_id">
-                    </div>
-
-                    <div>
-                        <div class="mb-3 pe-3">
-                            <label for="ash_collection" class="form-label pe-2">Are you collecting the Ash after cremation? *</label>
-
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="cremation_permission" value="1" required>
-                                <label class="form-check-label">Yes</label>
-                            </div>
-
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="cremation_permission" value="0">
-                                <label class="form-check-label">No</label>
+                                <label for="notes" class="form-label">Notes</label>
+                                <textarea name="notes" id="notes" rows="4" class="form-control"></textarea>
                             </div>
                         </div>
-
-                        <div class="col-md-3 mb-3">
-                            <label for="ash_collection_method" class="form-label">Ash collection method</label>
-                            <select name="ash_collection_method" id="ash_collection_method" class="form-select">
-                                <option value="">Select</option>
-                                <option value="">Collect</option>
-                                <option value="">Memorial</option>
-                            </select>
-                        </div>
+    
                     </div>
 
-                    <div class="row">
-                        <div class="mb-3">
-                            <label for="notes" class="form-label">Notes</label>
-                            <textarea name="notes" id="notes" rows="4" class="form-control"></textarea>
+                    <div class="col-md-4">
+                        <div class="price-card">
+                            <div class="mb-4 p-3 bg-light rounded-3">
+                                <h6 class="mb-3">Payment Summary</h6>
+                            </div>
+
+                            <div class="price-row">
+                                <span>Cremation Fee</span>
+                                <span id="price_cremation">LKR 0</span>
+                            </div>
+
+                            <div class="price-row">
+                                <span>Memorial Fee</span>
+                                <span id="price_memorial">LKR 0</span>
+                            </div>
+
+                            <hr>
+
+                            <div class="price-total">
+                                <span>Total</span>
+                                <span id="price_total">LKR 0</span>
+                            </div>
                         </div>
                     </div>
- 
+                </div>
+
+                <div class="text-end mt-3">
+                    <button type="submit" id="load_step4">Proceed to Confirmation Page</button>
                 </div>
             </form>
 
-            <div>
-                <button type="submit" class="btn btn-success">Next</button>
-            </div>
         </div>
     </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-
 <script>
-    console.log("JS Loaded");
+    // console.log("JS Loaded");
     
     $(document).ready(function() {
-        $.ajax({
-            url: "../routes/funeral_booking/generate_booking_code.php",
-            type: "POST",
-            data: {service_type: service_type},
-            success:function(response){
-                $("#booking_code").val(response);
-            }
-        });
+        updatePrice();
 
         $("#cremation_date").change(function(){
 
             let selectedDate = $(this).val();
             console.log("Selected Date:", selectedDate);
 
-            let dayOfWeek = new Date(selectedDate).toLocaleDateString('en-US', { weekday: 'long' });
-            console.log("Day:", dayOfWeek);
+            // let dayOfWeek = new Date(selectedDate).toLocaleDateString('en-US', { weekday: 'long' });
+            // console.log("Day:", dayOfWeek);
 
             $.post("../routes/funeral_booking/get_time_slots_route.php", {
-                date: dayOfWeek
+                date: selectedDate
             }, function(res) {
                 console.log("Response:", res);
                 $("#timeSlotsContainer").html(res);
@@ -101,16 +439,262 @@
 
             if($(this).hasClass("bg-secondary")) return;
 
-            $(".slot-card").removeClass("border-primary");
+            $(".slot-card").removeClass("slot-selected");
 
-            $(this).addClass("border-primary");
+            $(this).addClass("slot-selected");
 
             let slotId = $(this).data("id");
+            let slotText = $(this).data("text");
 
-            $("#selected_slot_id").val(slotId);
+            console.log("Slot:", slotId, slotText);
 
-            console.log("Selected Slot ID:", slotId);
+            // $("#selected_slot_id").val(slotId);
+
+            sessionStorage.setItem("selected_slot_id", slotId);
+            sessionStorage.setItem("slot_text", slotText);
+
+            // console.log("Selected Slot ID:", slotId);
 
         });
+
+        $("#cremation_info").on("submit", function(e) {
+            e.preventDefault();
+
+            updatePrice();
+
+            let designData = null;
+
+            if($("#ash_collection_method").val() === "memorial"){
+                designData = {
+                    name: $("input[name='memorial_name']").val(),
+                    message: $("textarea[name='memorial_message']").val(),
+                    font: $("select[name='font_style']").val(),
+                    theme: $("#tablet_theme").val(),
+                    icon: $("#memorial_icon").val(),
+                    hasImage: $("#memorial_image")[0].files.length > 0
+                };
+            }
+
+            var formData = new FormData(this);
+
+            if(designData){
+                formData.append("memorial_design", JSON.stringify(designData));
+            }
+
+            $.ajax({
+                url: "../routes/funeral_booking/add_cremation_info_route.php",
+                method: "POST",
+                data : formData,
+                processData: false,
+                contentType: false,
+
+                success:function(response){
+                    // console.log("Response:", response);
+
+                    response = response.trim();
+
+                    if(response === "success"){
+
+                        sessionStorage.setItem("cremation_date", $("#cremation_date").val());
+
+                        sessionStorage.setItem("area_type", $("#area_type option:selected").text()); 
+                        
+                        sessionStorage.setItem("selected_slot_id", $("#selected_slot_id").val());
+
+                        sessionStorage.setItem("cremation_permission", $("#ash_collection_method").val());
+
+                        sessionStorage.setItem("memorial_name", $("input[name='memorial_name']").val());
+                        sessionStorage.setItem("memorial_message", $("textarea[name='memorial_message']").val());
+                        sessionStorage.setItem("memorial_icon", $("#memorial_icon").val());
+                        sessionStorage.setItem("memorial_image", $("#memorial_image").val());
+                        sessionStorage.setItem("font_style", $("select[name='font_style']").val());
+                        sessionStorage.setItem("tablet_theme", $("#tablet_theme").val());
+                        
+                        sessionStorage.setItem("notes", $("#notes").val());
+
+                        $("#bookingContent").load("funeral_booking/confirmation.php");
+
+                    } else {
+
+                        alert(response);
+                    }
+                }
+            });
+        });
+
+        $("#ash_collection_method").change(function(){
+
+            let value = $(this).val();
+
+            if(value === "memorial"){
+                $("#memorialSection").slideDown().find("input, textarea, select").prop("disabled", false);
+                $("#previewWrapper").fadeIn();
+            } else {
+                $("#memorialSection").slideUp().find("input, textarea, select").prop("disabled", true);
+                $("#previewWrapper").fadeOut();
+            }
+
+        });
+
+        let selectedLang = "en";
+
+        $(document).on("change", "#language_type", function(){
+
+            selectedLang = $(this).val();
+
+            if(selectedLang === "en"){
+                $("#memorialPreview").css("font-family", "Georgia, serif");
+            }
+            else if(selectedLang === "si"){
+                $("#memorialPreview").css("font-family", "'Yaldevi', serif");
+            }
+            else if(selectedLang === "ta"){
+                $("#memorialPreview").css("font-family", "'Yaldevi', serif");
+            }
+        });
+
+        function updatePreviewText(){
+
+            let name = $("input[name='memorial_name']").val();
+            let msg = $("textarea[name='memorial_message']").val();
+
+            $("#previewName").text(name || "Name");
+            $("#previewMessage").text(msg || "Your message will appear here");
+        }
+
+        // $(document).on("input", "input[name='memorial_name']", function(){
+        //     let name = $(this).val();
+        //     $("#previewName").text(name || "Name");
+        // });
+
+        // $(document).on("input", "textarea[name='memorial_message']", function(){
+        //     let msg = $(this).val();
+        //     $("#previewMessage").text(msg || "Your message will appear here");
+        // });
+
+        $(document).on("input", "input[name='memorial_name']", function(){
+            updatePreviewText();
+        });
+
+        $(document).on("input", "textarea[name='memorial_message']", function(){
+            updatePreviewText();
+        });
+
+        $(document).on("change", "select[name='font_style']", function(){
+
+            let font = $(this).val();
+
+            if(font === "classic"){
+                $("#memorialPreview").css("font-family", "Georgia, serif");
+            }
+            else if(font === "modern"){
+                $("#memorialPreview").css("font-family", "Arial, sans-serif");
+            }
+            else if(font === "elegant"){
+                $("#memorialPreview").css("font-family", "Times New Roman, serif");
+            }
+
+        });
+
+        $("#tablet_theme").change(function(){
+
+            let theme = $(this).val();
+
+            if(theme === "dark"){
+                $("#memorialPreview").css({
+                    background: "linear-gradient(145deg, #2b2b2b, #1a1a1a)",
+                    color: "#eaeaea"
+                });
+            }
+            else if(theme === "light"){
+                $("#memorialPreview").css({
+                    background: "linear-gradient(145deg, #f8f8f8, #e5e5e5)",
+                    color: "#222"
+                });
+            }
+            else if(theme === "gold"){
+                $("#memorialPreview").css({
+                    background: "linear-gradient(145deg, #b8962e, #e6c65c)",
+                    color: "#2b2b2b"
+                });
+            }
+
+        });
+
+        $("#memorial_icon").change(function(){
+
+            let icon = $(this).val();
+
+            if(icon === "cross"){
+                $("#previewIcon").text("✝");
+            }
+            else if(icon === "flower"){
+                $("#previewIcon").text("🌸");
+            }
+            else{
+                $("#previewIcon").text("");
+            }
+
+        });
+
+        $("#memorial_image").change(function(e){
+
+            let file = e.target.files[0];
+
+            if(file){
+                let reader = new FileReader();
+
+                reader.onload = function(event){
+                    $("#previewImage")
+                        .attr("src", event.target.result)
+                        .show();
+                };
+
+                reader.readAsDataURL(file);
+            }
+
+        });
+
+        // Create the table to get the real pricings for services
+        const pricing = {
+            municipal_limit: 5000,
+            outside_municipal_limit: 8000,
+            memorial: 2000
+        };
+
+        function updatePrice(){
+
+            let areaType = $("#area_type").val();
+            let memorialType = $("#ash_collection_method").val();
+
+            let cremationPrice = 0;
+            let memorialPrice = 0;
+
+            if(areaType){
+                cremationPrice = pricing[areaType] || 0;
+            }
+
+            if(memorialType === "memorial"){
+                memorialPrice = pricing.memorial;
+            }
+
+            let total = cremationPrice + memorialPrice;
+
+            $("#price_cremation").text("LKR " + cremationPrice);
+            $("#price_memorial").text("LKR " + memorialPrice);
+            $("#price_total").text("LKR " + total);
+
+            sessionStorage.setItem("total_amount", total);
+        }
+
+        $("#area_type").change(function(){
+            updatePrice();
+        });
+
+        $("#ash_collection_method").change(function(){
+            updatePrice();
+        });
+
     });
+
 </script>

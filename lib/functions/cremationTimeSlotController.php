@@ -13,11 +13,21 @@ class CremationTimeSlotController extends MainController {
         return $this->conn->query($sql);
     }
 
-    public function addSlot($day, $start, $end) {
+    public function addSlot($day, $slottype, $start, $end) {
+
+        if(empty($day) || empty($slottype) || empty($start) || empty($end)) {
+            return "All fields are required.";
+        }
+
+        $start = date("H:i:s", strtotime($start));
+        $end   = date("H:i:s", strtotime($end));
+
+        if(strtotime($start) >= strtotime($end)){
+            return "End time must be after start time!";
+        }
 
         $check = $this->conn->query("
-            SELECT * FROM schedule_slots_table
-            WHERE day_of_the_week='$day'
+            SELECT * FROM schedule_slots_table WHERE day_of_the_week='$day'
             AND (
                 ('$start' BETWEEN start_time AND end_time)
                 OR ('$end' BETWEEN start_time AND end_time)
@@ -25,14 +35,22 @@ class CremationTimeSlotController extends MainController {
             )
         ");
 
+        if(!$check){
+            return "Check Error: " . $this->conn->error;
+        }
+
         if($check->num_rows > 0){
             return "Time slot overlaps!";
         }
 
-        $this->conn->query("
-            INSERT INTO schedule_slots_table (day_of_the_week, start_time, end_time)
-            VALUES ('$day', '$start', '$end')
+        $insert = $this->conn->query("
+            INSERT INTO schedule_slots_table (day_of_the_week, slot_type, start_time, end_time, is_active)
+            VALUES ('$day', '$slottype', '$start', '$end', 1)
         ");
+
+        if(!$insert){
+            return "Insert Error: " . $this->conn->error;
+        }
 
         return "Slot added successfully";
     }

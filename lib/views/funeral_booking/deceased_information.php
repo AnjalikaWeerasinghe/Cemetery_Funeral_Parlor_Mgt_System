@@ -1,16 +1,113 @@
 <style>
+:root {
+    --gold-main: #c9a44c;
+    --gold-soft: #e8d9a3;
+    --gold-dark: #a8892f;
+}
+
+body {
+    background: #f4f6fb;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.card {
+    background: #ffffff;
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+    padding: 10px;
+}
+
+h6 {
+    font-weight: 600;
+    color: var(--gold-main);
+    border-left: 4px solid var(--gold-main);
+    padding-left: 12px;
+    letter-spacing: 0.4px;
+}
+
+.form-control, .form-select {
+    border-radius: 10px;
+    padding: 10px 12px;
+    border: 1px solid #e0e6ed;
+    transition: all 0.2s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 3px rgba(13,110,253,0.1);
+}
+
+.form-label {
+    font-weight: 500;
+    color: #444;
+}
+
+.form-control,
+.form-select, 
+button {
+    transition: all 0.25s ease;
+}
+
+#load_step2 {
+    background: linear-gradient(135deg, var(--gold-main), var(--gold-soft));
+    color: #2b2b2b;
+    border: none;
+    border-radius: 12px;
+    padding: 12px 28px;
+    font-weight: 600;
+    letter-spacing: 0.6px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+#load_step2::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(120deg, transparent, rgba(255,255,255,0.4), transparent);
+    transition: 0.5s;
+}
+
+#load_step2:hover::after {
+    left: 100%;
+}
+
+#load_step2:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(201,164,76,0.4);
+}
+
+#load_step2:active {
+    transform: scale(0.98);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+}
+
+#load_step2:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(201,164,76,0.3);
+}
+
 #preview {
     width: 150px;
     height: 150px;
-    border: 2px dashed #ced4da;
+    border: 2px dashed #d0d7de;
+    border-radius: 12px;
+    background: #f9fbfd;
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: hidden;
-    border-radius: 10px;
-    background-color: #f8f9fa;
     color: #6c757d;
-    font-size: 14px;
+    font-size: 13px;
+    transition: 0.3s;
+}
+
+#preview:hover {
+    border-color: #0d6efd;
 }
 
 #preview img {
@@ -18,6 +115,7 @@
     height: 100%;
     object-fit: cover;
 }
+
 </style>
 
 <div class="container-fluid">
@@ -28,7 +126,9 @@
                 <div>
                     <input type="hidden" name="service_type" id="service_type">
 
-                    <h6 class="border-bottom pb-2 mb-3 text-primary">Deceased Information</h6>
+                    <div class="mb-4 p-3 bg-light rounded-3">
+                        <h6 class="mb-3">Deceased Information</h6>
+                    </div>
 
                     <div class="row">
                         <div class="col-md-8 mb-3">
@@ -80,7 +180,9 @@
                         </div>
                     </div>
 
-                    <h6 class="border-bottom pb-2 mb-3 text-primary">Applicant Information</h6>
+                    <div class="mb-4 p-3 bg-light rounded-3">
+                        <h6 class="mb-3">Applicant Information</h6>
+                    </div>
 
                     <div class="row">
                         <div class="col-md-8 mb-3">
@@ -118,8 +220,8 @@
 
                 </div>
 
-                <div>
-                    <button type="submit" id="load_step2" class="btn btn-success">Next</button>
+                <div class="text-end mt-3">
+                    <button type="submit" id="load_step2">Proceed to Next Page</button>
                 </div>
             </form>
 
@@ -160,36 +262,53 @@
 
         loadBookingCode();
 
-    });
+        $("#deceased_info").on("submit", function(e) {
+            e.preventDefault();
 
-    $("#deceased_info").on("submit", function(e) {
-        e.preventDefault();
+            $("#service_type").val(localStorage.getItem("selectedBookingService"));
 
-        $("#service_type").val(localStorage.getItem("selectedBookingService"));
+            var formData = new FormData(this);
 
-        var formData = new FormData(this);
+            $.ajax({
+                url: "../routes/funeral_booking/add_deceased_info_route.php",
+                method: "POST",
+                data : formData,
+                processData: false,
+                contentType: false,
 
-        $.ajax({
-            url: "../routes/funeral_booking/add_deceased_info_route.php",
-            method: "POST",
-            data : formData,
-            processData: false,
-            contentType: false,
+                success:function(response){
+                    console.log("Response:", response);
 
-            success:function(response){
-                console.log("Response:", response);
+                    response = response.trim();
 
-                response = response.trim();
+                    if(response === "success"){
 
-                if(response === "success"){
-                    
-                    $("#bookingContent").load("funeral_booking/document_information.php");
+                        sessionStorage.setItem("full_name", $("#full_name").val());
+                        sessionStorage.setItem("booking_code", $("#booking_code").val());
+                        sessionStorage.setItem("nic", $("#nic").val());
+                        sessionStorage.setItem("gender", $("#gender").val());
+                        sessionStorage.setItem("date_of_birth", $("#date_of_birth").val());
+                        sessionStorage.setItem("deceased_address", $("#deceased_address").val());
+                        sessionStorage.setItem("deceased_gn_division", $("#deceased_gn_division").val());
+                        sessionStorage.setItem("municipal_council", $("#municipal_council").val());
 
-                } else {
+                        sessionStorage.setItem("applicant_name", $("#applicant_name").val());
+                        sessionStorage.setItem("relationship_to_deceased", $("#relationship_to_deceased").val());
+                        sessionStorage.setItem("contact_number", $("#contact_number").val());
+                        sessionStorage.setItem("email", $("#email").val());
+                        sessionStorage.setItem("applicant_gn_division", $("#applicant_gn_division").val());
+                        sessionStorage.setItem("applicant_address", $("#applicant_address").val());
+                        
+                        $("#bookingContent").load("funeral_booking/document_information.php");
 
-                    alert(response);
+                    } else {
+
+                        alert(response);
+                    }
                 }
-            }
+            });
         });
+
     });
+ 
 </script>

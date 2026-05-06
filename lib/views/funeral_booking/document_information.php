@@ -1,4 +1,119 @@
 <style>
+:root {
+    --gold-main: #c9a44c;
+    --gold-soft: #e8d9a3;
+    --gold-dark: #a8892f;
+}
+
+body {
+    background: #f4f6fb;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.card {
+    background: #ffffff;
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+    padding: 10px;
+}
+
+h6 {
+    font-weight: 600;
+    color: var(--gold-main);
+    border-left: 4px solid var(--gold-main);
+    padding-left: 12px;
+    letter-spacing: 0.4px;
+}
+
+.form-control {
+    border-radius: 10px;
+    padding: 10px 12px;
+    border: 1px solid #e0e6ed;
+    transition: all 0.2s ease;
+}
+
+.form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 3px rgba(13,110,253,0.1);
+}
+
+.form-label {
+    font-weight: 500;
+    color: #444;
+}
+
+.form-control,
+button {
+    transition: all 0.25s ease;
+}
+
+input[type="file"] {
+    border: 2px dashed #d0d7de;
+    background: #f9fbfd;
+    padding: 10px;
+    cursor: pointer;
+}
+
+input[type="file"]:hover {
+    border-color: #0d6efd;
+}
+
+.form-check-input:checked {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.section-box {
+    background: #f8fafc;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+}
+
+#load_step3 {
+    background: linear-gradient(135deg, var(--gold-main), var(--gold-soft));
+    color: #2b2b2b;
+    border: none;
+    border-radius: 12px;
+    padding: 12px 28px;
+    font-weight: 600;
+    letter-spacing: 0.6px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+#load_step3::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(120deg, transparent, rgba(255,255,255,0.4), transparent);
+    transition: 0.5s;
+}
+
+#load_step3:hover::after {
+    left: 100%;
+}
+
+#load_step3:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(201,164,76,0.4);
+}
+
+#load_step3:active {
+    transform: scale(0.98);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+}
+
+#load_step3:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(201,164,76,0.3);
+}
+
 #preview {
     width: 150px;
     height: 150px;
@@ -24,9 +139,9 @@
     <div class="card shadow-sm border-0">
         <div class="card-body">
             <form id="document_info" autocomplete="off" enctype="multipart/form-data">
-                <div>
-                    <h6 class="border-bottom pb-2 mb-3 text-primary">Document Information</h6>
-                    <p>Please upload the soft copies of the orginal documents to confirm the death of the deceased and 
+                <div class="section-box">
+                    <h6 class="mb-3">Document Information</h6>
+                    <p class="text-muted">Please upload the soft copies of the orginal documents to confirm the death of the deceased and 
                     to continue the funeral reservation process.</p>
                 </div>
 
@@ -57,6 +172,7 @@
                 <div class="mb-3">
                     <label for="death_certificate" class="form-label">Death Certificate *</label>
                     <input type="file" name="death_certificate" id="death_certificate" class="form-control" required>
+                    <small class="text-muted">Upload PDF or Image (Max 2MB)</small>
                 </div>
 
                 <div class="row">
@@ -74,29 +190,34 @@
                 <div class="mb-3">
                     <label for="coroner_certificate" class="form-label">Inquirer's Certificate of Death</label>
                     <input type="file" name="coroner_certificate" id="coroner_certificate" class="form-control">
+                    <small class="text-muted">Upload PDF or Image (Max 2MB)</small>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label pe-2">Is the body permitted for Cremation? *</label>
 
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="cremation_permission" value="1" required>
-                        <label class="form-check-label">Yes</label>
-                    </div>
+                    <div class="d-flex gap-4 mt-2">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="cremation_permission" value="1" required>
+                            <label class="form-check-label">Yes</label>
+                        </div>
 
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="cremation_permission" value="0">
-                        <label class="form-check-label">No</label>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="cremation_permission" value="0">
+                            <label class="form-check-label">No</label>
+                        </div>
                     </div>
+                    
                 </div>
 
                 <div class="mb-3">
                     <label for="family_consent_letter" class="form-label">Family Consent Letter *</label>
                     <input type="file" name="family_consent_letter" id="family_consent_letter" class="form-control" required>
+                    <small class="text-muted">Upload PDF or Image (Max 2MB)</small>
                 </div>
 
-                <div>
-                    <button type="submit" class="btn btn-success">Next</button>
+                <div class="text-end mt-3">
+                    <button type="submit" class="btn btn-success" id="load_step3">Proceed to Next Page</button>
                 </div>
             </form>
  
@@ -105,6 +226,7 @@
 </div>
 
 <script>
+$(document).ready(function(){
     $("#document_info").on("submit", function(e) {
         e.preventDefault();
 
@@ -123,7 +245,20 @@
                 response = response.trim();
 
                 if(response === "success"){
+
+                    sessionStorage.setItem("death_certificate_number", $("#death_certificate_number").val());
+                    sessionStorage.setItem("registrar_name", $("#registrar_name").val());
+                    sessionStorage.setItem("date_of_death", $("#date_of_death").val());
+                    sessionStorage.setItem("cause_of_death", $("#cause_of_death").val());
+                    sessionStorage.setItem("death_certificate", $("#death_certificate").val());
+
+                    sessionStorage.setItem("coroner_name", $("#coroner_name").val());
+                    sessionStorage.setItem("coroner_decision", $("#coroner_decision").val());
+                    sessionStorage.setItem("coroner_certificate", $("#coroner_certificate").val());
                     
+                    sessionStorage.setItem("cremation_permission", $('input[name="cremation_permission"]:checked').val());
+                    sessionStorage.setItem("family_consent_letter", $("#family_consent_letter").val());
+
                     $("#bookingContent").load("funeral_booking/cremation_information.php");
 
                 } else {
@@ -133,4 +268,6 @@
             }
         });
     });
+});
+    
 </script>

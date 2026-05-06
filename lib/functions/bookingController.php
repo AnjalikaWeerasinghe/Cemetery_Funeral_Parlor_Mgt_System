@@ -63,10 +63,35 @@ class BookingController extends MainController{
 
     public function getSlotsByDate($date) {
 
-        $sql = "SELECT slot_id, day_of_the_week, start_time, end_time, is_active FROM schedule_slots_table WHERE day_of_the_week = ? ORDER BY start_time ASC";
+        $day = date('l', strtotime($date)); // Days of Week: Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday
+
+        $sql = "SELECT s.*, CASE WHEN b.schedule_slots_table_slot_id IS NOT NULL THEN 1 ELSE 0 END AS is_booked FROM schedule_slots_table s 
+                LEFT JOIN cremation_table b ON s.slot_id = b.schedule_slots_table_slot_id AND b.cremation_date = ? WHERE s.day_of_the_week = ? 
+                ORDER BY s.start_time ASC";
+
+    //     $sql = "
+    //     SELECT 
+    //         s.slot_id,
+    //         s.start_time,
+    //         s.end_time,
+    //         s.is_active,
+    //         s.slot_type,
+    //         IF(b.schedule_slots_table_slot_id IS NOT NULL, 1, 0) AS is_booked
+    //     FROM schedule_slots_table s
+    //     LEFT JOIN cremation_table b 
+    //         ON s.slot_id = b.schedule_slots_table_slot_id 
+    //         AND b.cremation_date = ?
+    //     WHERE s.day_of_the_week = ?
+    //     ORDER BY s.start_time ASC
+    // ";
 
         $stmt = $this->conn->prepare($sql);
-        $stmt->bind_param("s", $date);
+
+        if(!$stmt){
+            die("SQL ERROR: " . $this->conn->error);
+        }
+
+        $stmt->bind_param("ss", $date, $day);
         $stmt->execute();
 
         $result = $stmt->get_result();
@@ -76,6 +101,55 @@ class BookingController extends MainController{
             $slots[] = $row;
         }
         return $slots;
+    }
+
+    public function saveCremationInformation($data) {
+
+        $cremation_date = $data['cremation_date'] ?? '';
+        $area_type = $data['area_type'] ?? '';
+        $cremation_time_slot = $data['cremation_time_slot'] ?? '';
+        $cremation_permission = $data['cremation_permission'] ?? '';
+        $ash_collection_method = $data['ash_collection_method'] ?? '';
+        $notes = $data['notes'] ?? '';
+
+        $memorial_design = $data['memorial_design'] ?? null;
+        $memorial_image = $data['memorial_image'] ?? null;
+
+        if (empty($cremation_date) || empty($area_type) || empty($cremation_time_slot) || $cremation_permission === '') {
+            return "Please fill the required fields.";
+        }
+
+        if ($ash_collection_method === "memorial") {
+
+            if (empty($memorial_design)) {
+                return "Memorial design is required.";
+            }
+
+            $decodedDesign = json_decode($memorial_design, true);
+
+            if (!$decodedDesign) {
+                return "Invalid memorial design data.";
+            }
+        }
+
+        $_SESSION['booking']['step3'] = [
+            "cremation" => [
+                "date" => $cremation_date,
+                "area_type" => $area_type,
+                "time_slot" => $cremation_time_slot,
+                "permission" => $cremation_permission,
+                "notes" => $notes
+            ],
+
+            "memorial" => ($ash_collection_method === "memorial") ? [
+                "design" => $memorial_design,
+                "image" => $memorial_image
+            ] : null,
+
+            "ash_collection_method" => $ash_collection_method
+        ];
+
+        return "success";
     }
 
 }

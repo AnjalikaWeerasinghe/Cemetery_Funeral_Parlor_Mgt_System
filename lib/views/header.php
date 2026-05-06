@@ -6,6 +6,8 @@
     <link rel="stylesheet" href="../../styles/css/all.min.css">
     <link rel="stylesheet" href="../../styles/css/datatables.min.css">
 
+    <link rel="stylesheet" href="../../styles/webfonts/yaldevi/Yaldevi[wght].ttf">
+
     <script src="../../js/jquery.js"></script>
     <script src="../../js/bootstrap.bundle.min.js"></script>
     <script src="../../js/datatables.min.js"></script>

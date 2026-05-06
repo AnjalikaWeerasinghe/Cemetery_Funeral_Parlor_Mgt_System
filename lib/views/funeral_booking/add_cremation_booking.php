@@ -1,11 +1,94 @@
 <style>
-
-.guest-view {
-    margin-top: 110px;
+body {
+    background: #f5f7fb;
+    font-family: 'Segoe UI', sans-serif;
 }
 
-.admin-view {
-    margin-top: 0;
+.container {
+    max-width: 1100px;
+}
+
+.back-container {
+    position: absolute;
+    left: 20px;
+}
+
+.guest-view { margin-top: 110px; }
+.admin-view { margin-top: 20px; }
+
+.booking-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+
+h3 {
+    color: #222;
+    font-weight: 600;
+}
+
+h3::after {
+    content: "";
+    display: block;
+    width: 50px;
+    height: 3px;
+    background: #c9a44c;
+    margin: 8px auto 0;
+    border-radius: 2px;
+}
+
+.steps {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.step-btn {
+    border-radius: 50px;
+    padding: 10px 18px;
+    font-size: 13px;
+    border: 1px solid #ddd;
+    background: #f8f9fa;
+    color: #555;
+    transition: all 0.3s ease;
+}
+
+.step-btn.active {
+    background: linear-gradient(135deg, #c9a44c, #f4d03f);
+    color: #000;
+    border: none;
+    box-shadow: 0 4px 12px rgba(201,164,76,0.3);
+}
+
+.step-btn.completed {
+    background: #fff;
+    color: #c9a44c;
+    border: 1px solid #c9a44c;
+}
+
+.step-btn:hover {
+    border-color: #c9a44c;
+    color: #c9a44c;
+}
+
+.steps span {
+    color: #ccc;
+}
+
+#bookingContent {
+    min-height: 300px;
+    padding-top: 10px;
+}
+
+#bookingContent {
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 </style>
@@ -14,34 +97,48 @@
 $isAdmin = (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin');
 ?>
 
-<div class="back-container <?php echo $isAdmin ? 'admin-view' : 'guest-view'; ?>">
+<!-- <div class="back-container <?php echo $isAdmin ? 'admin-view' : 'guest-view'; ?>">
     <a href="" id="backBtn" class="btn btn-warning btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Go Back to Funeral Bookings">
         <i class="fa-solid fa-arrow-left"></i>
     </a>
-</div>
+</div> -->
 
 <div class="container mt-4">
+    <div class="booking-card">
 
-    <div class="steps text-center mb-4">
+        <h3 class="text-center mb-4">Crematorium Reservation</h3>
 
-        <button class="btn btn-primary step-btn" data-step="1">
-            Deceased Information
-        </button>
-        <span>→</span>
+        <div class="steps text-center mb-4">
 
-        <button class="btn btn-secondary step-btn" data-step="2">
-            Document Information
-        </button>
-        <span>→</span>
+            <button class="btn step-btn" data-step="1">
+                Deceased Information
+            </button>
+            <span>→</span>
 
-        <button class="btn btn-secondary step-btn" data-step="3">
-            Cremation Information
-        </button>
+            <button class="btn step-btn" data-step="2">
+                Document Information
+            </button>
+            <span>→</span>
 
-    </div>
+            <button class="btn step-btn" data-step="3">
+                Cremation Information
+            </button>
+            <span>→</span>
 
-    <div id="bookingContent">
+            <button class="btn step-btn" data-step="4">
+                Confirma the Reservation
+            </button>
+            <span>→</span>
 
+            <button class="btn step-btn" data-step="5">
+                Payment Information
+            </button>
+
+        </div>
+
+        <div id="bookingContent">
+
+        </div>
     </div>
 
 </div>
@@ -60,15 +157,34 @@ $isAdmin = (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin');
         ? '../views/' 
         : 'lib/views/'; ?>";
 
+    function setActiveStep(step) {
+
+        $(".step-btn").removeClass("active completed");
+
+        $(".step-btn").each(function () {
+            let btnStep = $(this).data("step");
+
+            if (btnStep < step) {
+                $(this).addClass("completed");
+            } else if (btnStep == step) {
+                $(this).addClass("active");
+            }
+        });
+    }
+
     function loadStep(step){
 
         const routes = {
             1: baseRoute + "funeral_booking/deceased_information.php",
             2: baseRoute + "funeral_booking/document_information.php",
-            3: baseRoute + "funeral_booking/cremation_information.php"
+            3: baseRoute + "funeral_booking/cremation_information.php",
+            4: baseRoute + "funeral_booking/confirmation.php",
+            5: baseRoute + "funeral_booking/booking_payment.php"
         };
 
         $("#bookingContent").load(routes[step]);
+
+        setActiveStep(step);
     }
 
     $(document).on("click",".step-btn",function(){
