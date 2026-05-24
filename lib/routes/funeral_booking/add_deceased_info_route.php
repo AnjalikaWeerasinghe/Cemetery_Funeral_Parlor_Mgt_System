@@ -34,6 +34,7 @@ $deceasedinfo->saveDeceasedInformation($_POST);
 
 $_SESSION['booking']['step1'] = [
     "service_type" => $service_type,
+
     "full_name" => $full_name,
     "nic" => $nic,
     "gender" => $gender,
@@ -41,6 +42,7 @@ $_SESSION['booking']['step1'] = [
     "deceased_address" => $deceased_address,
     "deceased_gn_division" => $deceased_gn_division,
     "municipal_council" => $municipal_council,
+    
     "applicant_name" => $applicant_name,
     "relationship_to_deceased" => $relationship_to_deceased,
     "contact_number" => $contact_number,

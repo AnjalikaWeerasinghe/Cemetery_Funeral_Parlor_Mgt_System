@@ -133,6 +133,44 @@ input[type="file"]:hover {
     height: 100%;
     object-fit: cover;
 }
+
+.back-btn {
+    background: linear-gradient(135deg, #6c757d, #adb5bd);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 10px 22px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.back-btn::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(120deg, transparent, rgba(255,255,255,0.4), transparent);
+    transition: 0.5s;
+}
+
+.back-btn:hover::after {
+    left: 100%;
+}
+
+.back-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
+
+.back-btn:active {
+    transform: scale(0.97);
+}
+
 </style>
 
 <div class="container-fluid">
@@ -216,9 +254,17 @@ input[type="file"]:hover {
                     <small class="text-muted">Upload PDF or Image (Max 2MB)</small>
                 </div>
 
-                <div class="text-end mt-3">
-                    <button type="submit" class="btn btn-success" id="load_step3">Proceed to Next Page</button>
+                <div id="filePreview" class="text-muted small mt-2"></div>
+
+                <div class="d-flex justify-content-between mt-3">
+                    <div>
+                        <button type="button" class="back-btn" id="load_step1">Back</button>
+                    </div>
+                    <div>
+                        <button type="submit" class="btn btn-success" id="load_step3">Proceed to Next Page</button>
+                    </div>
                 </div>
+
             </form>
  
         </div>
@@ -226,48 +272,129 @@ input[type="file"]:hover {
 </div>
 
 <script>
-$(document).ready(function(){
-    $("#document_info").on("submit", function(e) {
-        e.preventDefault();
+    $(document).ready(function(){
+        restoreStep2Data();
 
-        var formData = new FormData(this);
+        function restoreStep2Data() {
+            $("#death_certificate_number").val(sessionStorage.getItem("death_certificate_number") || "");
 
-        $.ajax({
-            url: "../routes/funeral_booking/add_document_info_route.php",
-            method: "POST",
-            data : formData,
-            processData: false,
-            contentType: false,
+            $("#registrar_name").val(sessionStorage.getItem("registrar_name") || "");
+            $("#date_of_death").val(sessionStorage.getItem("date_of_death") || "");
 
-            success:function(response){
-                console.log("Response:", response);
+            $("#cause_of_death").val(sessionStorage.getItem("cause_of_death") || "");
+            $("#coroner_name").val(sessionStorage.getItem("coroner_name") || "");
+            $("#coroner_decision").val(sessionStorage.getItem("coroner_decision") || "");
 
-                response = response.trim();
+            const cremationPermission = sessionStorage.getItem("cremation_permission");
+            if (cremationPermission !== null) {
+                $(`input[name="cremation_permission"][value="${cremationPermission}"]`).prop("checked", true);
+            }
 
-                if(response === "success"){
+            // Note: Cannot restore file inputs for security reasons, hence indicate if files were previously uploaded
+            if (sessionStorage.getItem("death_certificate_uploaded") === "1") {
+                $("#death_certificate").after("<small class='text-success'>File previously uploaded</small>");
+            }
+            if (sessionStorage.getItem("coroner_certificate_uploaded") === "1") {
+                $("#coroner_certificate").after("<small class='text-success'>File previously uploaded</small>");
+            }
+            if (sessionStorage.getItem("family_consent_letter_uploaded") === "1") {
+                $("#family_consent_letter").after("<small class='text-success'>File previously uploaded</small>");
+            }
+        }
 
-                    sessionStorage.setItem("death_certificate_number", $("#death_certificate_number").val());
-                    sessionStorage.setItem("registrar_name", $("#registrar_name").val());
-                    sessionStorage.setItem("date_of_death", $("#date_of_death").val());
-                    sessionStorage.setItem("cause_of_death", $("#cause_of_death").val());
-                    sessionStorage.setItem("death_certificate", $("#death_certificate").val());
+        function showFileNames() {
+            let files = [
+                "death_certificate",
+                "coroner_certificate",
+                "family_consent_letter"
+            ];
 
-                    sessionStorage.setItem("coroner_name", $("#coroner_name").val());
-                    sessionStorage.setItem("coroner_decision", $("#coroner_decision").val());
-                    sessionStorage.setItem("coroner_certificate", $("#coroner_certificate").val());
-                    
-                    sessionStorage.setItem("cremation_permission", $('input[name="cremation_permission"]:checked').val());
-                    sessionStorage.setItem("family_consent_letter", $("#family_consent_letter").val());
+            let output = "";
 
-                    $("#bookingContent").load("funeral_booking/cremation_information.php");
-
-                } else {
-
-                    alert(response);
+            files.forEach(id => {
+                let file = $(`#${id}`)[0].files?.[0];
+                if (file) {
+                    output += file.name + "<br>";
                 }
+            });
+
+            $("#filePreview").html(output);
+        }
+
+        $("input[type='file']").change(function(){
+
+            const file = this.files[0];
+
+            if(file && file.size > 2 * 1024 * 1024){
+                alert("File size must be below 2MB");
+                $(this).val("");
             }
         });
+
+        $("input[type='file']").change(showFileNames);
+
+        $("#document_info").on("submit", function(e) {
+            e.preventDefault();
+
+            var formData = new FormData(this);
+
+            $.ajax({
+                url: "../routes/funeral_booking/add_document_info_route.php",
+                method: "POST",
+                data : formData,
+                processData: false,
+                contentType: false,
+                success:function(response){
+                    // console.log("Response:", response);
+
+                    response = response.trim();
+
+                    if(response === "success"){
+
+                        sessionStorage.setItem("death_certificate_number", $("#death_certificate_number").val());
+                        sessionStorage.setItem("registrar_name", $("#registrar_name").val());
+                        sessionStorage.setItem("date_of_death", $("#date_of_death").val());
+                        sessionStorage.setItem("cause_of_death", $("#cause_of_death").val());
+                        sessionStorage.setItem("coroner_name", $("#coroner_name").val());
+                        sessionStorage.setItem("coroner_decision", $("#coroner_decision").val());
+                        
+                        sessionStorage.setItem("cremation_permission", $('input[name="cremation_permission"]:checked').val());
+
+                        sessionStorage.setItem(
+                            "death_certificate_uploaded",
+                            $("#death_certificate")[0].files.length > 0 ? "1" : "0"
+                        );
+
+                        sessionStorage.setItem(
+                            "coroner_certificate_uploaded",
+                            $("#coroner_certificate")[0].files.length > 0 ? "1" : "0"
+                        );
+
+                        sessionStorage.setItem(
+                            "family_consent_letter_uploaded",
+                            $("#family_consent_letter")[0].files.length > 0 ? "1" : "0"
+                        );
+
+                        unlockStep(3);
+                        loadStep(3);
+
+                    } else {
+
+                        alert(response);
+                    }
+                },
+
+                error:function(xhr){
+                    // console.log(xhr.responseText);
+                    alert("Something went wrong");
+                }
+            });
+        });
+
+        $("#load_step1").click(function(){
+            loadStep(1);
+            setActiveStep(1);
+        });
     });
-});
     
 </script>

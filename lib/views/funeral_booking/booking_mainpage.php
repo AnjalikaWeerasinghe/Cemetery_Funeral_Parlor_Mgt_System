@@ -1,5 +1,4 @@
 <style>
-
 .booking-card {
     background: rgba(30,30,30,0.85);
     border-radius: 15px;
@@ -55,7 +54,7 @@
 
         <div class="col-md-4 mb-4">
             <div class="card booking-card text-center p-4" data-service-type="Cremation" data-page="add_cremation_booking">
-                <i class="fa-solid fa-fire"></i>
+                <i class="fa-solid fa-fire text-center"></i>
                 <h5>Crematorium</h5>
                 <p>Reserve cremation services and available time slots.</p>
             </div>
@@ -63,7 +62,7 @@
 
         <div class="col-md-4 mb-4">
             <div class="card booking-card text-center p-4" data-service-type="Burial" data-page="add_burial_booking">
-                <i class="fa-solid fa-cross"></i>
+                <i class="fa-solid fa-cross text-center"></i>
                 <h5>Burial</h5>
                 <p>Book burial plots and cemetery services.</p>
             </div>
@@ -71,7 +70,8 @@
 
         <div class="col-md-4 mb-4">
             <div class="card booking-card text-center p-4" data-service-type="Parlor" data-page="add_parlor_booking">
-                <i class="fa-solid fa-building-columns"></i>
+                <i class="fa-solid fa-building-columns text-center"></i>
+                <h5>'Nisala Arana'</h5>
                 <h5>Funeral Parlor</h5>
                 <p>Reserve parlor facilities for funeral arrangements.</p>
             </div>

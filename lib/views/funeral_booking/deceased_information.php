@@ -231,6 +231,32 @@ button {
 
 <script>
     $(document).ready(function(){
+        loadBookingCode();
+
+        restoreStep1Data();
+
+        function restoreStep1Data(){
+
+            $("#full_name").val(sessionStorage.getItem("full_name"));
+            $("#booking_code").val(sessionStorage.getItem("booking_code"));
+            $("#nic").val(sessionStorage.getItem("nic"));
+            $("#gender").val(sessionStorage.getItem("gender"));
+            $("#date_of_birth").val(sessionStorage.getItem("date_of_birth"));
+
+            $("#deceased_address").val(sessionStorage.getItem("deceased_address"));
+            $("#deceased_gn_division").val(sessionStorage.getItem("deceased_gn_division"));
+            $("#municipal_council").val(sessionStorage.getItem("municipal_council"));
+
+            $("#applicant_name").val(sessionStorage.getItem("applicant_name"));
+            $("#relationship_to_deceased").val(sessionStorage.getItem("relationship_to_deceased"));
+
+            $("#contact_number").val(sessionStorage.getItem("contact_number"));
+            $("#email").val(sessionStorage.getItem("email"));
+
+            $("#applicant_gn_division").val(sessionStorage.getItem("applicant_gn_division"));
+            $("#applicant_address").val(sessionStorage.getItem("applicant_address"));
+
+        }
 
         function loadBookingCode(){
             const serviceType = localStorage.getItem("selectedBookingService");
@@ -259,8 +285,6 @@ button {
                 }
             });
         }
-
-        loadBookingCode();
 
         $("#deceased_info").on("submit", function(e) {
             e.preventDefault();
@@ -299,7 +323,8 @@ button {
                         sessionStorage.setItem("applicant_gn_division", $("#applicant_gn_division").val());
                         sessionStorage.setItem("applicant_address", $("#applicant_address").val());
                         
-                        $("#bookingContent").load("funeral_booking/document_information.php");
+                        unlockStep(2);
+                        loadStep(2);
 
                     } else {
 

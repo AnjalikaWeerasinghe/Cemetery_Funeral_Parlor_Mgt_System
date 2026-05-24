@@ -215,6 +215,43 @@ input[type="file"]:hover {
     background: linear-gradient(to right, transparent, #ddd, transparent);
 }
 
+.back-btn {
+    background: linear-gradient(135deg, #6c757d, #adb5bd);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 10px 22px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.back-btn::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(120deg, transparent, rgba(255,255,255,0.4), transparent);
+    transition: 0.5s;
+}
+
+.back-btn:hover::after {
+    left: 100%;
+}
+
+.back-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
+
+.back-btn:active {
+    transform: scale(0.97);
+}
+
 @font-face {
     font-family: 'Yaldevi';
     src: url('/../../styles/webfonts/yaldevi/Yaldevi[wght].ttf') format('ttf'),
@@ -259,7 +296,7 @@ input[type="file"]:hover {
                                 
                             </div>
 
-                            <input type="hidden" id="selected_slot_id" name="cremation_time_slot">
+                            <input type="hidden" id="selected_slot_id" name="schedule_slots_table_slot_id">
                         </div>
 
                         <div>
@@ -267,12 +304,12 @@ input[type="file"]:hover {
                                 <label for="ash_collection" class="form-label pe-2">Are you collecting the Ash after cremation? *</label>
 
                                 <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="cremation_permission" value="1" required>
+                                    <input class="form-check-input" type="radio" name="collect_ash" value="1" required>
                                     <label class="form-check-label">Yes</label>
                                 </div>
 
                                 <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="cremation_permission" value="0">
+                                    <input class="form-check-input" type="radio" name="collect_ash" value="0">
                                     <label class="form-check-label">No</label>
                                 </div>
                             </div>
@@ -295,15 +332,6 @@ input[type="file"]:hover {
                                             <h6 class="mb-3">Memorial Tablet Customization</h6>
                                         </div>
 
-                                        <!-- <div class="mb-2">
-                                            <label for="language_type" class="form-label">Select the Language you want to appear in the memorial</label>
-                                            <select class="form-select" id="language_type">
-                                                <option value="en">English</option>
-                                                <option value="si">සිංහල</option>
-                                                <option value="ta">தமிழ்</option>
-                                            </select>
-                                        </div> -->
-
                                         <div class="mb-2">
                                             <label class="form-label">Name on Tablet</label>
                                             <input type="text" class="form-control" name="memorial_name">
@@ -325,7 +353,7 @@ input[type="file"]:hover {
 
                                         <div class="mb-2">
                                             <label class="form-label">Upload Image (Optional)</label>
-                                            <input type="file" id="memorial_image" class="form-control" accept="image/*">
+                                            <input type="file" id="memorial_image" name="memorial_image" class="form-control" accept="image/*">
                                         </div>
 
                                         <div class="mb-2">
@@ -397,15 +425,21 @@ input[type="file"]:hover {
 
                             <div class="price-total">
                                 <span>Total</span>
-                                <span id="price_total">LKR 0</span>
+                                <span name="price_total" id="price_total">LKR 0</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="text-end mt-3">
-                    <button type="submit" id="load_step4">Proceed to Confirmation Page</button>
+                <div class="d-flex justify-content-between mt-3">
+                    <div>
+                        <button type="button" class="back-btn" id="load_step2">Back</button>
+                    </div>
+                    <div class="text-end">
+                        <button type="submit" id="load_step4">Proceed to Confirmation Page</button>
+                    </div>
                 </div>
+
             </form>
 
         </div>
@@ -416,22 +450,103 @@ input[type="file"]:hover {
     // console.log("JS Loaded");
     
     $(document).ready(function() {
-        updatePrice();
+        // Create the table to get the real pricings for services
+        const pricing = {
+            municipal_limit: 5000,
+            outside_municipal_limit: 8000,
+            memorial: 2000
+        };
 
-        $("#cremation_date").change(function(){
-
-            let selectedDate = $(this).val();
-            console.log("Selected Date:", selectedDate);
-
-            // let dayOfWeek = new Date(selectedDate).toLocaleDateString('en-US', { weekday: 'long' });
-            // console.log("Day:", dayOfWeek);
+        function loadTimeSlots(selectedDate){
 
             $.post("../routes/funeral_booking/get_time_slots_route.php", {
                 date: selectedDate
             }, function(res) {
-                console.log("Response:", res);
+                // console.log("Response:", res);
                 $("#timeSlotsContainer").html(res);
+
+                let savedSlotId = sessionStorage.getItem("selected_slot_id");
+
+                setTimeout(function(){
+
+                    if(savedSlotId){
+                        let selectedCard = $(`.slot-card[data-id="${savedSlotId}"]`);
+
+                        if(selectedCard.length){
+                            selectedCard.trigger("click");
+                        }
+                    }
+
+                }, 100);
             });
+
+        }
+
+        restoreStep3Data();
+
+        updatePrice();
+
+        function restoreStep3Data(){
+            $("#notes").val(sessionStorage.getItem("notes"));
+
+            let selectedDate = sessionStorage.getItem("selectedDate");
+            let areaType = sessionStorage.getItem("area_type");
+
+            let collectAsh = sessionStorage.getItem("collect_ash");
+            let ashCollectionMethod = sessionStorage.getItem("ash_collection_method");
+
+            if(selectedDate && selectedDate !== "undefined"){
+                $("#cremation_date").val(selectedDate);
+
+                loadTimeSlots(selectedDate);
+            }
+
+            if(areaType){
+                $("#area_type").val(areaType).trigger("change");
+            }
+
+            if(collectAsh){
+                $(`input[name="collect_ash"][value="${collectAsh}"]`).prop("checked", true);
+            }
+
+            if(ashCollectionMethod){
+                $("#ash_collection_method").val(ashCollectionMethod).trigger("change");
+            }
+
+             // Restore memorial design if available
+            if(ashCollectionMethod === "memorial"){
+                $("#memorialSection").show();
+                $("#previewWrapper").show();
+
+                $("input[name='memorial_name']").val(sessionStorage.getItem("memorial_name") || "");
+                $("textarea[name='memorial_message']").val(sessionStorage.getItem("memorial_message") || "");
+
+                $("select[name='font_style']").val(sessionStorage.getItem("font_style")).trigger("change");
+                $("#tablet_theme").val(sessionStorage.getItem("tablet_theme")).trigger("change");
+                $("#memorial_icon").val(sessionStorage.getItem("memorial_icon")).trigger("change");
+
+                let savedImage = sessionStorage.getItem("memorial_image");
+                if (savedImage) {
+                    $("#previewImage").attr("src", savedImage).show();
+                }
+
+                updatePreviewText();
+
+                // Note: cannot restore the uploaded image due to browser security restrictions
+            }  
+            
+            updatePrice();
+        }
+
+        $("#cremation_date").change(function(){
+
+            let selectedDate = $(this).val();
+            // console.log("Selected Date:", selectedDate);
+
+            // let dayOfWeek = new Date(selectedDate).toLocaleDateString('en-US', { weekday: 'long' });
+            // console.log("Day:", dayOfWeek);
+
+           loadTimeSlots(selectedDate);
 
         });
 
@@ -446,9 +561,9 @@ input[type="file"]:hover {
             let slotId = $(this).data("id");
             let slotText = $(this).data("text");
 
-            console.log("Slot:", slotId, slotText);
+            // console.log("Slot:", slotId, slotText);
 
-            // $("#selected_slot_id").val(slotId);
+            $("#selected_slot_id").val(slotId);
 
             sessionStorage.setItem("selected_slot_id", slotId);
             sessionStorage.setItem("slot_text", slotText);
@@ -464,6 +579,8 @@ input[type="file"]:hover {
 
             let designData = null;
 
+            let formData = new FormData(this);
+
             if($("#ash_collection_method").val() === "memorial"){
                 designData = {
                     name: $("input[name='memorial_name']").val(),
@@ -475,10 +592,14 @@ input[type="file"]:hover {
                 };
             }
 
-            var formData = new FormData(this);
-
             if(designData){
                 formData.append("memorial_design", JSON.stringify(designData));
+
+                let memorialImage = $("#memorial_image")[0].files[0];
+
+                if(memorialImage){
+                    formData.append("memorial_image", memorialImage);
+                }
             }
 
             $.ajax({
@@ -494,29 +615,34 @@ input[type="file"]:hover {
                     response = response.trim();
 
                     if(response === "success"){
+                        let date = $("#cremation_date").val();
 
-                        sessionStorage.setItem("cremation_date", $("#cremation_date").val());
+                        if(date){
+                            sessionStorage.setItem("selectedDate", date);
+                        }
 
-                        sessionStorage.setItem("area_type", $("#area_type option:selected").text()); 
+                        sessionStorage.setItem("area_type", $("#area_type").val()); 
                         
                         sessionStorage.setItem("selected_slot_id", $("#selected_slot_id").val());
 
-                        sessionStorage.setItem("cremation_permission", $("#ash_collection_method").val());
+                        sessionStorage.setItem("collect_ash", $('input[name="collect_ash"]:checked').val());
+                        sessionStorage.setItem("ash_collection_method", $("#ash_collection_method").val());
 
                         sessionStorage.setItem("memorial_name", $("input[name='memorial_name']").val());
                         sessionStorage.setItem("memorial_message", $("textarea[name='memorial_message']").val());
                         sessionStorage.setItem("memorial_icon", $("#memorial_icon").val());
-                        sessionStorage.setItem("memorial_image", $("#memorial_image").val());
+                        
                         sessionStorage.setItem("font_style", $("select[name='font_style']").val());
                         sessionStorage.setItem("tablet_theme", $("#tablet_theme").val());
                         
                         sessionStorage.setItem("notes", $("#notes").val());
 
-                        $("#bookingContent").load("funeral_booking/confirmation.php");
+                        unlockStep(4);
+                        loadStep(4);
 
                     } else {
 
-                        alert(response);
+                        showModal(response);
                     }
                 }
             });
@@ -561,16 +687,6 @@ input[type="file"]:hover {
             $("#previewName").text(name || "Name");
             $("#previewMessage").text(msg || "Your message will appear here");
         }
-
-        // $(document).on("input", "input[name='memorial_name']", function(){
-        //     let name = $(this).val();
-        //     $("#previewName").text(name || "Name");
-        // });
-
-        // $(document).on("input", "textarea[name='memorial_message']", function(){
-        //     let msg = $(this).val();
-        //     $("#previewMessage").text(msg || "Your message will appear here");
-        // });
 
         $(document).on("input", "input[name='memorial_name']", function(){
             updatePreviewText();
@@ -648,19 +764,14 @@ input[type="file"]:hover {
                     $("#previewImage")
                         .attr("src", event.target.result)
                         .show();
+
+                    sessionStorage.setItem("memorial_image", event.target.result);
                 };
 
                 reader.readAsDataURL(file);
             }
 
         });
-
-        // Create the table to get the real pricings for services
-        const pricing = {
-            municipal_limit: 5000,
-            outside_municipal_limit: 8000,
-            memorial: 2000
-        };
 
         function updatePrice(){
 
@@ -684,16 +795,23 @@ input[type="file"]:hover {
             $("#price_memorial").text("LKR " + memorialPrice);
             $("#price_total").text("LKR " + total);
 
+            sessionStorage.setItem("cremation_price", cremationPrice);
+            sessionStorage.setItem("memorial_price", memorialPrice);
             sessionStorage.setItem("total_amount", total);
         }
 
-        $("#area_type").change(function(){
+        $("#area_type, #ash_collection_method").on("change", function () {
             updatePrice();
         });
 
-        $("#ash_collection_method").change(function(){
-            updatePrice();
+        $(document).on("click", "#load_step2", function () {
+            loadStep(2);
         });
+
+        function showModal(message) {
+            $("#modalMessage").text(message);
+            $("#messageModal").modal("show");
+        }
 
     });
 

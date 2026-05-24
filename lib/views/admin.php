@@ -155,14 +155,27 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
                     case 'add_cremation_booking':
                         include 'funeral_booking/add_cremation_booking.php';
                         break;
+                    case 'add_burial_booking':
+                        include 'funeral_booking/add_burial_booking.php';
+                        break;
+                    case 'add_parlor_booking':
+                        include 'funeral_booking/add_parlor_booking.php';
+                        break;
+                    
                     case 'deceasedInfo':
                         include 'funeral_booking/deceased_information.php';
                         break;
                     case 'docInfo':
                         include 'funeral_booking/document_information.php';
                         break;
-                    case 'burialInfo':
+                    case 'cremationInfo':
                         include 'funeral_booking/cremation_information.php';
+                        break;
+                    case 'burialInfo':
+                        include 'funeral_booking/burial_information.php';
+                        break;
+                    case 'parlorInfo':
+                        include 'funeral_booking/parlor_information.php';
                         break; 
                     case 'memorialInfo':
                         include 'funeral_booking/memorial_service_information.php';
@@ -174,6 +187,10 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
 
                     case 'roleSettings':
                         include 'system_settings/role_settings.php';
+                        break;
+
+                    case 'deceased':
+                        include 'deceased/deceased_details.php';
                         break;
 
                     default:

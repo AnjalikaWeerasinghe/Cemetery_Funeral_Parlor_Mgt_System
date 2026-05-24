@@ -137,6 +137,13 @@ if(isset($_POST['login'])){
             case 'add_cremation_booking':
                 include 'lib/views/funeral_booking/add_cremation_booking.php';
                 break;
+            case 'add_burial_booking':
+                include 'lib/views/funeral_booking/add_burial_booking.php';
+                break;
+            case 'add_parlor_booking':
+                include 'lib/views/funeral_booking/add_parlor_booking.php';
+                break;
+
             case 'deceasedInfo':
                 include 'lib/views/funeral_booking/deceased_information.php';
                 break;
@@ -146,6 +153,12 @@ if(isset($_POST['login'])){
             case 'cremationInfo':
                 include 'lib/views/funeral_booking/cremation_information.php';
                 break; 
+            case 'burialInfo':
+                include 'lib/views/funeral_booking/burial_information.php';
+                break;
+            case 'parlorInfo':
+                include 'lib/views/funeral_booking/parlor_information.php';
+                break;
 
             default:
                 include 'lib/views/main_pages/home.php';

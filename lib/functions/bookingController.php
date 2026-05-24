@@ -19,10 +19,20 @@ class BookingController extends MainController{
         return $number->generateUniqueNumber("booking_code", "funeral_service_table", $prefix);
     }
 
+    public function generatePaymentCode() {
+        $number = new Numbering();
+        return $number->generateUniqueNumber("payment_code", "payment_table", "PAY-");
+    }
+
+    public function generateTransactionReference() {
+        return "TRC-" . strtoupper(bin2hex(random_bytes(5)));
+    }
+
     public function saveDeceasedInformation($data) {
 
         $full_name = $data['full_name'] ?? '';
         $nic = $data['nic'] ?? '';
+
         $applicant_name = $data['applicant_name'] ?? '';
         $relationship_to_deceased = $data['relationship_to_deceased'] ?? '';
         $contact_number = $data['contact_number'] ?? '';
@@ -46,17 +56,18 @@ class BookingController extends MainController{
         $registrar_name = $data['registrar_name'] ?? '';
         $date_of_death = $data['date_of_death'] ?? '';
         $cause_of_death = $data['cause_of_death'] ?? '';
-        $death_certificate = $data['death_certificate'] ?? '';
+
         $cremation_permission = $data['cremation_permission'] ?? '';
-        $family_consent_letter = $data['family_consent_letter'] ?? '';
 
-        if (empty($death_certificate_number) || empty($registrar_name) || empty($date_of_death) || empty($cause_of_death) || empty($death_certificate) || 
-            $cremation_permission === '' || empty($family_consent_letter)) {
-
+        if (
+            empty($death_certificate_number) ||
+            empty($registrar_name) ||
+            empty($date_of_death) ||
+            empty($cause_of_death) ||
+            $cremation_permission === ''
+        ) {
             return "Please fill the required fields.";
         }
-
-        $_SESSION['booking']['step2'] = $data;
 
         return "success";
     }
@@ -68,22 +79,6 @@ class BookingController extends MainController{
         $sql = "SELECT s.*, CASE WHEN b.schedule_slots_table_slot_id IS NOT NULL THEN 1 ELSE 0 END AS is_booked FROM schedule_slots_table s 
                 LEFT JOIN cremation_table b ON s.slot_id = b.schedule_slots_table_slot_id AND b.cremation_date = ? WHERE s.day_of_the_week = ? 
                 ORDER BY s.start_time ASC";
-
-    //     $sql = "
-    //     SELECT 
-    //         s.slot_id,
-    //         s.start_time,
-    //         s.end_time,
-    //         s.is_active,
-    //         s.slot_type,
-    //         IF(b.schedule_slots_table_slot_id IS NOT NULL, 1, 0) AS is_booked
-    //     FROM schedule_slots_table s
-    //     LEFT JOIN cremation_table b 
-    //         ON s.slot_id = b.schedule_slots_table_slot_id 
-    //         AND b.cremation_date = ?
-    //     WHERE s.day_of_the_week = ?
-    //     ORDER BY s.start_time ASC
-    // ";
 
         $stmt = $this->conn->prepare($sql);
 
@@ -103,21 +98,23 @@ class BookingController extends MainController{
         return $slots;
     }
 
-    public function saveCremationInformation($data) {
+    public function saveCremationInformation($data, $files = []) {
 
         $cremation_date = $data['cremation_date'] ?? '';
         $area_type = $data['area_type'] ?? '';
-        $cremation_time_slot = $data['cremation_time_slot'] ?? '';
-        $cremation_permission = $data['cremation_permission'] ?? '';
+        $schedule_slots_table_slot_id  = $data['schedule_slots_table_slot_id'] ?? '';
+        $collect_ash = $data['collect_ash'] ?? '';
         $ash_collection_method = $data['ash_collection_method'] ?? '';
         $notes = $data['notes'] ?? '';
 
         $memorial_design = $data['memorial_design'] ?? null;
-        $memorial_image = $data['memorial_image'] ?? null;
+        // $memorial_image = $data['memorial_image'] ?? null;
 
-        if (empty($cremation_date) || empty($area_type) || empty($cremation_time_slot) || $cremation_permission === '') {
+        if (empty($cremation_date) || empty($area_type) || empty($schedule_slots_table_slot_id ) || $collect_ash === '') {
             return "Please fill the required fields.";
         }
+
+        $decodedDesign = null;
 
         if ($ash_collection_method === "memorial") {
 
@@ -134,22 +131,354 @@ class BookingController extends MainController{
 
         $_SESSION['booking']['step3'] = [
             "cremation" => [
-                "date" => $cremation_date,
+                "cremation_date" => $cremation_date,
                 "area_type" => $area_type,
-                "time_slot" => $cremation_time_slot,
-                "permission" => $cremation_permission,
+                "schedule_slots_table_slot_id" => $schedule_slots_table_slot_id,
+                "collect_ash" => $collect_ash,
                 "notes" => $notes
             ],
 
+            "ash_collection_method" => $ash_collection_method,
+
             "memorial" => ($ash_collection_method === "memorial") ? [
-                "design" => $memorial_design,
-                "image" => $memorial_image
+                "design" => $decodedDesign,
+                "image" => $files['memorial_image']['name'] ?? null
             ] : null,
 
             "ash_collection_method" => $ash_collection_method
         ];
 
         return "success";
+    }
+
+    public function savePaymentInformation($data) {
+        
+        if(empty($data['payment_method']) || empty($data['total_payment'])) {
+            return "Payment details are missing.";
+        }
+
+        $_SESSION['booking']['payment'] = $data;
+
+        return "success";
+    }
+
+    // Saving all the booking data to the database after the final step
+    public function confirmCremationBooking() {
+
+        if (!isset($_SESSION['booking']['step1']) || 
+            !isset($_SESSION['booking']['step2']) || 
+            !isset($_SESSION['booking']['step3']) ||
+            !isset($_SESSION['booking']['payment'])) {
+                return "Incomplete booking data.";
+        }
+
+        if(!isset($_SESSION['booking']['booking_code'])){
+
+            $_SESSION['booking']['booking_code'] =
+                $this->getNewBookingCode("Cremation");
+        }
+
+        $booking_code = $_SESSION['booking']['booking_code'];
+
+        $step1 = $_SESSION['booking']['step1'];
+        $step2 = $_SESSION['booking']['step2'];
+        $step3 = $_SESSION['booking']['step3'];
+        $step4 = $_SESSION['booking']['payment'];
+
+        $this->conn->begin_transaction();
+
+        try{
+            //Step 1 insertion - Deceased and Applicant Information
+
+            $checkSql = "SELECT deceased_id FROM deceased_table WHERE nic = ?";
+
+            $checkStmt = $this->conn->prepare($checkSql);
+
+            $checkStmt->bind_param("s", $step1['nic']);
+
+            $checkStmt->execute();
+
+            $result = $checkStmt->get_result();
+
+            if($result->num_rows > 0){
+
+                $row = $result->fetch_assoc();
+                $deceased_id = $row['deceased_id'];
+
+            } else {
+
+                $sql1 = "INSERT INTO deceased_table (
+                        full_name, nic, gender, date_of_birth, deceased_address, deceased_gn_division, municipal_council)
+                        VALUES (?, ?, ?, ?, ?, ?, ?)";
+                
+                $stmt1 = $this->conn->prepare($sql1);
+
+                $stmt1->bind_param("sssssss", 
+                    $step1['full_name'], $step1['nic'], $step1['gender'], $step1['date_of_birth'], $step1['deceased_address'], $step1['deceased_gn_division'], $step1['municipal_council']
+                );
+
+                if(!$stmt1->execute()){
+                    throw new Exception($stmt1->error);
+                }
+
+                $deceased_id = $stmt1->insert_id;
+
+            }
+
+            $sql2 = "INSERT INTO applicant_table (
+                    applicant_name, relationship_to_deceased, contact_number, email, applicant_gn_division, applicant_address)
+                    VALUES (?, ?, ?, ?, ?, ?)";
+
+            $stmt2 = $this->conn->prepare($sql2);
+
+            $stmt2->bind_param("ssssss", 
+                $step1['applicant_name'], $step1['relationship_to_deceased'], $step1['contact_number'], $step1['email'], $step1['applicant_gn_division'], $step1['applicant_address']
+            );
+
+            if(!$stmt2->execute()){
+                throw new Exception($stmt2->error);
+            }
+
+            $applicant_id = $stmt2->insert_id;
+
+            //Step 2 insertion - Document Information
+            $coroner_name = $step2['coroner_name'] ?? null;
+
+            $coroner_decision = $step2['coroner_decision'] ?? null;
+
+            $coroner_certificate = $step2['coroner_certificate'] ?? null;
+
+            $sql3  = "INSERT INTO document_table (
+                    death_certificate_number, registrar_name, date_of_death, cause_of_death, coroner_name, coroner_decision, cremation_permission, verification_status,
+                    death_certificate, coroner_certificate, family_consent_letter)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+            $stmt3 = $this->conn->prepare($sql3);
+
+            $stmt3->bind_param("ssssssissss", 
+                $step2['death_certificate_number'], $step2['registrar_name'], $step2['date_of_death'], $step2['cause_of_death'], $coroner_name, $coroner_decision, $step2['cremation_permission'], $step2['verification_status'],
+                $step2['death_certificate'], $coroner_certificate, $step2['family_consent_letter']
+            );
+
+            if(!$stmt3->execute()){
+                throw new Exception($stmt3->error);
+            }
+
+            $document_id = $stmt3->insert_id;
+
+            // Insertion to the main booking table with foreign keys from the above tables - funeral_service_table
+
+            $service_type = "Cremation";
+
+            $booking_status = "Confirmed"; // Initial status before payment confirmation
+
+            $booking_created_at = date("Y-m-d H:i:s");
+
+            $sql4 = "INSERT INTO funeral_service_table (
+                    booking_code, service_type, booking_status, booking_created_at, 
+                    deceased_table_deceased_id, applicant_table_applicant_id, document_table_document_set_id) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+            $stmt4 = $this->conn->prepare($sql4);
+
+            if(!$stmt4){
+                die("SQL4 Error: " . $this->conn->error);
+            }
+
+            $stmt4->bind_param("ssssiii", 
+                $booking_code, $service_type, $booking_status, $booking_created_at,
+                $deceased_id, $applicant_id, $document_id
+            );
+
+            if(!$stmt4->execute()){
+                throw new Exception($stmt4->error);
+            }
+
+            $funeral_service_id = $stmt4->insert_id;
+
+            // Step 3 insertion - Cremation and Memorial Information
+
+            $sql5 = "INSERT INTO cremation_table (
+                    cremation_date, area_type, collect_ash, ash_collection_method, notes, schedule_slots_table_slot_id, funeral_service_table_funeral_service_id)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+            $stmt5 = $this->conn->prepare($sql5);
+
+            $stmt5->bind_param("ssissii", 
+                $step3['cremation']['cremation_date'], $step3['cremation']['area_type'], $step3['cremation']['collect_ash'], $step3['ash_collection_method'], $step3['cremation']['notes'], $step3['cremation']['schedule_slots_table_slot_id'], $funeral_service_id
+            );
+
+            if(!$stmt5->execute()){
+                throw new Exception($stmt5->error);
+            }
+
+            // If memorial design is provided, insert into memorial_table
+
+            if ($step3['ash_collection_method'] === "memorial") {
+
+                // $design = json_decode($step3['memorial']['design'], true);
+                $design = $step3['memorial']['design'];
+
+                // $icon = is_array($design['icon'])
+                //     ? json_encode($design['icon'])
+                //     : $design['icon'];
+
+                // $font = is_array($design['font'])
+                //     ? json_encode($design['font'])
+                //     : $design['font'];
+
+                // $theme = is_array($design['theme'])
+                //     ? json_encode($design['theme'])
+                //     : $design['theme'];
+
+                if(is_string($design)){
+                    $design = json_decode($design, true);
+                }
+
+                if(!is_array($design)){
+                    throw new Exception("Invalid memorial design data.");
+                }
+
+                $name = isset($design['name']) ? (string)$design['name'] : '';
+                $message = isset($design['message']) ? (string)$design['message'] : '';
+                $icon = isset($design['icon']) ? (string)$design['icon'] : '';
+                $font = isset($design['font']) ? (string)$design['font'] : '';
+                $theme = isset($design['theme']) ? (string)$design['theme'] : '';
+
+                $image = isset($step3['memorial']['image'])
+                    ? (string)$step3['memorial']['image']
+                    : '';
+
+                $sql6 = "INSERT INTO memorial_service_table (
+                memorial_name, memorial_message, memorial_icon, font_style, tablet_theme, memorial_image, funeral_service_table_funeral_service_id)
+                VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+                $stmt6 = $this->conn->prepare($sql6);
+
+                if(!$stmt6){
+                    die("Memorial SQL Error: " . $this->conn->error);
+                }
+
+                $stmt6->bind_param("ssssssi", 
+                    $design['name'], $design['message'], $icon, $font, $theme, $step3['memorial']['image'], $funeral_service_id
+                );
+
+                // echo "<pre>";
+
+                // var_dump($design['name']);
+                // var_dump($design['message']);
+                // var_dump($icon);
+                // var_dump($font);
+                // var_dump($theme);
+                // var_dump($step3['memorial']['image']);
+                // var_dump($funeral_service_id);
+
+                // exit;
+
+                if(!$stmt6->execute()){
+                    throw new Exception($stmt6->error);
+                }
+
+            }
+
+            // Step 4 insertion - Payment Information
+
+            $sql7 = "INSERT INTO payment_table (
+                    payment_code, payment_method, payment_status, transaction_reference, service_cost, memorial_cost, total_payment, paid_amount, payment_date, funeral_service_table_funeral_service_id)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+            $stmt7 = $this->conn->prepare($sql7);
+
+            if(!$stmt7){
+                die("Payment SQL Error: " . $this->conn->error);
+            }
+
+            $stmt7->bind_param("ssssddddsi", 
+                $step4['payment_code'], $step4['payment_method'], $step4['payment_status'], $step4['transaction_reference'], $step4['service_cost'], $step4['memorial_cost'], $step4['total_payment'], $step4['paid_amount'], $step4['payment_date'], $funeral_service_id
+            );
+
+            if(!$stmt7->execute()){
+                throw new Exception($stmt7->error);
+            }
+
+            $this->conn->commit();
+
+            unset($_SESSION['booking']); // Clear session data after database insertion
+
+            return [
+                "status" => "success",
+                "booking_code" => $booking_code
+            ];
+
+        }
+        catch(Exception $e){
+
+            $this->conn->rollback();
+            return "Error saving booking: " . $e->getMessage();
+
+        }
+
+    }
+
+    public function view_Booking_Data() {
+
+        $sql = "SELECT fs.booking_code, d.full_name AS deceased_name, doc.date_of_death, a.applicant_name, a.contact_number, fs.service_type
+                FROM funeral_service_table fs
+                JOIN deceased_table d ON fs.deceased_table_deceased_id = d.deceased_id
+                JOIN applicant_table a ON fs.applicant_table_applicant_id = a.applicant_id
+                JOIN document_table doc ON fs.document_table_document_set_id = doc.document_id
+                WHERE fs.booking_status = 'Confirmed'
+                ORDER BY fs.booking_created_at DESC";
+
+        $result = $this->conn->query($sql);
+
+        if ($result && $result->num_rows > 0) {
+            
+            while($rec = $result->fetch_assoc()) {
+
+                echo "<tr>";
+                echo "<td>".$rec['booking_code']."</td>";
+                echo "<td>".$rec['deceased_name']."</td>";
+                echo "<td>".$rec['date_of_death']."</td>";
+                echo "<td>".$rec['applicant_name']."</td>";
+                echo "<td>".$rec['contact_number']."</td>";
+                echo "<td>".$rec['service_type']."</td>";
+
+                echo "<td>
+                        <a href='admin.php?page=funeral_booking_details&code=".$rec['booking_code']."' class='btn btn-sm btn-info'>
+                            <i class='fa-solid fa-eye'></i> 
+                        </a>
+                        <button class='btn btn-danger btn-sm delete' id='".$rec['booking_code']."'>
+                            <i class=\"fa-solid fa-trash\"></i> 
+                        </button>
+                     </td>";
+                echo "</tr>";
+            }
+            
+        } else {
+            return "<tr><td colspan='7' class='text-center'>No bookings found.</td></tr>";
+        }
+    }
+
+    public function saveParlorInformation() {
+
+        $district = $_POST["district"] ?? '';
+        $urban_council_division = $_POST["urban_council_division"] ?? '';
+        $parlor_name = $_POST["parlor_name"] ?? '';
+
+        $start_date = $_POST["start_date"] ?? '';
+        $start_time = $_POST["start_time"] ?? '';
+        $end_date = $_POST["end_date"] ?? '';
+        $end_time = $_POST["end_time"] ?? '';
+
+        $total_cost = $_POST["parlor_cost"] ?? '';
+
+        if (empty($start_date) || empty($start_time) || empty($end_date) || empty($end_time)) {
+            return "Please fill the required fields.";
+        }
+
+        return "success";
+
     }
 
 }

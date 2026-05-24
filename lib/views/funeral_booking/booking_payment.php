@@ -90,10 +90,10 @@
                 <div class="section-title">Booking Summary</div>
 
                 <div class="summary-box">
-                    <div><span class="label">Name:</span> <span class="value" id="p_name"></span></div>
-                    <div><span class="label">Date:</span> <span class="value" id="p_date"></span></div>
-                    <div><span class="label">Slot:</span> <span class="value" id="p_slot"></span></div>
-                    <div><span class="label">Area:</span> <span class="value" id="p_area"></span></div>
+                    <div><span class="label">Name of Deceased:</span> <span class="value" id="deceased_name"></span></div>
+                    <div><span class="label">Date of Cremation:</span> <span class="value" id="cremation_date"></span></div>
+                    <div><span class="label">Cremation Time Slot:</span> <span class="value" id="cremation_slot"></span></div>
+                    <div><span class="label">Area:</span> <span class="value" id="area_type"></span></div>
                 </div>
 
                 <div class="section-title">Select Payment Method</div>
@@ -111,14 +111,14 @@
                 </div>
 
                 <div id="cardForm" style="display:none;">
-                    <input class="form-control mb-2" placeholder="Card Number">
-                    <input class="form-control mb-2" placeholder="Card Holder Name">
+                    <input type="text" id="card_number" class="form-control mb-2" placeholder="Card Number">
+                    <input type="text" id="card_holder" class="form-control mb-2" placeholder="Card Holder Name">
                     <div class="row">
                         <div class="col">
-                            <input class="form-control" placeholder="MM/YY">
+                            <input type="text" id="expiry_date" class="form-control" placeholder="MM/YY">
                         </div>
                         <div class="col">
-                            <input class="form-control" placeholder="CVV">
+                            <input type="text" id="cvv" class="form-control" placeholder="CVV">
                         </div>
                     </div>
                 </div>
@@ -138,19 +138,19 @@
 
                 <div class="d-flex justify-content-between">
                     <span>Cremation Fee</span>
-                    <span id="fee1">LKR 0</span>
+                    <span id="funeral_service_fee">LKR 0</span>
                 </div>
 
                 <div class="d-flex justify-content-between">
                     <span>Memorial Fee</span>
-                    <span id="fee2">LKR 0</span>
+                    <span id="memorial_fee">LKR 0</span>
                 </div>
 
                 <hr>
 
                 <div class="d-flex justify-content-between fw-bold">
                     <span>Total</span>
-                    <span id="total">LKR 0</span>
+                    <span id="total_fee">LKR 0</span>
                 </div>
 
             </div>
@@ -162,14 +162,25 @@
 <script>
 $(document).ready(function(){
 
-    $("#p_name").text(sessionStorage.getItem("full_name"));
-    $("#p_date").text(sessionStorage.getItem("cremation_date"));
-    $("#p_slot").text(sessionStorage.getItem("slot_text"));
-    $("#p_area").text(sessionStorage.getItem("area_type"));
+    $("#deceased_name").text(sessionStorage.getItem("full_name"));
+    $("#cremation_date").text(sessionStorage.getItem("selectedDate"));
+    $("#cremation_slot").text(sessionStorage.getItem("slot_text"));
 
-    $("#fee1").text("LKR " + (sessionStorage.getItem("cremation_fee") || 0));
-    $("#fee2").text("LKR " + (sessionStorage.getItem("memorial_fee") || 0));
-    $("#total").text("LKR " + (sessionStorage.getItem("total_amount") || 0));
+    let areaType = sessionStorage.getItem("area_type");
+
+    if(areaType === "municipal_limit"){
+        $("#area_type").text("Municipal Limit Area");
+    }
+    else if(areaType === "outside_municipal_limit"){
+        $("#area_type").text("Outside Municipal Limit Area");
+    } 
+    else{
+        $("#area_type").text("Not Selected");
+    }
+
+    $("#funeral_service_fee").text("LKR " + (sessionStorage.getItem("cremation_price") || 0));
+    $("#memorial_fee").text("LKR " + (sessionStorage.getItem("memorial_price") || 0));
+    $("#total_fee").text("LKR " + (sessionStorage.getItem("total_amount") || 0));
 
     $(".payment-method").click(function(){
         $(".payment-method").removeClass("active");
@@ -178,14 +189,76 @@ $(document).ready(function(){
         let method = $(this).data("method");
 
         if(method === "card"){
-            $("#cardForm").slideDown();
-        } else {
-            $("#cardForm").slideUp();
+            $("#cardForm").stop(true, true).slideDown();
+        }
+        else{
+            $("#cardForm").stop(true, true).slideUp();
         }
     });
 
     $("#payNow").click(function(){
-        alert("Payment Processing... (Integrate gateway here)");
+        let pay_method = $(".payment-method.active").data("method");
+        if(!pay_method){
+            alert("Please select a payment method.");
+            return;
+        }
+
+        if(pay_method === "card"){
+            let cardNo = $("#card_number").val();
+
+            if(!cardNo || cardNo.replace(/\s/g, "").length < 16){
+                alert("Invalid card number.");
+                return;
+            }
+        }
+
+        $.ajax({
+            url: "../routes/funeral_booking/add_booking_payment_route.php",
+            method: "POST",
+            data: {
+                payment_method: pay_method,
+                service_cost: sessionStorage.getItem("cremation_price"),
+                memorial_cost: sessionStorage.getItem("memorial_price"),
+                total_payment: sessionStorage.getItem("total_amount"),
+                paid_amount: sessionStorage.getItem("total_amount")
+            },
+            success: function(res){
+                console.log(res);
+
+                if(res.trim() === "success"){
+
+                    $.ajax({
+                        url: "../routes/funeral_booking/confirm_cremation_booking_route.php",
+                        method: "POST",
+                        success: function(confirmRes){
+                            console.log(confirmRes);
+
+                            if(confirmRes.includes("success")){
+                                alert("Payment successful! Your booking is confirmed.");
+
+                                sessionStorage.clear();
+
+                                $("#bookingContent").load("views/funeral_booking/booking_confirmation.php");
+                            } else {
+                                alert(confirmRes);
+                            }
+                        },
+                        error: function(err){
+                            console.log(err.responseText);
+
+                            alert("Booking confirmation failed.");
+                        }
+                    });
+                       
+                } else {
+                    alert(res);
+                }
+            },
+            error: function(xhr){
+                console.log(xhr.responseText);
+                alert("An error occurred while processing your payment.");
+            }
+        });
     });
 
 });

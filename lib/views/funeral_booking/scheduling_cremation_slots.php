@@ -1,44 +1,42 @@
 <style>
 
 .slot-card {
-    background: #f8f8f8;
-    border: 1px solid #ccc;
-    transition: 0.2s;
-}
-
-.slot-card {
     padding: 15px;
     border-radius: 8px;
     text-align: center;
     border: 1px solid #ddd;
     transition: all 0.25s ease;
     font-weight: 500;
+    cursor: pointer;
 }
 
-.slot-normal {
+.slot-standard {
     background: #f8f9fa;
     color: #333;
 }
 
-.slot-normal:hover {
+.slot-standard:hover {
     background: #e9ecef;
 }
 
-.slot-after {
+.slot-peak {
     background: #fff3cd;
     color: #856404;
     border: 1px solid #ffeeba;
 }
 
-.slot-after:hover {
+.slot-peak:hover {
     background: #ffe8a1;
 }
 
-.slot-disabled {
-    background: #d6d6d6 !important;
-    color: #888 !important;
-    cursor: not-allowed;
-    opacity: 0.7;
+.slot-premium {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.slot-premium:hover {
+    background: #f1bfc5;
 }
 
 .slot-selected {
@@ -48,20 +46,11 @@
     box-shadow: 0 2px 6px rgba(0,0,0,0.3);
 }
 
-.slot-card:hover {
-    background: #eeeeee;
-}
-
-.slot-selected {
-    background: linear-gradient(145deg, #3a3a3a, #1f1f1f);
-    color: #fff;
-    border: 1px solid #666;
-}
-
 .slot-disabled {
-    background: #ccc;
-    color: #777;
+    background: #d6d6d6 !important;
+    color: #888 !important;
     cursor: not-allowed;
+    opacity: 0.7;
 }
 </style>
 
@@ -86,8 +75,9 @@
         <div class="col-md-4">
             <select name="slottype" id="slottype" class="form-control mb-3">
                 <option value="">Select slot type</option>
-                <option value="normal" class="slot-normal">Normal</option>
-                <option value="afterNormal" class="slot-after">After Normal</option>
+                <option value="standard" class="slot-standard">Standard</option>
+                <option value="peak" class="slot-peak">Peak</option>
+                <option value="premium" class="slot-premium">Premium</option>
             </select>
         </div>
     </div>

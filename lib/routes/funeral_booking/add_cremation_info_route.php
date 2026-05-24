@@ -1,18 +1,21 @@
 <?php
 require_once("../../functions/bookingController.php");
 
-$designJson = $_POST['memorial_design'] ?? null;
-
 $cremation_date = $_POST['cremation_date'] ?? '';
 $area_type = $_POST['area_type'] ?? '';
-$cremation_time_slot = $_POST['cremation_time_slot'] ?? '';
-$cremation_permission = $_POST['cremation_permission'] ?? '';
+$schedule_slots_table_slot_id = $_POST['schedule_slots_table_slot_id'] ?? '';
+$collect_ash = $_POST['collect_ash'] ?? '';
 $ash_collection_method = $_POST['ash_collection_method'] ?? '';
 $notes = $_POST['notes'] ?? '';
 
-if (empty($cremation_date) || empty($area_type) || empty($cremation_time_slot) || $cremation_permission === '') {
-    return "Please fill the required fields.";
+$designJson = $_POST['memorial_design'] ?? null;
+
+if (empty($cremation_date) || empty($area_type) || empty($schedule_slots_table_slot_id) || $collect_ash === '') {
+    echo "Please fill the required fields.";
+    exit();
 }
+
+$imageName = '';
 
 if($ash_collection_method === "memorial"){
     if(empty($designJson)){
@@ -20,8 +23,6 @@ if($ash_collection_method === "memorial"){
         exit;
     }
 }
-
-$imageName = '';
 
 if ($ash_collection_method === "memorial" && !empty($_FILES['memorial_image']['name'])) {
 
@@ -49,38 +50,30 @@ if ($ash_collection_method === "memorial" && !empty($_FILES['memorial_image']['n
     }
 }
 
-$data = $_POST;
-$data['memorial_design'] = $designJson;
-$data['memorial_image'] = $imageName ?? null;
+$_POST['memorial_image'] = $imageName;
 
-$_SESSION['booking']['step3'] = $data;
+$_SESSION['booking']['step3'] = [
+    "cremation" => [
+        "cremation_date" => $cremation_date,
+        "area_type" => $area_type,
+        "schedule_slots_table_slot_id" => $schedule_slots_table_slot_id,
+        "collect_ash" => $collect_ash,
+        "notes" => $notes
+    ],
+
+    "ash_collection_method" => $ash_collection_method,
+
+    "memorial" => ($ash_collection_method === "memorial") ? [
+        "design" => $designJson,
+        "image" => $imageName
+    ] : null
+
+];
+
+$cremationinfo = new BookingController();
+
+$cremationinfo->saveCremationInformation($_POST);
 
 echo "success";
-
-// if($designJson){
-//     $design = json_decode($designJson, true);
-
-//     $name = $design['name'];
-//     $message = $design['message'];
-//     $font = $design['font'];
-//     $theme = $design['theme'];
-//     $icon = $design['icon'];
-// }
-
-// $cremationInfo = new BookingController();
-
-// $cremationInfo->saveCremationInformation($data);
-
-// $_SESSION['booking']['step3'] = [
-//     "cremation_date" => $cremation_date,
-//     "area_type" => $area_type,
-//     "cremation_time_slot" => $cremation_time_slot,
-//     "cremation_permission" => $cremation_permission,
-//     "ash_collection_method" => $ash_collection_method,
-//     "notes" => $notes,
-
-//     "memorial_design" => $designJson,
-//     "memorial_image" => isset($fileName) ? $fileName : null
-// ];
 
 ?>

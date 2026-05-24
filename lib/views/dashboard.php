@@ -1,72 +1,95 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
-    <style>
-        .dash-card {
-            background:#fff;
-            padding:20px;
-            border-radius:12px;
-            border-top:3px solid #c9a44c;
-            box-shadow:0 10px 20px rgba(0,0,0,0.08);
-            margin-bottom:15px;
-        }
+<div class="row mt-4">
 
-        .dash-card h3 {
-            color:#c9a44c;
-        }
-    </style>
-</head>
-<body>
-    <h5>Dashboard</h5>
-    <p>Overview of Cemetery</p>
-    <div class="container-fluid mt-4">
+    <!-- Upcoming Cremations -->
+    <div class="col-lg-6 mb-4">
 
-        <div class="row">
+        <div class="card shadow border-0 rounded-4">
 
-            <!-- Cards -->
-            <div class="col-md-3">
-                <div class="dash-card">
-                    <h6>Total Payments</h6>
-                    <h3>Rs. 1,250,000</h3>
-                </div>
+            <div class="card-header bg-dark text-white">
+                Upcoming Cremations
             </div>
 
-            <div class="col-md-3">
-                <div class="dash-card">
-                    <h6>Today Payments</h6>
-                    <h3>Rs. 45,000</h3>
+            <div class="card-body" id="cremationContainer">
+
+                <div class="text-center text-muted">
+                    
                 </div>
+
             </div>
-
-            <div class="col-md-3">
-                <div class="dash-card">
-                    <h6>Pending</h6>
-                    <h3>12</h3>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- Table -->
-        <div class="card mt-4 p-3">
-            <h5>Payment Records</h5>
-
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th>Booking ID</th>
-                        <th>Name</th>
-                        <th>Amount</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-            </table>
 
         </div>
 
     </div>
-</body>
-</html>
+
+    <!-- Upcoming Burials -->
+    <div class="col-lg-6 mb-4">
+
+        <div class="card shadow border-0 rounded-4">
+
+            <div class="card-header bg-dark text-white">
+                Upcoming Burials
+            </div>
+
+            <div class="card-body" id="burialContainer">
+
+                <div class="text-center text-muted">
+                    
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    $(document).ready(function(){
+        $.ajax({
+            url: '../routes/dashboard/dashboard_route.php?action=upcoming_cremations',
+            method: 'GET',
+            success: function(data) {
+                if (data.length === 0) {
+                    $('#cremationContainer .text-muted').text('No upcoming cremations.');
+                } else {
+                    let html = '<ul class="list-group">';
+                    data.forEach(function(cremation) {
+                        html += `<li class="list-group-item d-flex justify-content-between align-items-center">
+                                    ${cremation.deceased_name} - ${cremation.date_time}
+                                    <span class="badge bg-primary rounded-pill">${cremation.status}</span>
+                                </li>`;
+                    });
+                    html += '</ul>';
+                    $('#cremationContainer').html(html);
+                }
+            },
+            error: function() {
+                $('#cremationContainer .text-muted').text('Failed to load upcoming cremations.');
+            }
+        });
+
+        $.ajax({
+            url: '../routes/dashboard/dashboard_route.php?action=upcoming_burials',
+            method: 'GET',
+            success: function(data) {
+                if (data.length === 0) {
+                    $('#burialContainer .text-muted').text('No upcoming burials.');
+                } else {
+                    let html = '<ul class="list-group">';
+                    data.forEach(function(burial) {
+                        html += `<li class="list-group-item d-flex justify-content-between align-items-center">
+                                    ${burial.deceased_name} - ${burial.date_time}
+                                    <span class="badge bg-primary rounded-pill">${burial.status}</span>
+                                </li>`;
+                    });
+                    html += '</ul>';
+                    $('#burialContainer').html(html);
+                }
+            },
+            error: function() {
+                $('#burialContainer .text-muted').text('Failed to load upcoming burials.');
+            }
+        });
+    });
+</script>

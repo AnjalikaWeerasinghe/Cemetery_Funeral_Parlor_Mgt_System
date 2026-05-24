@@ -52,7 +52,7 @@ if (session_status() === PHP_SESSION_NONE) {
         </li>
 
         <li class="nav-item">
-            <a class="nav-link text-dark fw-semibold" href="#">
+            <a class="nav-link text-dark fw-semibold" href="admin.php?page=deceased">
                 <!-- <i class="fa-solid fa-file me-2"></i>-->
                 Deceased Records
             </a>

@@ -18,7 +18,7 @@
                     <th>Booking Code</th>
                     <th>Deceased Name</th>
                     <th>Date of Death</th>
-                    <th>Applicant NIC</th>
+                    <th>Applicant Name</th>
                     <th>Contact Number</th>
                     <th>Service Type</th>
                     <th width="150">Actions</th>
@@ -30,3 +30,29 @@
         </table>
     </div>
 </div>
+
+<script>
+    $(document).ready(function() {
+        function loadBookings() {
+            $.ajax({
+                url: '../routes/funeral_booking/view_booking_route.php',
+                method: 'GET',
+                success: function(data) {
+                    $('#booking_data').html(data);
+                },
+                error: function() {
+                    alert('Failed to load bookings.');
+                }
+            });
+        }
+
+        loadBookings();
+
+        $('#searchBookings').on('input', function() {
+            var query = $(this).val().toLowerCase();
+            $('#booking_data tr').filter(function() {
+                $(this).toggle($(this).text().toLowerCase().indexOf(query) > -1)
+            });
+        });
+    });
+</script>

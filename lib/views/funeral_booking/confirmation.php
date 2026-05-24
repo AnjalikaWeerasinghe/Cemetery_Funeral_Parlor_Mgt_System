@@ -104,16 +104,41 @@
     box-shadow: 0 0 0 3px rgba(201,164,76,0.3);
 }
 
-.edit-btn {
-    border-radius: 10px;
+.back-btn {
+    background: linear-gradient(135deg, #6c757d, #adb5bd);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
     padding: 10px 22px;
-    border: 1px solid #ccc;
-    transition: 0.3s;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
 }
 
-.edit-btn:hover {
-    background: #f1f1f1;
-    transform: translateY(-1px);
+.back-btn::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(120deg, transparent, rgba(255,255,255,0.4), transparent);
+    transition: 0.5s;
+}
+
+.back-btn:hover::after {
+    left: 100%;
+}
+
+.back-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
+
+.back-btn:active {
+    transform: scale(0.97);
 }
 
 .confirm-card {
@@ -141,27 +166,76 @@
         <div class="section-title mb-4 p-3 bg-light rounded-3">Deceased Information</div>
         <div class="summary-box">
             <div><span class="label">Full Name:</span> <span class="value" id="full_name"></span></div>
-            <div><span class="label">NIC:</span> <span class="value" id="nic"></span></div>
-            <div><span class="label">Gender:</span> <span class="value" id="gender"></span></div>
+            <div class="row">
+                <div class="col-md-4"><span class="label">NIC:</span> <span class="value" id="nic"></span></div>
+                <div class="col-md-4"><span class="label">Gender:</span> <span class="value" id="gender"></span></div>
+                <div class="col-md-4"><span class="label">DOB:</span> <span class="value" id="dob"></span></div>
+            </div>
+            <div><span class="label">Address:</span> <span class="value" id="deceased_address"></span></div>
+            <div class="row">
+                <div class="col-md-6"><span class="label">G. N. Division:</span> <span class="value" id="gn_division"></span></div>
+                <div class="col-md-6"><span class="label">Area of Municipal Council:</span> <span class="value" id="municipal_council"></span></div>
+            </div>
         </div>
 
         <div class="section-title mb-4 p-3 bg-light rounded-3">Applicant Information</div>
         <div class="summary-box">
-            <div><span class="label">Name:</span> <span class="value" id="applicant_name"></span></div>
-            <div><span class="label">Contact:</span> <span class="value" id="contact_number"></span></div>
+            <div class="row">
+                <div class="col-md-6"><span class="label">Applicant Name:</span> <span class="value" id="applicant_name"></span></div>
+                <div class="col-md-6"><span class="label">Relationship to deceased:</span> <span class="value" id="relation_to_deceased"></span></div>
+            </div>
+            <div class="row">
+                <div class="col-md-6"><span class="label">Contact Number:</span> <span class="value" id="contact_number"></span></div>
+                <div class="col-md-6"><span class="label">Email:</span> <span class="value" id="email"></span></div>
+            </div>
+            <div class="row">
+                <div class="col-md-6"><span class="label">G. N. Division:</span> <span class="value" id="applicant_gn_division"></span></div>
+                <div class="col-md-6"><span class="label">Address:</span> <span class="value" id="applicant_address"></span></div>
+            </div>
         </div>
 
         <div class="section-title mb-4 p-3 bg-light rounded-3">Document Information</div>
         <div class="summary-box">
             <div><span class="label">Death Certificate No:</span> <span class="value" id="death_certificate_no"></span></div>
-            <div><span class="label">Date of Death:</span> <span class="value" id="date_of_death"></span></div>
+            <div class="row">
+                <div class="col-md-6"><span class="label">Name of the Registrar:</span> <span class="value" id="registrar_name"></span></div>
+                <div class="col-md-6"><span class="label">Date of Death:</span> <span class="value" id="date_of_death"></span></div>
+            </div>
+            <div><span class="label">Cause of death:</span> <span class="value" id="cause_of_death"></span></div>
+            <div><span class="label">Death Certificate:</span> <span class="value" id="death_certificate"></span></div>
+            <div class="row">
+                <div class="col-md-6"><span class="label">Name of the Coroner & Position:</span> <span class="value" id="coroner_name_position"></span></div>
+                <div class="col-md-6"><span class="label">Coroner Decision:</span> <span class="value" id="coroner_decision"></span></div>
+            </div>
+            <div><span class="label">Inquirer's Certificate of Death:</span> <span class="value" id="inquirer_certificate"></span></div>
+            <div><span class="label">Is body permitted for Cremation? :</span> <span class="value" id="cremation_permission"></span></div>
+            <div><span class="label">Family Consent Letter:</span> <span class="value" id="family_consent_letter"></span></div>
         </div>
 
         <div class="section-title mb-4 p-3 bg-light rounded-3">Cremation Details</div>
         <div class="summary-box">
-            <div><span class="label">Date:</span> <span class="value" id="cremation_date"></span></div>
+            <div class="row">
+                <div class="col-md-6"><span class="label">Cremation Date:</span> <span class="value" id="cremation_date"></span></div>
+                <div class="col-md-6"><span class="label">Area Type:</span> <span class="value" id="area_type"></span></div>
+            </div>
             <div><span class="label">Time Slot:</span> <span class="value highlight" id="cremation_slot"></span></div>
-            <div><span class="label">Area Type:</span> <span class="value" id="area_type"></span></div>
+            <div><span class="label">Are you collecting ash after cremation?</span> <span class="value" id="collect_ash"></span></div>
+                
+            <div class="col-md-6"><span class="label">Ash collecting method? :</span> <span class="value" id="ash_collecting_method"></span></div>
+            <div class="col-md-6">
+                <div id="memorialSection" style="display:none;" class="mt-3">
+                    <span class="label d-block mb-2">Memorial Preview</span>
+
+                    <div id="memorialPreview" class="p-3 text-center" style="width: 220px; border-radius: 10px; border: 1px solid #ccc; background: #f8f8f8">
+                        <div class="confirmIcon" id="confirmIcon" style="font-size: 20px;"></div>
+                        <img id="confirmImage" style="max-width:60px; display:none; margin:5px auto;" />
+                        <h6 id="confirmName">Name</h6>
+                        <p id="confirmMessage" style="font-size:13px;">Message</p>
+                    </div>
+                </div>
+            </div>
+
+            <div><span class="label">Notes:</span> <span class="value" id="notes" name="notes"></span></div>
         </div>
 
         <div class="section-title mb-4 p-3 bg-light rounded-3">Booking Reference</div>
@@ -179,13 +253,9 @@
         </div>
 
         <div class="d-flex justify-content-between align-items-center mt-4">
-            <button class="btn btn-outline-secondary edit-btn" id="editBtn">
-                ← Edit Details
-            </button>
+            <button type="button" class="back-btn" id="load_step3">Back</button>
 
-            <button type="button" id="load_step5">
-                Confirm & Proceed to Payment →
-            </button>
+            <button type="button" id="load_step5">Confirm & Proceed to Payment</button>
         </div>
 
     </div>
@@ -193,30 +263,145 @@
 
 <script>
     $(document).ready(function(){
+        let permission = sessionStorage.getItem("cremation_permission");
+        let collect_ash = sessionStorage.getItem("collect_ash");
 
         $("#full_name").text(sessionStorage.getItem("full_name"));
         $("#nic").text(sessionStorage.getItem("nic"));
         $("#gender").text(sessionStorage.getItem("gender"));
+        $('#dob').text(sessionStorage.getItem("date_of_birth"));
+        $("#deceased_address").text(sessionStorage.getItem("deceased_address"));
+        $("#gn_division").text(sessionStorage.getItem("deceased_gn_division"));
+        $("#municipal_council").text(sessionStorage.getItem("municipal_council"));
 
         $("#applicant_name").text(sessionStorage.getItem("applicant_name"));
+        $("#relation_to_deceased").text(sessionStorage.getItem("relationship_to_deceased"));
+        $("#email").text(sessionStorage.getItem("email"));
         $("#contact_number").text(sessionStorage.getItem("contact_number"));
+        $("#applicant_gn_division").text(sessionStorage.getItem("applicant_gn_division"));
+        $("#applicant_address").text(sessionStorage.getItem("applicant_address"));
 
         $("#death_certificate_no").text(sessionStorage.getItem("death_certificate_number"));
+        $("#registrar_name").text(sessionStorage.getItem("registrar_name"));
         $("#date_of_death").text(sessionStorage.getItem("date_of_death"));
+        $("#cause_of_death").text(sessionStorage.getItem("cause_of_death"));
+        
+        $("#coroner_name_position").text(sessionStorage.getItem("coroner_name_position"));
+        $("#coroner_decision").text(sessionStorage.getItem("coroner_decision"));
+        
+        $("#cremation_permission").text(permission == "1" ? "Yes" : "No");
 
-        $("#cremation_date").text(sessionStorage.getItem("cremation_date"));
-        $("#cremation_slot").text(sessionStorage.getItem("slot_text"));
-        $("#area_type").text(sessionStorage.getItem("area_type"));
+        $("#cremation_date").text(sessionStorage.getItem("selectedDate"));
+        $("#cremation_slot").text(sessionStorage.getItem("slot_text")); // Display selected cremation time slot
+
+        $("#death_certificate").text(
+            sessionStorage.getItem("death_certificate_uploaded") === "1"
+            ? "Uploaded"
+            : "Not Uploaded"
+        );
+
+        $("#inquirer_certificate").text(
+            sessionStorage.getItem("coroner_certificate_uploaded") === "1"
+            ? "Uploaded"
+            : "Not Uploaded"
+        );
+
+        $("#family_consent_letter").text(
+            sessionStorage.getItem("family_consent_letter_uploaded") === "1"
+            ? "Uploaded"
+            : "Not Uploaded"
+        );
+
+        let areaType = sessionStorage.getItem("area_type");
+
+        if(areaType === "municipal_limit"){
+            $("#area_type").text("Municipal Limit Area");
+        }
+        else if(areaType === "outside_municipal_limit"){
+            $("#area_type").text("Outside Municipal Limit Area");
+        } 
+
+        $("#collect_ash").text(collect_ash == "1" ? "Yes" : "No");
+
+        let ashMethod = sessionStorage.getItem("ash_collection_method");
+
+        if(ashMethod === "memorial"){
+            $("#ash_collecting_method").text("Memorial Service");
+        }
+        else if(ashMethod === "collect"){
+            $("#ash_collecting_method").text("Collecting Ashes");
+        }
+        else{
+            $("#ash_collecting_method").text("Not Selected");
+        }
+
+        if(ashMethod === "memorial"){
+
+            $("#memorialSection").show();
+
+            let name = sessionStorage.getItem("memorial_name");
+            let message = sessionStorage.getItem("memorial_message");
+            let icon = sessionStorage.getItem("memorial_icon");
+            let theme = sessionStorage.getItem("tablet_theme");
+            let font = sessionStorage.getItem("font_style");
+
+            $("#confirmName").text(name || "Name");
+            $("#confirmMessage").text(message || "Message");
+
+            if(icon === "cross"){
+                $("#confirmIcon").text("✝");
+            }
+            else if(icon === "flower"){
+                $("#confirmIcon").text("🌸");
+            }
+            else{
+                $("#confirmIcon").text("");
+            }
+
+            if(theme === "dark"){
+                $("#memorialPreview").css({
+                    background: "linear-gradient(145deg, #2b2b2b, #1a1a1a)",
+                    color: "#fff"
+                });
+            }
+            else if(theme === "light"){
+                $("#memorialPreview").css({
+                    background: "#f8f8f8",
+                    color: "#222"
+                });
+            }
+            else if(theme === "gold"){
+                $("#memorialPreview").css({
+                    background: "linear-gradient(145deg, #b8962e, #e6c65c)",
+                    color: "#2b2b2b"
+                });
+            }
+
+            if(font === "classic"){
+                $("#memorialPreview").css("font-family", "Georgia, serif");
+            }
+            else if(font === "modern"){
+                $("#memorialPreview").css("font-family", "Arial, sans-serif");
+            }
+            else if(font === "elegant"){
+                $("#memorialPreview").css("font-family", "Times New Roman, serif");
+            }
+        }
+        $("#notes").text(sessionStorage.getItem("notes") || "None");
+
+        $("#total_amount").text("LKR " + sessionStorage.getItem("total_amount"));
 
         $("#booking_code").text(sessionStorage.getItem("booking_code"));
 
     });
 
-    $("#editBtn").click(function(){
-        $("#bookingContent").load("funeral_booking/deceased_information.php");
-    });
-
     $("#load_step5").click(function(){
         $("#bookingContent").load("funeral_booking/booking_payment.php");
+        // unlockStep(4);
+        // loadStep(4);
+    });
+
+    $(document).on("click", "#load_step3", function () {
+        loadStep(3);
     });
 </script>
