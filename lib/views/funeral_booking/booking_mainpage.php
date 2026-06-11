@@ -3,11 +3,22 @@
     background: rgba(30,30,30,0.85);
     border-radius: 15px;
     border: 1px solid rgba(212,175,122,0.2);
-    transition: 0.3s;
+    transition: all 0.3s ease;
     color: #ccc;
     position: relative;
     overflow: hidden;
-    margin-bottom: 25.5px;
+    cursor: pointer;
+
+    width: 100%;
+    min-height: 220px; /* reduced height */
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    text-align: center;
+    padding: 15px;
 }
 
 .booking-card h5 {
@@ -42,17 +53,21 @@
     width: 100%;
 }
 
+#booking_service_types {
+    max-width: 1200px;
+}
+
 </style>
 
-<div class="container mt-5">
+<div class="container d-flex flex-column justify-content-center align-items-center mb-5">
     <div class="text-center mb-5" style="margin-top: 110px;">
         <h2 class="fw-bold text-gold">Select Booking Type</h2>
         <p class="text-muted">Choose a service to continue your booking</p>
     </div>
 
-    <div class="row" id="booking_service_types">
+    <div class="row justify-content-center g-4 w-100" id="booking_service_types">
 
-        <div class="col-md-4 mb-4">
+        <div class="col-lg-4 col-md-6 col-sm-10 d-flex justify-content-center">
             <div class="card booking-card text-center p-4" data-service-type="Cremation" data-page="add_cremation_booking">
                 <i class="fa-solid fa-fire text-center"></i>
                 <h5>Crematorium</h5>
@@ -60,7 +75,7 @@
             </div>
         </div>
 
-        <div class="col-md-4 mb-4">
+        <div class="col-lg-4 col-md-6 col-sm-10 d-flex justify-content-center">
             <div class="card booking-card text-center p-4" data-service-type="Burial" data-page="add_burial_booking">
                 <i class="fa-solid fa-cross text-center"></i>
                 <h5>Burial</h5>
@@ -68,7 +83,7 @@
             </div>
         </div>
 
-        <div class="col-md-4 mb-4">
+        <div class="col-lg-4 col-md-6 col-sm-10 d-flex justify-content-center">
             <div class="card booking-card text-center p-4" data-service-type="Parlor" data-page="add_parlor_booking">
                 <i class="fa-solid fa-building-columns text-center"></i>
                 <h5>'Nisala Arana'</h5>

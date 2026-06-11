@@ -179,7 +179,7 @@ input[type="file"]:hover {
             <form id="document_info" autocomplete="off" enctype="multipart/form-data">
                 <div class="section-box">
                     <h6 class="mb-3">Document Information</h6>
-                    <p class="text-muted">Please upload the soft copies of the orginal documents to confirm the death of the deceased and 
+                    <p class="text-muted">Please upload the soft copies of the original documents to confirm the death of the deceased and 
                     to continue the funeral reservation process.</p>
                 </div>
 
@@ -193,7 +193,12 @@ input[type="file"]:hover {
                 <div class="row">
                     <div class="col-md-9 mb-3">
                         <label for="registrar_name" class="form-label">Name of the Registrar *</label>
-                        <input type="text" name="registrar_name" id="registrar_name" class="form-control" required>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0">
+                                <i class="fa-solid fa-user text-secondary"></i>
+                            </span>
+                            <input type="text" name="registrar_name" id="registrar_name" class="form-control border-start-0" required>
+                        </div>
                     </div>
 
                     <div class="col-md-3 mb-3">
@@ -209,18 +214,24 @@ input[type="file"]:hover {
 
                 <div class="mb-3">
                     <label for="death_certificate" class="form-label">Death Certificate *</label>
-                    <input type="file" name="death_certificate" id="death_certificate" class="form-control" required>
+                    <input type="file" name="death_certificate" id="death_certificate" class="form-control">
+                    <div id="death_certificate_status"></div>
                     <small class="text-muted">Upload PDF or Image (Max 2MB)</small>
                 </div>
 
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label for="coroner_name" class="form-label">Name of the Coroner and Position</label>
-                        <input type="text" name="coroner_name" id="coroner_name" class="form-control">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0">
+                                <i class="fa-solid fa-user text-secondary"></i>
+                            </span>
+                            <input type="text" name="coroner_name" id="coroner_name" class="form-control border-start-0">
+                        </div>
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="coroner_decision" class="form-label">Coroner Desicion</label>
+                        <label for="coroner_decision" class="form-label">Coroner Decision</label>
                         <input type="text" name="coroner_decision" id="coroner_decision" class="form-control">
                     </div>
                 </div>
@@ -228,6 +239,7 @@ input[type="file"]:hover {
                 <div class="mb-3">
                     <label for="coroner_certificate" class="form-label">Inquirer's Certificate of Death</label>
                     <input type="file" name="coroner_certificate" id="coroner_certificate" class="form-control">
+                    <div id="coroner_certificate_status"></div>
                     <small class="text-muted">Upload PDF or Image (Max 2MB)</small>
                 </div>
 
@@ -250,7 +262,8 @@ input[type="file"]:hover {
 
                 <div class="mb-3">
                     <label for="family_consent_letter" class="form-label">Family Consent Letter *</label>
-                    <input type="file" name="family_consent_letter" id="family_consent_letter" class="form-control" required>
+                    <input type="file" name="family_consent_letter" id="family_consent_letter" class="form-control">
+                    <div id="family_consent_letter_status"></div>
                     <small class="text-muted">Upload PDF or Image (Max 2MB)</small>
                 </div>
 
@@ -261,7 +274,7 @@ input[type="file"]:hover {
                         <button type="button" class="back-btn" id="load_step1">Back</button>
                     </div>
                     <div>
-                        <button type="submit" class="btn btn-success" id="load_step3">Proceed to Next Page</button>
+                        <button type="submit" class="load-btn" id="load_step3">Proceed to Next Page</button>
                     </div>
                 </div>
 
@@ -286,20 +299,44 @@ input[type="file"]:hover {
             $("#coroner_decision").val(sessionStorage.getItem("coroner_decision") || "");
 
             const cremationPermission = sessionStorage.getItem("cremation_permission");
+
             if (cremationPermission !== null) {
                 $(`input[name="cremation_permission"][value="${cremationPermission}"]`).prop("checked", true);
             }
 
-            // Note: Cannot restore file inputs for security reasons, hence indicate if files were previously uploaded
-            if (sessionStorage.getItem("death_certificate_uploaded") === "1") {
-                $("#death_certificate").after("<small class='text-success'>File previously uploaded</small>");
+            if(sessionStorage.getItem("death_certificate_name")){
+                $("#death_certificate_status").html(
+                    `<span class="text-success">Previously uploaded: ${sessionStorage.getItem("death_certificate_name")}</span>`
+                );
             }
-            if (sessionStorage.getItem("coroner_certificate_uploaded") === "1") {
-                $("#coroner_certificate").after("<small class='text-success'>File previously uploaded</small>");
+
+            let coronerFile = sessionStorage.getItem("coroner_certificate_name");
+            if(coronerFile){
+                $("#coroner_certificate_status").html(
+                    `<span class="text-success">Previously uploaded: ${coronerFile}</span>`
+                );
             }
-            if (sessionStorage.getItem("family_consent_letter_uploaded") === "1") {
-                $("#family_consent_letter").after("<small class='text-success'>File previously uploaded</small>");
+
+            // if(sessionStorage.getItem("coroner_certificate_name")){
+            //     $("#coroner_certificate_status").html(
+            //         `<span class="text-success">Previously uploaded: ${sessionStorage.getItem("coroner_certificate_name")}</span>`
+            //     );
+            // }
+
+            if(sessionStorage.getItem("family_consent_letter_name")){
+                $("#family_consent_letter_status").html(
+                    `<span class="text-success">Previously uploaded: ${sessionStorage.getItem("family_consent_letter_name")}</span>`
+                );
             }
+
+            if(sessionStorage.getItem("death_certificate_name")){
+                $("#death_certificate").removeAttr("required");
+            }
+
+            if(sessionStorage.getItem("family_consent_letter_name")){
+                $("#family_consent_letter").removeAttr("required");
+            }
+
         }
 
         function showFileNames() {
@@ -325,9 +362,20 @@ input[type="file"]:hover {
 
             const file = this.files[0];
 
-            if(file && file.size > 2 * 1024 * 1024){
+            if(!file) return;
+
+            if(file.size > 2 * 1024 * 1024){
                 alert("File size must be below 2MB");
                 $(this).val("");
+                return;
+            }
+
+            const allowedTypes = ["application/pdf", "image/jpeg", "image/png", "image/jpg"];
+
+            if(!allowedTypes.includes(file.type)){
+                alert("Only PDF, JPG, JPEG, PNG files are allowed.")
+                $(this).val("");
+                return;
             }
         });
 
@@ -347,7 +395,7 @@ input[type="file"]:hover {
                 success:function(response){
                     // console.log("Response:", response);
 
-                    response = response.trim();
+                    response = $.trim(response);
 
                     if(response === "success"){
 
@@ -360,20 +408,21 @@ input[type="file"]:hover {
                         
                         sessionStorage.setItem("cremation_permission", $('input[name="cremation_permission"]:checked').val());
 
-                        sessionStorage.setItem(
-                            "death_certificate_uploaded",
-                            $("#death_certificate")[0].files.length > 0 ? "1" : "0"
-                        );
+                        const deathFile = $("#death_certificate")[0].files[0]?.name || sessionStorage.getItem("death_certificate_name");
+                        sessionStorage.setItem("death_certificate_name", deathFile);
 
-                        sessionStorage.setItem(
-                            "coroner_certificate_uploaded",
-                            $("#coroner_certificate")[0].files.length > 0 ? "1" : "0"
-                        );
+                        const familyConsentFile = $("#family_consent_letter")[0].files[0]?.name || sessionStorage.getItem("family_consent_letter_name");
+                        sessionStorage.setItem("family_consent_letter_name", familyConsentFile);
 
-                        sessionStorage.setItem(
-                            "family_consent_letter_uploaded",
-                            $("#family_consent_letter")[0].files.length > 0 ? "1" : "0"
-                        );
+                        let coronerFileName = $("#coroner_certificate")[0].files[0];
+                        if(coronerFileName){
+                            sessionStorage.setItem("coroner_certificate_name", coronerFileName.name);
+                        } else {
+                            sessionStorage.removeItem("coroner_certificate_name");
+                        }
+
+                        // const coronerFile = $("#coroner_certificate")[0].files[0]?.name || sessionStorage.getItem("coroner_certificate_name");
+                        // sessionStorage.setItem("coroner_certificate_name", coronerFile);
 
                         unlockStep(3);
                         loadStep(3);

@@ -24,6 +24,11 @@ if($ash_collection_method === "memorial"){
     }
 }
 
+if($collect_ash === "0" && $ash_collection_method === "memorial"){
+    echo "Invalid ash collection method.";
+    exit();
+}
+
 if ($ash_collection_method === "memorial" && !empty($_FILES['memorial_image']['name'])) {
 
     $allowedExts = ['jpg', 'jpeg', 'png', 'webp'];
@@ -42,7 +47,14 @@ if ($ash_collection_method === "memorial" && !empty($_FILES['memorial_image']['n
     }
 
     $imageName = uniqid('img_') . '.' . $imageExt;
-    $uploadPath = '../../uploads/memorial_images/' . $imageName;
+
+    $uploadDir = '../../uploads/memorial_images/';
+
+    if(!file_exists($uploadDir)){
+        mkdir($uploadDir, 0777, true);
+    }
+
+    $uploadPath = $uploadDir . $imageName;
 
     if (!move_uploaded_file($tmpName, $uploadPath)) {
         echo "Image upload failed.";
@@ -50,7 +62,7 @@ if ($ash_collection_method === "memorial" && !empty($_FILES['memorial_image']['n
     }
 }
 
-$_POST['memorial_image'] = $imageName;
+$memorial_image = $imageName;
 
 $_SESSION['booking']['step3'] = [
     "cremation" => [

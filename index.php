@@ -26,24 +26,173 @@ if(isset($_POST['login'])){
 
     <script src="js/bootstrap.bundle.min.js"></script>
     <script src="js/jquery.js"></script>
+
+    <style>
+
+        :root{
+            --gold-main: #d4af7a;
+            --gold-dark: #8b6f47;
+            --dark-bg: #1e1e1e;
+            --light-bg: #f8f9fa;
+        }
+
+        body{
+            font-family: 'Segoe UI', sans-serif;
+            background: #f4f6f9;
+            overflow-x: hidden;
+        }
+
+        .main-content{
+            margin-top: 90px;
+            min-height: calc(100vh - 220px);
+        }
+
+        .navbar{
+            backdrop-filter: blur(10px);
+            padding: 13px 20px;
+        }
+
+        .navbar-brand{
+            transition: 0.3s ease;
+        }
+
+        .navbar-brand:hover{
+            transform: scale(1.02);
+        }
+
+        .nav-link{
+            position: relative;
+            color: #1e1e1e !important;
+            margin: 0 8px;
+            transition: 0.3s ease;
+        }
+
+        .nav-link::after{
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            left: 0;
+            bottom: 0;
+            background: #1e1e1e;
+            transition: 0.3s ease;
+        }
+
+        .nav-link:hover::after{
+            width: 100%;
+        }
+
+        .nav-link:hover{
+            transform: translateY(-2px);
+        }
+
+        .logo-img{
+            object-fit: cover;
+        }
+
+        .btn-dark{
+            background: #1e1e1e;
+            border: none;
+            transition: 0.3s ease;
+        }
+
+        .btn-dark:hover{
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(0,0,0,0.2);
+        }
+
+        .btn-outline-dark:hover{
+            background: #1e1e1e;
+            color: white;
+        }
+
+        .footer{
+            margin-top: 50px;
+        }
+
+        .footer h5{
+            color: #1e1e1e;
+        }
+
+        .footer p,
+        .footer small{
+            color: #fff;
+        }
+
+        .dropdown-menu{
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .dropdown-item{
+            transition: 0.2s ease;
+        }
+
+        .dropdown-item:hover{
+            background: rgba(212,175,122,0.15);
+            padding-left: 20px;
+        }
+
+        .footer .col-md-4{
+            transition: 0.3s ease;
+        }
+
+        .footer .col-md-4:hover{
+            transform: translateY(-5px);
+        }
+
+        @media (max-width: 768px){
+
+            .logo-img{
+                width: 45px;
+                height: 45px;
+            }
+
+            .navbar-brand .lh-sm{
+                font-size: 13px;
+            }
+
+        }
+
+        @media (max-width: 991px){
+
+            .navbar-collapse{
+                background: rgba(255,255,255,0.95);
+                padding: 15px;
+                border-radius: 15px;
+                margin-top: 10px;
+            }
+
+            .navbar-nav{
+                text-align: center;
+            }
+
+            .d-flex.ms-auto{
+                justify-content: center;
+                margin-top: 15px;
+            }
+
+        }
+
+    </style>
+
 </head>
 <body>
     <nav class="navbar navbar-expand-lg fixed-top shadow opacity-80" style="background: linear-gradient(to right, #8b6f47, #d4af7a);">
         <div class="container-fluid">
 
             <a class="navbar-brand fw-bold text-dark d-flex align-items-center" href="index.php">
-                <img src="lib/uploads/cemetery_logo.png" class="rounded-circle mb-0" width="70" height="70" alt="Logo">
-                <div class="lh-sm">
-                General Cemetery <br> & Funeral Parlor
-                </div>
+                <img src="lib/uploads/cemetery_logo.png" alt="Logo" class="rounded-circle me-2 logo-img" width="60" height="60">
+                <div class="lh-sm">General Cemetery <br> & Funeral Parlor</div>
             </a>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-            <div class="collapse navbar-collapse justify-content-center fw-bold" id="navbarColor01">
-                <ul class="navbar-nav">
+            <div class="collapse navbar-collapse justify-content-center fw-bold mt-3 mt-lg-0" id="navbarColor01">
+                <ul class="navbar-nav align-items-lg-center">
                     <a class="nav-link" href="index.php?page=home">Home</a>
                     <a class="nav-link" href="index.php?page=history">History</a>
                     <a class="nav-link" href="index.php?page=about">About Us</a>
@@ -100,7 +249,7 @@ if(isset($_POST['login'])){
         </div>
     </nav>
 
-    <div class="container-fluid p-0">
+    <div class="container-fluid p-0 main-content">
 
         <?php
         $page = $_GET['page'] ?? 'home';
@@ -168,7 +317,7 @@ if(isset($_POST['login'])){
 
     </div>
 
-    <div class="footer text-white" style="background: linear-gradient(to right, #8b6f47, #d4af7a);">
+    <div class="footer text-white shadow-lg" style="background: linear-gradient(to right, #8b6f47, #d4af7a);">
   
         <div class="container py-4">
             <div class="row text-center text-md-center">

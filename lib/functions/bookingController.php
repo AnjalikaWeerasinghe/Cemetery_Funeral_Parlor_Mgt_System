@@ -3,8 +3,10 @@ session_start();
 include_once('main.php');
 include_once('numberGeneration.php');
 
+// Purpose: This class contains methods for managing funeral booking operations
 class BookingController extends MainController{
 
+    // This function generates a unique booking code based on the selected service type
     public function getNewBookingCode($service_type) {
         $number = new Numbering();
 
@@ -19,16 +21,20 @@ class BookingController extends MainController{
         return $number->generateUniqueNumber("booking_code", "funeral_service_table", $prefix);
     }
 
+    // This function generates a unique payment code for the payment record
     public function generatePaymentCode() {
         $number = new Numbering();
         return $number->generateUniqueNumber("payment_code", "payment_table", "PAY-");
     }
 
+    // This function generates a unique transaction reference for payment processing
     public function generateTransactionReference() {
         return "TRC-" . strtoupper(bin2hex(random_bytes(5)));
     }
 
-    public function saveDeceasedInformation($data) {
+    // This function saves the deceased and applicant information to the session for later use in the booking process. 
+    // It also performs basic validation on the required fields.
+    public function saveDeceasedInformation($data, $files = []) {
 
         $full_name = $data['full_name'] ?? '';
         $nic = $data['nic'] ?? '';
@@ -50,6 +56,7 @@ class BookingController extends MainController{
         return "success";
     }
 
+    // This function saves the document information to the session for later use in the booking process.
     public function saveDocumentInformation($data) {
 
         $death_certificate_number = $data['death_certificate_number'] ?? '';
@@ -72,6 +79,7 @@ class BookingController extends MainController{
         return "success";
     }
 
+    // This function retrieves the available schedule slots for a given date, along with their booking status, to help users select a suitable time for the cremation service.
     public function getSlotsByDate($date) {
 
         $day = date('l', strtotime($date)); // Days of Week: Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday
@@ -98,6 +106,8 @@ class BookingController extends MainController{
         return $slots;
     }
 
+    // This function saves the cremation and memorial information to the session for later use in the booking process. 
+    // It also performs validation on the required fields and handles the memorial design data if the user chooses to collect ashes through a memorial service.
     public function saveCremationInformation($data, $files = []) {
 
         $cremation_date = $data['cremation_date'] ?? '';
@@ -143,14 +153,15 @@ class BookingController extends MainController{
             "memorial" => ($ash_collection_method === "memorial") ? [
                 "design" => $decodedDesign,
                 "image" => $files['memorial_image']['name'] ?? null
-            ] : null,
+            ] : null
 
-            "ash_collection_method" => $ash_collection_method
         ];
 
         return "success";
     }
 
+    // This function saves the payment information to the session for later use in the booking process. 
+    // It also performs validation on the required fields to ensure that payment details are complete before proceeding to the final booking confirmation step.
     public function savePaymentInformation($data) {
         
         if(empty($data['payment_method']) || empty($data['total_payment'])) {
@@ -162,7 +173,7 @@ class BookingController extends MainController{
         return "success";
     }
 
-    // Saving all the booking data to the database after the final step
+    // This function saves all the booking data to the database after the final step
     public function confirmCremationBooking() {
 
         if (!isset($_SESSION['booking']['step1']) || 
@@ -185,11 +196,12 @@ class BookingController extends MainController{
         $step3 = $_SESSION['booking']['step3'];
         $step4 = $_SESSION['booking']['payment'];
 
+        // Begin database transaction
+        // Ensures all booking-related inserts succeed or rollback together
         $this->conn->begin_transaction();
 
         try{
             //Step 1 insertion - Deceased and Applicant Information
-
             $checkSql = "SELECT deceased_id FROM deceased_table WHERE nic = ?";
 
             $checkStmt = $this->conn->prepare($checkSql);
@@ -208,13 +220,13 @@ class BookingController extends MainController{
             } else {
 
                 $sql1 = "INSERT INTO deceased_table (
-                        full_name, nic, gender, date_of_birth, deceased_address, deceased_gn_division, municipal_council)
-                        VALUES (?, ?, ?, ?, ?, ?, ?)";
+                        full_name, title, religion, deceased_photo, nic, gender, date_of_birth, deceased_address, deceased_gn_division, municipal_council)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                 
                 $stmt1 = $this->conn->prepare($sql1);
 
-                $stmt1->bind_param("sssssss", 
-                    $step1['full_name'], $step1['nic'], $step1['gender'], $step1['date_of_birth'], $step1['deceased_address'], $step1['deceased_gn_division'], $step1['municipal_council']
+                $stmt1->bind_param("ssssssssss", 
+                    $step1['full_name'], $step1['title'], $step1['religion'], $step1['deceased_photo'], $step1['nic'], $step1['gender'], $step1['date_of_birth'], $step1['deceased_address'], $step1['deceased_gn_division'], $step1['municipal_council']
                 );
 
                 if(!$stmt1->execute()){
@@ -270,7 +282,7 @@ class BookingController extends MainController{
 
             $service_type = "Cremation";
 
-            $booking_status = "Confirmed"; // Initial status before payment confirmation
+            $booking_status = "Pending"; // Initial status before payment confirmation
 
             $booking_created_at = date("Y-m-d H:i:s");
 
@@ -316,20 +328,7 @@ class BookingController extends MainController{
 
             if ($step3['ash_collection_method'] === "memorial") {
 
-                // $design = json_decode($step3['memorial']['design'], true);
                 $design = $step3['memorial']['design'];
-
-                // $icon = is_array($design['icon'])
-                //     ? json_encode($design['icon'])
-                //     : $design['icon'];
-
-                // $font = is_array($design['font'])
-                //     ? json_encode($design['font'])
-                //     : $design['font'];
-
-                // $theme = is_array($design['theme'])
-                //     ? json_encode($design['theme'])
-                //     : $design['theme'];
 
                 if(is_string($design)){
                     $design = json_decode($design, true);
@@ -427,7 +426,7 @@ class BookingController extends MainController{
                 JOIN deceased_table d ON fs.deceased_table_deceased_id = d.deceased_id
                 JOIN applicant_table a ON fs.applicant_table_applicant_id = a.applicant_id
                 JOIN document_table doc ON fs.document_table_document_set_id = doc.document_id
-                WHERE fs.booking_status = 'Confirmed'
+                WHERE fs.booking_status = 'Pending'
                 ORDER BY fs.booking_created_at DESC";
 
         $result = $this->conn->query($sql);

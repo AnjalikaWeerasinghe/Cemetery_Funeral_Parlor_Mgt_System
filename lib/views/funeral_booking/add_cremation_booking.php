@@ -7,13 +7,20 @@
     --bg-soft:#f5f7fb;
 }
 
+html{
+    scroll-behavior:smooth;
+}
+
 body {
     background:var(--bg-soft);
     font-family: 'Segoe UI', sans-serif;
 }
 
-.container {
-    max-width: 1150px;
+.booking-wrapper{
+    width: 100%;
+    max-width: 1200px;
+    margin: auto;
+    padding: 0 15px;
 }
 
 .back-container {
@@ -30,6 +37,15 @@ body {
     padding:35px;
     box-shadow:0 15px 40px rgba(0,0,0,0.06);
     border:1px solid rgba(0,0,0,0.03);
+}
+
+.booking-card{
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.booking-card:hover{
+    transform: translateY(-3px);
 }
 
 h3 {
@@ -49,14 +65,24 @@ h3::after {
     border-radius:50px;
 }
 
-.steps {
+.steps{
     display:flex;
     align-items:center;
-    justify-content:space-between;
+    justify-content:flex-start;
     gap:10px;
     overflow-x:auto;
-    padding-bottom:10px;
-    margin-bottom:5px;
+    overflow-y:hidden;
+    white-space:nowrap;
+    position:sticky;
+    top:80px;
+    z-index:100;
+    background:#fff;
+    padding:15px 10px;
+    border-radius:15px;
+    box-shadow:0 8px 25px rgba(0,0,0,0.05);
+    margin-bottom:20px;
+    scrollbar-width:thin;
+    width: 100%;
 }
 
 .steps::-webkit-scrollbar {
@@ -68,17 +94,22 @@ h3::after {
     border-radius:10px;
 }
 
-.step-btn {
-    border-radius:50px;
-    padding:12px 18px;
-    font-size:13px;
-    font-weight:600;
-    border:1px solid var(--border-soft);
-    background:#fafafa;
-    color:#666;
-    transition:all .3s ease;
-    white-space:nowrap;
-    min-width:max-content;
+.step-btn{
+    border-radius: 14px;
+    padding: 14px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    border: 1px solid var(--border-soft);
+    background: #fafafa;
+    color: #666;
+    transition: all .3s ease;
+    white-space: nowrap;
+    min-width: 170px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-shrink:0;
 }
 
 .step-btn:hover {
@@ -106,9 +137,10 @@ h3::after {
     flex-shrink:0;
 }
 
-#bookingContent {
-    min-height:350px;
-    animation:fadeIn .3s ease;
+#bookingContent{
+    min-height: 450px;
+    padding-top: 20px;
+    animation: fadeIn .35s ease;
 }
 
 #messageModal .modal-content {
@@ -119,7 +151,7 @@ h3::after {
         0 20px 45px rgba(0,0,0,0.18),
         0 5px 15px rgba(0,0,0,0.08);
     border: 1px solid rgba(201,164,76,0.18);
-    animation: modalFade 0.25s ease;
+    animation: modalFade 0.12s ease-out;
 }
 
 #messageModal .modal-header {
@@ -189,13 +221,35 @@ h3::after {
 
 .modal-backdrop.show {
     background: rgba(15,15,15,0.75);
-    backdrop-filter: blur(4px);
+}
+
+.step-btn.active{
+    position: relative;
+    overflow: hidden;
+}
+
+.step-btn.active::before{
+    content:"";
+    position:absolute;
+    top:0;
+    left:-100%;
+    width:100%;
+    height:100%;
+    background:rgba(255,255,255,0.25);
+    transform:skewX(-25deg);
+    animation:shine 2s infinite;
+}
+
+@keyframes shine{
+    100%{
+        left:120%;
+    }
 }
 
 @keyframes modalFade {
     from{
         opacity: 0;
-        transform: translateY(20px) scale(0.96);
+        transform: translateY(8px);
     }
     to{
         opacity: 1;
@@ -224,6 +278,50 @@ h3::after {
         font-size:12px;
         padding:10px 14px;
     }
+
+    .booking-card{
+        padding:18px;
+        border-radius:14px;
+    }
+
+    .steps{
+        justify-content:flex-start;
+        flex-wrap:nowrap;
+        overflow-x:auto;
+        overflow-y:hidden;
+        padding-bottom:12px;
+        -webkit-overflow-scrolling:touch;
+    }
+
+    .step-btn{
+        min-width:160px;
+        font-size:12px;
+        padding:12px 14px;
+    }
+
+    .step-divider{
+        display:none;
+    }
+
+    h3{
+        font-size:22px;
+    }
+
+    #bookingContent{
+        min-height:300px;
+    }
+}
+
+@media(max-width:576px){
+
+    #messageModal .modal-dialog{
+        margin: 15px;
+    }
+
+    #messageModal .modal-body{
+        padding: 22px 18px;
+    }
+
 }
 
 </style>
@@ -232,7 +330,7 @@ h3::after {
     $isAdmin = (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin');
 ?>
 
-<div class="container mt-4">
+<div class="booking-wrapper mt-4">
     <div class="booking-card">
 
         <h3 class="text-center mb-4">Crematorium Reservation</h3>
@@ -280,15 +378,12 @@ h3::after {
 
 </div>
 
-<div class="modal fade" id="messageModal" tabindex="-1">
+<div class="modal" id="messageModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow">
 
             <div class="modal-header bg-warning text-dark">
-                <h5 class="modal-title">
-                    System Message
-                </h5>
-
+                <h5 class="modal-title">System Message</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
@@ -297,9 +392,7 @@ h3::after {
             </div>
 
             <div class="modal-footer">
-                <button type="button"
-                        class="btn btn-dark px-4"
-                        data-bs-dismiss="modal">
+                <button type="button" class="btn btn-dark px-4" data-bs-dismiss="modal">
                     OK
                 </button>
             </div>
@@ -346,6 +439,12 @@ h3::after {
             4: baseRoute + "funeral_booking/confirmation.php",
             5: baseRoute + "funeral_booking/booking_payment.php"
         };
+
+        $("#bookingContent").html(`
+            <div class="text-center py-5">
+                <div class="spinner-border text-warning"></div>
+            </div>
+        `);
 
         $("#bookingContent").load(routes[step]);
 

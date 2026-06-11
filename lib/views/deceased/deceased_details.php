@@ -1,6 +1,5 @@
 <div class="container-fluid mt-4">
 
-    <!-- Page Header -->
     <div class="d-flex justify-content-between align-items-center mb-3">
 
         <div>
@@ -12,7 +11,6 @@
 
     </div>
 
-    <!-- Search + Filters -->
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-body">
 
@@ -48,7 +46,6 @@
         </div>
     </div>
 
-    <!-- Table -->
     <div class="card shadow border-0 rounded-4">
 
         <div class="table-responsive">
@@ -63,6 +60,7 @@
                         <th>Gender</th>
                         <th>Date of Death</th>
                         <th>Burial/Cremation</th>
+                        <th>Religion</th>
                         <th>Status</th>
                         <th width="180">Actions</th>
                     </tr>

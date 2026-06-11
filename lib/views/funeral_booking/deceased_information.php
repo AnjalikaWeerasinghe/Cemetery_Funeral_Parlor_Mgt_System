@@ -1,3 +1,5 @@
+<!-- Step 1 - Deceased and Applicant Information -->
+
 <style>
 :root {
     --gold-main: #c9a44c;
@@ -116,6 +118,73 @@ button {
     object-fit: cover;
 }
 
+.photo-card{
+    background:#fff;
+    border-radius:18px;
+    padding:20px;
+    border:1px solid #edf1f5;
+    box-shadow:0 10px 30px rgba(0,0,0,0.06);
+}
+
+.photo-upload-wrapper{
+    width:100%;
+    height:260px;
+    border:2px dashed #d7dce2;
+    border-radius:16px;
+    overflow:hidden;
+    background:#f9fbfd;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+    transition:0.3s ease;
+}
+
+.photo-upload-wrapper:hover{
+    border-color:#c9a44c;
+    background:#fffdf7;
+}
+
+#previewPlaceholder{
+    text-align:center;
+    color:#7b8794;
+}
+
+#previewPlaceholder i{
+    font-size:42px;
+    color:#c9a44c;
+}
+
+#previewImage{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.upload-btn{
+    background:linear-gradient(135deg,#c9a44c,#e8d9a3);
+    color:#2b2b2b;
+    padding:10px 18px;
+    border-radius:12px;
+    cursor:pointer;
+    font-weight:600;
+    display:inline-block;
+    transition:0.3s ease;
+}
+
+.upload-btn:hover{
+    transform:translateY(-2px);
+    box-shadow:0 8px 20px rgba(201,164,76,0.35);
+}
+
+.input-group-text{
+    border-radius:10px 0 0 10px;
+}
+
+.input-group .form-control{
+    border-radius:0 10px 10px 0;
+}
+
 </style>
 
 <div class="container-fluid">
@@ -127,67 +196,131 @@ button {
                     <input type="hidden" name="service_type" id="service_type">
 
                     <div class="mb-4 p-3 bg-light rounded-3">
-                        <h6 class="mb-3">Deceased Information</h6>
+                        <h6 class="mb-0">Deceased Information</h6>
                     </div>
 
-                    <div class="row">
-                        <div class="col-md-8 mb-3">
-                            <label for="full_name" class="form-label">Full Name *</label>
-                            <input type="text" name="full_name" id="full_name" class="form-control" required>
-                        </div>   
+                    <div class="row g-4 align-items-start">
+                        <div class="col-lg-9">
+                            <div class="row">
+                                <div class="col-md-8 mb-3">
+                                    <label for="full_name" class="form-label">Full Name *</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white border-end-0">
+                                            <i class="fa-solid fa-user text-secondary"></i>
+                                        </span>
+                                        <input type="text" name="full_name" id="full_name" class="form-control border-start-0" placeholder="Enter deceased full name" required>
+                                    </div>   
+                                </div>
 
-                        <div class="col-md-4 mb-3">
-                            <label for="booking_code" class="form-label">Booking Code</label>
-                            <input type="text" name="booking_code" id="booking_code" class="form-control" readonly>
+                                <div class="col-md-4 mb-3">
+                                    <label for="booking_code" class="form-label">Booking Code</label>
+                                    <input type="text" name="booking_code" id="booking_code" class="form-control bg-light" readonly>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label for="title" class="form-label">Title</label>
+                                    <select name="title" id="title" class="form-select">
+                                        <option value="">Select</option>
+                                        <option value="Mr">Mr</option>
+                                        <option value="Mrs">Mrs</option>
+                                        <option value="Miss">Miss</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-4 mb-3">
+                                    <label for="religion" class="form-label">Religion</label>
+                                    <select name="religion" id="religion" class="form-select">
+                                        <option value="">Select Religion</option>
+                                        <option value="Buddhism">Buddhism</option>
+                                        <option value="Catholic">Catholic</option>
+                                        <option value="Tamil">Tamil</option>
+                                        <option value="Islam">Islam</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-4 mb-3">
+                                    <label for="gender" class="form-label">Gender</label>
+                                    <select name="gender" id="gender" class="form-select">
+                                        <option value="">Select</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="nic" class="form-label">NIC *</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white border-end-0">
+                                            <i class="fa-solid fa-id-card text-secondary"></i>
+                                        </span>
+                                        <input type="text" name="nic" id="nic" class="form-control border-start-0" pattern="[0-9]{9}[vVxX]|[0-9]{12}" placeholder="Enter NIC" required>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="date_of_birth" class="form-label">DOB</label>
+                                    <input type="date" name="date_of_birth" id="date_of_birth" class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="deceased_address" class="form-label">Address</label>
+                                <textarea name="deceased_address" id="deceased_address" rows="2" class="form-control" placeholder="Enter address"></textarea>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="deceased_gn_division" class="form-label">G. N. Division</label>
+                                    <input type="text" name="deceased_gn_division" id="deceased_gn_division" class="form-control" placeholder="Enter Grama Niladari division">
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="municipal_council" class="form-label">Area of Urban Council</label>
+                                    <input type="text" name="municipal_council" id="municipal_council" class="form-control" placeholder="Enter municipal council">
+                                </div>
+                            </div>
+
                         </div>
-                    </div>
 
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <label for="nic" class="form-label">NIC *</label>
-                            <input type="text" name="nic" id="nic" class="form-control" pattern="[0-9]{9}[vVxX]|[0-9]{12}" required>
+                        <div class="col-lg-3">
+                            <div class="photo-card text-center">
+                                <div class="photo-upload-wrapper">
+                                    <img id="previewImage" src="" style="display:none;">
+                                    <div id="previewPlaceholder">
+                                        <i class="fa-solid fa-image"></i>
+                                        <p class="mb-0 mt-2">Upload Photo</p>
+                                    </div>
+                                </div>
+
+                                <label class="upload-btn mt-3">
+                                    <i class="fa-solid fa-upload me-2"></i>Choose Photo
+                                    <input type="file" name="deceased_photo" id="deceased_photo" accept="image/*" hidden>
+                                </label>
+
+                                <small class="text-muted d-block mt-2">Optional image upload</small>
+                            </div>
                         </div>
 
-                        <div class="col-md-4 mb-3">
-                            <label for="gender" class="form-label">Gender</label>
-                            <select name="gender" id="gender" class="form-select">
-                            <option value="">Select</option>
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
-                            </select>
-                        </div>
-
-                        <div class="col-md-4 mb-3">
-                            <label for="date_of_birth" class="form-label">DOB</label>
-                            <input type="date" name="date_of_birth" id="date_of_birth" class="form-control">
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="deceased_address" class="form-label">Address</label>
-                        <textarea name="deceased_address" id="deceased_address" rows="2" class="form-control"></textarea>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="deceased_gn_division" class="form-label">G. N. Division</label>
-                            <input type="text" name="deceased_gn_division" id="deceased_gn_division" class="form-control">
-                        </div>
-
-                        <div class="col-md-6 mb-3">
-                            <label for="municipal_council" class="form-label">Area of Municipal Council</label>
-                            <input type="text" name="municipal_council" id="municipal_council" class="form-control">
-                        </div>
                     </div>
 
                     <div class="mb-4 p-3 bg-light rounded-3">
-                        <h6 class="mb-3">Applicant Information</h6>
+                        <h6 class="mb-0">Applicant Information</h6>
                     </div>
 
                     <div class="row">
                         <div class="col-md-8 mb-3">
                             <label for="applicant_name" class="form-label">Applicant Name *</label>
-                            <input type="text" name="applicant_name" id="applicant_name" class="form-control" required>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0">
+                                    <i class="fa-solid fa-user text-secondary"></i>
+                                </span>
+                                <input type="text" name="applicant_name" id="applicant_name" class="form-control border-start-0" required>
+                            </div>
                         </div>
 
                         <div class="col-md-4 mb-3">
@@ -199,17 +332,27 @@ button {
                     <div class="row">
                         <div class="col-md-4 mb-3">
                             <label for="contact_number" class="form-label">Contact Number *</label>
-                            <input type="text" name="contact_number" id="contact_number" class="form-control" required>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0">
+                                    <i class="fa-solid fa-phone text-secondary"></i>
+                                </span>
+                                <input type="text" name="contact_number" id="contact_number" class="form-control border-start-0" required>
+                            </div>
                         </div>
                         
                         <div class="col-md-4 mb-3">
                             <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" name="email" id="email" autocomplete="off" placeholder="Enter email">
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0">
+                                    <i class="fa-solid fa-envelope text-secondary"></i>
+                                </span>
+                                <input type="email" class="form-control border-start-0" name="email" id="email" autocomplete="off" placeholder="Enter email">
+                            </div>
                         </div>
 
                         <div class="col-md-4 mb-3">
                             <label for="applicant_gn_division" class="form-label">G. N. Division</label>
-                            <input type="text" name="applicant_gn_division" id="applicant_gn_division" class="form-control">
+                            <input type="text" name="applicant_gn_division" id="applicant_gn_division" class="form-control" placeholder="Enter Grama Niladari division">
                         </div>
                     </div>
 
@@ -235,10 +378,15 @@ button {
 
         restoreStep1Data();
 
+        // This function restores previously entered step 1 data from sessionStorage
+        // This is useful when users navigate back to Step 1 from Step 2
         function restoreStep1Data(){
+            let savedPreview = sessionStorage.getItem("deceased_photo_preview");
 
             $("#full_name").val(sessionStorage.getItem("full_name"));
             $("#booking_code").val(sessionStorage.getItem("booking_code"));
+            $("#title").val(sessionStorage.getItem("title"));
+            $("#religion").val(sessionStorage.getItem("religion"));
             $("#nic").val(sessionStorage.getItem("nic"));
             $("#gender").val(sessionStorage.getItem("gender"));
             $("#date_of_birth").val(sessionStorage.getItem("date_of_birth"));
@@ -256,8 +404,14 @@ button {
             $("#applicant_gn_division").val(sessionStorage.getItem("applicant_gn_division"));
             $("#applicant_address").val(sessionStorage.getItem("applicant_address"));
 
+            if(savedPreview){
+                $("#previewImage").attr("src", savedPreview).show();
+                $("#previewPlaceholder").hide();
+            }
+
         }
 
+        // This function generates a unique booking code based on the selected service type
         function loadBookingCode(){
             const serviceType = localStorage.getItem("selectedBookingService");
 
@@ -286,6 +440,7 @@ button {
             });
         }
 
+        // Handle form submission for deceased and applicant information
         $("#deceased_info").on("submit", function(e) {
             e.preventDefault();
 
@@ -307,8 +462,11 @@ button {
 
                     if(response === "success"){
 
+                    // store data from Step 1 in sessionStorage to restore it when user comes back to Step 1 from Step 2
                         sessionStorage.setItem("full_name", $("#full_name").val());
                         sessionStorage.setItem("booking_code", $("#booking_code").val());
+                        sessionStorage.setItem("title", $("#title").val());
+                        sessionStorage.setItem("religion", $("#religion").val());
                         sessionStorage.setItem("nic", $("#nic").val());
                         sessionStorage.setItem("gender", $("#gender").val());
                         sessionStorage.setItem("date_of_birth", $("#date_of_birth").val());
@@ -332,6 +490,37 @@ button {
                     }
                 }
             });
+        });
+
+        // This function handles the image preview when a user selects a photo for the deceased
+        $("#deceased_photo").change(function(e){
+            let file = e.target.files[0];
+
+            if(file){
+                let reader = new FileReader();
+
+                reader.onload = function(event){
+                    $("#previewImage").attr("src", event.target.result).show();
+                    $("#previewPlaceholder").hide();
+
+                    sessionStorage.setItem("deceased_photo_preview", event.target.result);
+                };
+
+                reader.readAsDataURL(file);
+            }
+
+        });
+
+        // Automatically set gender based on the selected title    
+        $("#title").change(function(){
+            let title = $(this).val();
+
+            if(title === "Mr"){
+                $("#gender").val("Male");
+            }
+            else if(title === "Mrs" || title === "Miss"){
+                $("#gender").val("Female");
+            }
         });
 
     });

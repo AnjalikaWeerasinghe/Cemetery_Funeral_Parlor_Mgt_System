@@ -165,7 +165,16 @@
 
         <div class="section-title mb-4 p-3 bg-light rounded-3">Deceased Information</div>
         <div class="summary-box">
-            <div><span class="label">Full Name:</span> <span class="value" id="full_name"></span></div>
+            <div class="row align-items-center mb-3">
+                <div class="col-md-2 text-center">
+                    <img id="deceased_photo" src="" alt="Deceased Photo" style="width:100px; height:100px; object-fit:cover; border-radius:10px; border:1px solid #ccc; display:none;">
+                </div>
+                <div class="col-md-10">
+                    <div><span class="label">Title:</span><span class="value" id="title"></span></div>
+                    <div><span class="label">Full Name:</span> <span class="value" id="full_name"></span></div>
+                    <div><span class="label">Religion:</span><span class="value" id="religion"></span></div>
+                </div>
+            </div>
             <div class="row">
                 <div class="col-md-4"><span class="label">NIC:</span> <span class="value" id="nic"></span></div>
                 <div class="col-md-4"><span class="label">Gender:</span> <span class="value" id="gender"></span></div>
@@ -219,18 +228,20 @@
                 <div class="col-md-6"><span class="label">Area Type:</span> <span class="value" id="area_type"></span></div>
             </div>
             <div><span class="label">Time Slot:</span> <span class="value highlight" id="cremation_slot"></span></div>
-            <div><span class="label">Are you collecting ash after cremation?</span> <span class="value" id="collect_ash"></span></div>
+            <div><span class="label">Are you collecting ash after cremation? :</span> <span class="value" id="collect_ash"></span></div>
+            <div><span class="label">Ash collecting method? :</span> <span class="value" id="ash_collecting_method"></span></div>
                 
-            <div class="col-md-6"><span class="label">Ash collecting method? :</span> <span class="value" id="ash_collecting_method"></span></div>
-            <div class="col-md-6">
-                <div id="memorialSection" style="display:none;" class="mt-3">
-                    <span class="label d-block mb-2">Memorial Preview</span>
+            <div class="row">
+                <div class="col-md-6">
+                    <div id="memorialSection" style="display:none;" class="mt-3">
+                        <span class="label d-block mb-2">Memorial Preview</span>
 
-                    <div id="memorialPreview" class="p-3 text-center" style="width: 220px; border-radius: 10px; border: 1px solid #ccc; background: #f8f8f8">
-                        <div class="confirmIcon" id="confirmIcon" style="font-size: 20px;"></div>
-                        <img id="confirmImage" style="max-width:60px; display:none; margin:5px auto;" />
-                        <h6 id="confirmName">Name</h6>
-                        <p id="confirmMessage" style="font-size:13px;">Message</p>
+                        <div id="memorialPreview" class="p-3 text-center" style="width: 220px; border-radius: 10px; border: 1px solid #ccc; background: #f8f8f8">
+                            <div class="confirmIcon" id="confirmIcon" style="font-size: 20px;"></div>
+                            <img id="confirmImage" style="max-width:60px; display:none; margin:5px auto;" />
+                            <h6 id="confirmName">Name</h6>
+                            <p id="confirmMessage" style="font-size:13px;">Message</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -265,7 +276,17 @@
     $(document).ready(function(){
         let permission = sessionStorage.getItem("cremation_permission");
         let collect_ash = sessionStorage.getItem("collect_ash");
+        let deceasedPhoto = sessionStorage.getItem("deceased_photo");
 
+        console.log("Photo Name:", deceasedPhoto);
+        console.log("Image Path:", "../uploads/images/" + deceasedPhoto);
+
+        if(deceasedPhoto){
+            $("#deceased_photo").attr("src","../uploads/images/" + deceasedPhoto).show();
+        }
+
+        $("#title").text(sessionStorage.getItem("title"));
+        $("#religion").text(sessionStorage.getItem("religion"));
         $("#full_name").text(sessionStorage.getItem("full_name"));
         $("#nic").text(sessionStorage.getItem("nic"));
         $("#gender").text(sessionStorage.getItem("gender"));
@@ -286,7 +307,7 @@
         $("#date_of_death").text(sessionStorage.getItem("date_of_death"));
         $("#cause_of_death").text(sessionStorage.getItem("cause_of_death"));
         
-        $("#coroner_name_position").text(sessionStorage.getItem("coroner_name_position"));
+        $("#coroner_name_position").text(sessionStorage.getItem("coroner_name"));
         $("#coroner_decision").text(sessionStorage.getItem("coroner_decision"));
         
         $("#cremation_permission").text(permission == "1" ? "Yes" : "No");
@@ -294,22 +315,22 @@
         $("#cremation_date").text(sessionStorage.getItem("selectedDate"));
         $("#cremation_slot").text(sessionStorage.getItem("slot_text")); // Display selected cremation time slot
 
-        $("#death_certificate").text(
-            sessionStorage.getItem("death_certificate_uploaded") === "1"
-            ? "Uploaded"
-            : "Not Uploaded"
+        $("#death_certificate").html(
+            sessionStorage.getItem("death_certificate_name") 
+                ? `<span class="text-success">${sessionStorage.getItem("death_certificate_name")}</span>`
+                : `<span class="text-danger">Not Uploaded</span>`
         );
 
-        $("#inquirer_certificate").text(
-            sessionStorage.getItem("coroner_certificate_uploaded") === "1"
-            ? "Uploaded"
-            : "Not Uploaded"
+        $("#inquirer_certificate").html(
+            sessionStorage.getItem("coroner_certificate_name") 
+                ? `<span class="text-success">${sessionStorage.getItem("coroner_certificate_name")}</span>`
+                : `<span class="text-danger">Not Uploaded</span>`
         );
 
-        $("#family_consent_letter").text(
-            sessionStorage.getItem("family_consent_letter_uploaded") === "1"
-            ? "Uploaded"
-            : "Not Uploaded"
+        $("#family_consent_letter").html(
+            sessionStorage.getItem("family_consent_letter_name") 
+                ? `<span class="text-success">${sessionStorage.getItem("family_consent_letter_name")}</span>`
+                : `<span class="text-danger">Not Uploaded</span>`
         );
 
         let areaType = sessionStorage.getItem("area_type");
@@ -323,6 +344,11 @@
 
         $("#collect_ash").text(collect_ash == "1" ? "Yes" : "No");
 
+        if(collect_ash == "0"){
+            $("#ash_collecting_method").closest(".col-md-6").hide();
+            $("#memorialSection").hide();
+        }
+
         let ashMethod = sessionStorage.getItem("ash_collection_method");
 
         if(ashMethod === "memorial"){
@@ -331,8 +357,8 @@
         else if(ashMethod === "collect"){
             $("#ash_collecting_method").text("Collecting Ashes");
         }
-        else{
-            $("#ash_collecting_method").text("Not Selected");
+        else if(ashMethod === "scatter"){
+            $("#ash_collecting_method").text("Scatter Ashes in Cemetery Premise");
         }
 
         if(ashMethod === "memorial"){
@@ -345,6 +371,8 @@
             let theme = sessionStorage.getItem("tablet_theme");
             let font = sessionStorage.getItem("font_style");
 
+            let memorialImage = sessionStorage.getItem("memorial_image");
+
             $("#confirmName").text(name || "Name");
             $("#confirmMessage").text(message || "Message");
 
@@ -356,6 +384,10 @@
             }
             else{
                 $("#confirmIcon").text("");
+            }
+
+            if(memorialImage){
+                $("#confirmImage").attr("src", memorialImage).show();
             }
 
             if(theme === "dark"){
@@ -395,10 +427,9 @@
 
     });
 
-    $("#load_step5").click(function(){
-        $("#bookingContent").load("funeral_booking/booking_payment.php");
-        // unlockStep(4);
-        // loadStep(4);
+    $(document).on("click", "#load_step5", function () {
+        unlockStep(5);
+        loadStep(5);
     });
 
     $(document).on("click", "#load_step3", function () {

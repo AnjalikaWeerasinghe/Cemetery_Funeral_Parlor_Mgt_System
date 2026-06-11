@@ -264,7 +264,7 @@ input[type="file"]:hover {
 <div class="container-fluid">
     <div class="card shadow-sm border-0">
         <div class="card-body">
-            <form id="cremation_info" autocomplete="off">
+            <form id="cremation_info" autocomplete="off" enctype="multipart/form-data">
                 <div class="row">
                     <div class="col-md-8">
                         <div class="mb-4 p-3 bg-light rounded-3">
@@ -318,13 +318,13 @@ input[type="file"]:hover {
                                 <label for="ash_collection_method" class="form-label">Ash collection method</label>
                                 <select name="ash_collection_method" id="ash_collection_method" class="form-select">
                                     <option value="">Select</option>
-                                    <option value="collect">Collect</option>
+                                    <option value="scatter">Scatter</option>
                                     <option value="memorial">Memorial</option>
                                 </select>
                             </div>
 
                             <!-- Display only if Memorial is selected -->
-                            <div class="row mt-6">
+                            <div class="row mt-4">
                                 <div class="col-md-7">
                                     <div id="memorialSection" style="display:none;" class="border rounded p-3 mt-3">
 
@@ -344,7 +344,7 @@ input[type="file"]:hover {
 
                                         <div class="mb-2">
                                             <label class="form-label">Add a Symbol</label>
-                                            <select class="form-select" id="memorial_icon">
+                                            <select class="form-select" id="memorial_icon" name="memorial_icon">
                                                 <option value="">None</option>
                                                 <option value="cross">Cross</option>
                                                 <option value="flower">Flower</option>
@@ -367,7 +367,7 @@ input[type="file"]:hover {
 
                                         <div class="mb-2">
                                             <label class="form-label">Theme</label>
-                                            <select id="tablet_theme" class="form-select">
+                                            <select id="tablet_theme" name="tablet_theme" class="form-select">
                                                 <option value="dark">Granite</option>
                                                 <option value="light">Marble</option>
                                                 <option value="gold">Gold</option>
@@ -378,7 +378,7 @@ input[type="file"]:hover {
                                 </div>
 
                                 <!-- Preview of Memorial  -->
-                                <div class="col-md-4 text-center mt-6">
+                                <div class="col-md-4 text-center mt-4">
                                     <div id="previewWrapper" class="mt-4" style="display:none;">
                                         <div class="m-4 p-3 bg-light rounded-3">
                                             <h6 class="mb-3">Live Preview</h6>
@@ -450,6 +450,9 @@ input[type="file"]:hover {
     // console.log("JS Loaded");
     
     $(document).ready(function() {
+        let today = new Date().toISOString().split("T")[0];
+        $("#cremation_date").attr("min", today);
+
         // Create the table to get the real pricings for services
         const pricing = {
             municipal_limit: 5000,
@@ -506,7 +509,7 @@ input[type="file"]:hover {
             }
 
             if(collectAsh){
-                $(`input[name="collect_ash"][value="${collectAsh}"]`).prop("checked", true);
+                $(`input[name="collect_ash"][value="${collectAsh}"]`).prop("checked", false);
             }
 
             if(ashCollectionMethod){
@@ -528,6 +531,8 @@ input[type="file"]:hover {
                 let savedImage = sessionStorage.getItem("memorial_image");
                 if (savedImage) {
                     $("#previewImage").attr("src", savedImage).show();
+                } else{
+                    $("#previewImage").hide().attr("src", "");
                 }
 
                 updatePreviewText();
@@ -602,6 +607,19 @@ input[type="file"]:hover {
                 }
             }
 
+            if($("#selected_slot_id").val() === ""){
+                showModal("Please select a time slot for cremation.");
+                return;
+            }
+
+            if($("#ash_collection_method").val() === "memorial"){
+
+                if($("input[name='memorial_name']").val().trim() === ""){
+                    showModal("Please enter memorial name.");
+                    return;
+                }
+            }
+
             $.ajax({
                 url: "../routes/funeral_booking/add_cremation_info_route.php",
                 method: "POST",
@@ -648,6 +666,20 @@ input[type="file"]:hover {
             });
         });
 
+        $("input[name='collect_ash']").change(function(){
+            let collectAsh = $('input[name="collect_ash"]:checked').val();
+
+            if(collectAsh === "0"){
+                $("#ash_collection_method").val("").prop("disabled", false);
+                $("#memorialSection").hide();
+                $("#previewWrapper").hide();
+            } else {
+                $("#ash_collection_method").prop("disabled", true);
+            }
+
+            updatePrice();
+        });
+
         $("#ash_collection_method").change(function(){
 
             let value = $(this).val();
@@ -658,6 +690,20 @@ input[type="file"]:hover {
             } else {
                 $("#memorialSection").slideUp().find("input, textarea, select").prop("disabled", true);
                 $("#previewWrapper").fadeOut();
+
+                // Clear memorial design data from sessionStorage when not selected
+                sessionStorage.removeItem("memorial_name");
+                sessionStorage.removeItem("memorial_message");
+                sessionStorage.removeItem("memorial_icon");
+                sessionStorage.removeItem("font_style");
+                sessionStorage.removeItem("tablet_theme");
+                sessionStorage.removeItem("memorial_image");
+
+                // Reset preview to default
+                $("#previewName").text("Name");
+                $("#previewMessage").text("Your message will appear here");
+                $("#previewIcon").text("");
+                $("#previewImage").hide().attr("src", "");
             }
 
         });
@@ -687,6 +733,8 @@ input[type="file"]:hover {
             $("#previewName").text(name || "Name");
             $("#previewMessage").text(msg || "Your message will appear here");
         }
+
+        $("#memorialSection").find("input, textarea, select").prop("disabled", true);
 
         $(document).on("input", "input[name='memorial_name']", function(){
             updatePreviewText();
@@ -757,13 +805,17 @@ input[type="file"]:hover {
 
             let file = e.target.files[0];
 
+            if(file && file.size > 2 * 1024 * 1024){
+                showModal("Memorial image must be below 2MB.");
+                $(this).val("");
+                return;
+            }
+
             if(file){
                 let reader = new FileReader();
 
                 reader.onload = function(event){
-                    $("#previewImage")
-                        .attr("src", event.target.result)
-                        .show();
+                    $("#previewImage").attr("src", event.target.result).show();
 
                     sessionStorage.setItem("memorial_image", event.target.result);
                 };
@@ -793,7 +845,7 @@ input[type="file"]:hover {
 
             $("#price_cremation").text("LKR " + cremationPrice);
             $("#price_memorial").text("LKR " + memorialPrice);
-            $("#price_total").text("LKR " + total);
+            $("#price_total").text("LKR " + total.toLocaleString());
 
             sessionStorage.setItem("cremation_price", cremationPrice);
             sessionStorage.setItem("memorial_price", memorialPrice);

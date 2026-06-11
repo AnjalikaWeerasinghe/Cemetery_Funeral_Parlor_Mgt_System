@@ -1,118 +1,212 @@
-<!-- <nav class="navbar navbar-expand-lg bg-body-tertiary">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="#">Navbar</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="#">Home</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Sample</a>
-        </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Dropdown
-          </a>
-          <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="#" id="add_emp">Add EMP</a></li>
-            <li><a class="dropdown-item" href="#" id="view_emp">View EMP</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="#">Something else here</a></li>
-          </ul>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link disabled" aria-disabled="true">Disabled</a>
-        </li>
-      </ul>
-      <form action="../routes/logout.php" method="post">
-        <input type="submit" value="Logout" class="btn btn-danger">
-      </form>
-    </div>
-  </div>
-</nav> -->
-
 <!-- <?php
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 ?> -->
 
-<div id="sidebar" class="vh-100 p-3" style="width: 220px; background: linear-gradient(to bottom, #8b6f47, #d4af7a);">
+<style>
+.sidebar-wrapper{
+    width: 260px;
+    min-height: 100vh;
+    background: linear-gradient(to bottom, #8b6f47, #d4af7a);
+    padding: 20px 15px;
+    overflow-y: auto;
+    transition: all 0.3s ease;
+    z-index: 1040;
+}
 
-    <ul class="nav flex-column gap-2">
+.sidebar-header{
+    color: #1e1e1e;
+    font-weight: bold;
+    margin-bottom: 25px;
+    padding-left: 10px;
+}
+
+.sidebar-menu .nav-link{
+    color: #1e1e1e;
+    font-weight: 600;
+    border-radius: 10px;
+    padding: 12px 15px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+}
+
+.sidebar-menu .nav-link:hover{
+    background: rgba(255,255,255,0.2);
+    transform: translateX(5px);
+}
+
+.sidebar-dropdown-btn{
+    width: 100%;
+    border: none;
+    background: transparent;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    border-radius: 10px;
+    font-weight: 600;
+    color: #1e1e1e;
+    transition: 0.3s ease;
+}
+
+.sidebar-dropdown-btn:hover{
+    background: rgba(255,255,255,0.2);
+    transform: translateX(5px);
+}
+
+.sidebar-submenu{
+    padding-left: 15px;
+    margin-top: 5px;
+}
+
+.sidebar-submenu a{
+    display: block;
+    text-decoration: none;
+    color: #2f2f2f;
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin-bottom: 5px;
+    transition: 0.3s ease;
+}
+
+.sidebar-submenu a:hover{
+    background: rgba(255,255,255,0.2);
+    padding-left: 20px;
+}
+
+.sidebar-wrapper.collapsed{
+    width: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+@media (max-width: 991px){
+
+    .sidebar-wrapper{
+        position: fixed;
+        left: -260px;
+        top: 75px;
+        width: 260px;
+        z-index: 1050;
+        height: calc(100vh - 75px);
+        transition: left 0.3s ease;
+    }
+
+    .sidebar-wrapper.active{
+        left: 0;
+    }
+
+}
+
+</style>
+
+<div id="sidebar" class="sidebar-wrapper">
+
+    <div class="sidebar-header">
+        <h5 class="m-0">Admin Panel</h5>
+    </div>
+
+    <ul class="nav flex-column sidebar-menu">
 
         <li class="nav-item">
-            <a class="nav-link text-dark fw-semibold" href="admin.php?page=dashboard">
-                <!-- <i class="fa-solid fa-gauge-high me-2"></i> --> 
-                Dashboard
+            <a class="nav-link" href="admin.php?page=dashboard">
+                <i class="fa-solid fa-gauge-high me-2"></i>Dashboard
             </a>
         </li>
 
         <li class="nav-item">
-            <a class="nav-link text-dark fw-semibold" href="admin.php?page=deceased">
-                <!-- <i class="fa-solid fa-file me-2"></i>-->
-                Deceased Records
+            <a class="nav-link" href="admin.php?page=deceased">
+                <i class="fa-solid fa-file-lines me-2"></i>Deceased Records
             </a>
         </li>
 
         <li class="nav-item">
-            <a class="nav-link text-dark fw-semibold" href="#">
-                <!-- <i class="fa-solid fa-square-parking me-2"></i>  -->
-                Plot & Grave Management
+            <a class="nav-link" href="#">
+                <i class="fa-solid fa-map-location-dot me-2"></i>Plot & Grave Management
             </a>
-        </li>
-
-        <li class="nav-item dropdown-container">
-            <a class="nav-link dropdown-toggle text-dark fw-semibold" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <!-- <i class="fa-solid fa-candle-holder me-2"></i>  -->
-                Funeral & Services
-            </a>
-            <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="admin.php?page=funeralBookings">Funeral Bookings</a></li>
-                <li><a class="dropdown-item" href="admin.php?page=cremationTimeSlots">Manage Cremation Time Slots</a></li>
-            </ul>
         </li>
 
         <li class="nav-item">
-            <a class="nav-link text-dark fw-semibold" href="#">
-                <!-- <i class="fa-solid fa-money-bill-wave me-2"></i>  -->
-                Payments & Billing
-            </a>
-        </li>
 
-        <li class="nav-item dropdown-container">
-            <a class="nav-link dropdown-toggle fw-semibold text-dark" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <!-- <i class="fa-solid fa-users me-2"></i>  -->
-                User Management
-            </a>
-            <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="admin.php?page=staff">Staff Details</a></li>
-                <li><a class="dropdown-item" href="admin.php?page=member">Member Details</a></li>
-            </ul>
+            <button class="sidebar-dropdown-btn" data-bs-toggle="collapse" data-bs-target="#funeralMenu">
+                <span>
+                    <i class="fa-solid fa-cross me-2"></i>Funeral & Services
+                </span>
+            </button>
+
+            <div class="collapse sidebar-submenu" id="funeralMenu">
+                <a href="admin.php?page=funeralBookings">Funeral Bookings</a>
+                <a href="admin.php?page=cremationTimeSlots">Cremation Time Slots</a>
+            </div>
+
         </li>
 
         <li class="nav-item">
-            <a class="nav-link text-dark fw-semibold" href="#">
-                <!-- <i class="fa-solid fa-chart-line me-2"></i>  -->
-                Reports
+            <a class="nav-link" href="#">
+                <i class="fa-solid fa-money-bill-wave me-2"></i>Payments & Billing
             </a>
         </li>
 
-        <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle text-dark fw-semibold" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <!-- <i class="fa-solid fa-gear me-2"></i>  -->
-                System Settings
+        <li class="nav-item">
+
+            <button class="sidebar-dropdown-btn" data-bs-toggle="collapse" data-bs-target="#userMenu">
+                <span>
+                    <i class="fa-solid fa-users me-2"></i>User Management
+                </span>
+            </button>
+
+            <div class="collapse sidebar-submenu" id="userMenu">
+                <a href="admin.php?page=staff">Staff Details</a>
+                <a href="admin.php?page=member">Member Details</a>
+            </div>
+
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link" href="#">
+                <i class="fa-solid fa-chart-line me-2"></i>Reports
             </a>
-            <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="admin.php?page=roleSettings">Manage Roles</a></li>
-            </ul>
+        </li>
+
+        <li class="nav-item">
+
+            <button class="sidebar-dropdown-btn" data-bs-toggle="collapse" data-bs-target="#settingsMenu">
+                <span>
+                    <i class="fa-solid fa-gear me-2"></i>System Settings
+                </span>
+            </button>
+
+            <div class="collapse sidebar-submenu" id="settingsMenu">
+                <a href="admin.php?page=roleSettings">Manage Roles</a>
+            </div>
+
         </li>
 
     </ul>
+
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const menuToggle = document.getElementById("menu-toggle");
+
+        const sidebar = document.getElementById("sidebar");
+
+        menuToggle.addEventListener("click", function () {
+
+            if(window.innerWidth <= 991){
+                sidebar.classList.toggle("active");
+            } else {
+                sidebar.classList.toggle("collapsed");
+            }
+
+        });
+
+    });
+</script>
 
 
 
