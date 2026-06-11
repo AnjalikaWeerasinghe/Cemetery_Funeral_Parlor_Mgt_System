@@ -1,7 +1,5 @@
 <?php
-
 session_start();
-
 include_once('connection.php');
 
 class Auth {
@@ -11,6 +9,23 @@ class Auth {
         $this->conn = $this->connObj->conn();
     }
 
+    /**
+     * Function Name: login
+     * Description: Authenticates a user by validating the email and password, checks account status, creates session variables, 
+     *              and redirects the user according to their role.
+     *
+     * Parameters:
+     *   - $userName (string): User's email address.
+     *   - $userPwd (string): User's password entered during login.
+     *
+     * Returns:
+     *   - void
+     *
+     * Dependencies:
+     *   - login_table
+     *   - PHP Session Management
+     *   - password_verify()
+     */
     function login($userName, $userPwd){
 
         $sql = "SELECT * FROM login_table WHERE user_email = ?";
