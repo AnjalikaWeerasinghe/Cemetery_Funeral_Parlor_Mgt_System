@@ -209,6 +209,9 @@ include_once('header.php');
                     case 'funeralBookings':
                         include 'funeral_booking/funeral_booking_details.php';
                         break;
+                    case 'view_funeral_booking':
+                        include 'funeral_booking/get_funeral_booking_view.php';
+                        break;
                     case 'selectbookingtype':
                         include 'funeral_booking/booking_mainpage.php';
                         break;
@@ -251,6 +254,10 @@ include_once('header.php');
 
                     case 'deceased':
                         include 'deceased/deceased_details.php';
+                        break;
+
+                    case 'view_deceased_details':
+                        include 'deceased/get_deceased_view.php';
                         break;
 
                     default:

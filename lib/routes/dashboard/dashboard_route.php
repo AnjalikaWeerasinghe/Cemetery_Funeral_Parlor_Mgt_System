@@ -1,18 +1,18 @@
 <?php
 include_once('../../functions/dashboardController.php');
+header('Content-Type: application/json');
 
-$dashboard = new DashboardController($conn);
+$dashboard = new DashboardController();
 
 if(isset($_GET['action'])) {
 
     switch($_GET['action']) {
 
         case 'upcoming_cremations':
-            $dashboard->get_Upcoming_Cremations();
-            break;
-
-        case 'upcoming_burials':
-            $dashboard->get_Upcoming_Burials();
+            // $data = $dashboard->get_Upcoming_Cremations();
+            // print_r($data);
+            // exit;
+            echo json_encode($dashboard->get_Upcoming_Cremations());
             break;
 
         default:

@@ -282,7 +282,7 @@
         console.log("Image Path:", "../uploads/images/" + deceasedPhoto);
 
         if(deceasedPhoto){
-            $("#deceased_photo").attr("src","../uploads/images/" + deceasedPhoto).show();
+            $("#deceased_photo").attr("src","../uploads/images/" + data.deceasedPhoto).show();
         }
 
         $("#title").text(sessionStorage.getItem("title"));

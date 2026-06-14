@@ -436,7 +436,7 @@ input[type="file"]:hover {
                         <button type="button" class="back-btn" id="load_step2">Back</button>
                     </div>
                     <div class="text-end">
-                        <button type="submit" id="load_step4">Proceed to Confirmation Page</button>
+                        <button type="submit" id="load_step4">Proceed to Next Page</button>
                     </div>
                 </div>
 
@@ -450,6 +450,13 @@ input[type="file"]:hover {
     // console.log("JS Loaded");
     
     $(document).ready(function() {
+        const mode = window.mode;
+        const bookingCode = window.bookingCode;
+
+        if (mode === "view" && bookingCode) {
+            loadCremationView(bookingCode);
+        }
+
         let today = new Date().toISOString().split("T")[0];
         $("#cremation_date").attr("min", today);
 
@@ -460,13 +467,17 @@ input[type="file"]:hover {
             memorial: 2000
         };
 
-        function loadTimeSlots(selectedDate){
+        function loadTimeSlots(selectedDate, callback){
 
             $.post("../routes/funeral_booking/get_time_slots_route.php", {
                 date: selectedDate
             }, function(res) {
                 // console.log("Response:", res);
                 $("#timeSlotsContainer").html(res);
+
+                if(typeof callback === "function"){
+                    callback();
+                }
 
                 let savedSlotId = sessionStorage.getItem("selected_slot_id");
 
@@ -509,7 +520,7 @@ input[type="file"]:hover {
             }
 
             if(collectAsh){
-                $(`input[name="collect_ash"][value="${collectAsh}"]`).prop("checked", false);
+                $(`input[name="collect_ash"][value="${collectAsh}"]`).prop("checked", true);
             }
 
             if(ashCollectionMethod){
@@ -518,7 +529,7 @@ input[type="file"]:hover {
 
              // Restore memorial design if available
             if(ashCollectionMethod === "memorial"){
-                $("#memorialSection").show();
+                $("#memorialSection").show().find("input, textarea, select").prop("disabled", false);
                 $("#previewWrapper").show();
 
                 $("input[name='memorial_name']").val(sessionStorage.getItem("memorial_name") || "");
@@ -531,6 +542,7 @@ input[type="file"]:hover {
                 let savedImage = sessionStorage.getItem("memorial_image");
                 if (savedImage) {
                     $("#previewImage").attr("src", savedImage).show();
+                    $("#previewWrapper").show();
                 } else{
                     $("#previewImage").hide().attr("src", "");
                 }
@@ -551,7 +563,7 @@ input[type="file"]:hover {
             // let dayOfWeek = new Date(selectedDate).toLocaleDateString('en-US', { weekday: 'long' });
             // console.log("Day:", dayOfWeek);
 
-           loadTimeSlots(selectedDate);
+            loadTimeSlots(selectedDate);
 
         });
 
@@ -863,6 +875,63 @@ input[type="file"]:hover {
         function showModal(message) {
             $("#modalMessage").text(message);
             $("#messageModal").modal("show");
+        }
+
+        function loadCremationView(bookingCode){
+
+            $.ajax({
+                url: "../routes/funeral_booking/get_funeral_booking_info_route.php",
+                type: "GET",
+                data: { booking_code: bookingCode },
+
+                success: function(res){
+                    const data = typeof res === "string" ? JSON.parse(res) : res;
+
+                    // Fill basic fields
+                    $("#cremation_date").val(data.cremation_date);
+                    $("#area_type").val(data.area_type);
+                    $("#notes").val(data.notes);
+
+                    // Ash collection
+                    $(`input[name="collect_ash"][value="${data.collect_ash}"]`)
+                        .prop("checked", true);
+
+                    $("#ash_collection_method").val(data.ash_collection_method);
+
+                    // Slot (display only)
+                    $("#selected_slot_id").val(data.slot_id);
+
+                    // Memorial (if exists)
+                    if(data.ash_collection_method === "memorial"){
+                        $("#memorialSection").show();
+
+                        $("input[name='memorial_name']").val(data.memorial_name);
+                        $("textarea[name='memorial_message']").val(data.memorial_message);
+                        $("#tablet_theme").val(data.tablet_theme);
+                        $("#memorial_icon").val(data.memorial_icon);
+
+                        if(data.memorial_image){
+                            $("#previewImage").attr("src", data.memorial_image).show();
+                        }
+                    }
+
+                    disableCremationView();
+                }
+            });
+        }
+
+        function disableCremationView(){
+
+            // disable all inputs
+            $("#cremation_info :input").prop("disabled", true);
+
+            // hide buttons / interactions
+            $("#load_step2").hide();
+            $(".slot-card").css("pointer-events", "none");
+            $("input[type='file']").hide();
+
+            $(document).off("click", ".slot-card");
+            $("#cremation_info").off("submit");
         }
 
     });

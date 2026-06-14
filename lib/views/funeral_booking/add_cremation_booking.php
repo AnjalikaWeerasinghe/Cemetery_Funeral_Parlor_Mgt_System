@@ -408,6 +408,9 @@ h3::after {
         ? '../views/' 
         : 'lib/views/'; ?>";
 
+    window.mode = "create";
+    window.bookingCode = "<?= $bookingCode ?? '' ?>";
+
     $(document).ready(function(){
 
         loadStep(1);

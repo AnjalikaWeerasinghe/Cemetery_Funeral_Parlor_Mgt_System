@@ -1,12 +1,12 @@
 <?php
-session_start();
 include_once('main.php');
 
 class DeceasedController extends MainController{
 
+    // Load summerized deceased data to the deceased details table 
     public function view_Deceased_Data(){
 
-        $sql = "SELECT d.deceased_photo, d.title, d.full_name AS deceased_name, d.nic, d.gender, doc.date_of_death, fs.service_type, d.religion
+        $sql = "SELECT d.deceased_photo, d.title, d.full_name AS deceased_name, d.nic, d.gender, doc.date_of_death, fs.service_type, d.religion, fs.booking_code
                 FROM funeral_service_table fs
                 JOIN deceased_table d ON fs.deceased_table_deceased_id = d.deceased_id
                 JOIN document_table doc ON fs.document_table_document_set_id = doc.document_id
@@ -30,9 +30,9 @@ class DeceasedController extends MainController{
                 echo "<td>" . "Pending" . "</td>"; // Placeholder for status
 
                 echo "<td>
-                        <button class='btn btn-sm btn-outline-primary'>
+                        <a href='admin.php?page=view_deceased_details&booking_code=" . $rec['booking_code'] . "' class='btn btn-sm btn-outline-info'>
                             <i class='fa-solid fa-eye'></i>
-                        </button>
+                        </a>
 
                         <button class='btn btn-sm btn-outline-warning'>
                             <i class='fa-solid fa-pen'></i>
@@ -50,6 +50,33 @@ class DeceasedController extends MainController{
         }
         
     }
+
+    // Load detailed/compeleted deceased data view by using the booking code
+    public function getDeceasedDetails_By_BookingCode($booking_code){
+
+        $sql = "SELECT fs.booking_code,
+                d.title, d.full_name, d.religion, d.nic, d.deceased_address, d.gender, d.date_of_birth, d.deceased_gn_division, d.municipal_council,
+                a.applicant_name, a.relationship_to_deceased, a.contact_number, a.email, a.applicant_gn_division, a.applicant_address,
+                doc.death_certificate_number, doc.registrar_name, doc.date_of_death, doc.cause_of_death, doc.coroner_name, doc.coroner_decision, doc.cremation_permission,
+                    doc.death_certificate, doc.coroner_certificate, doc.family_consent_letter
+                FROM funeral_service_table fs
+                JOIN deceased_table d ON fs.deceased_table_deceased_id = d.deceased_id
+                JOIN applicant_table a ON fs.applicant_table_applicant_id = a.applicant_id
+                JOIN document_table doc ON fs.document_table_document_set_id = doc.document_id
+                WHERE fs.booking_code = ?";
+
+        $stmt = $this->conn->prepare($sql);
+        if(!$stmt){
+            die("SQL Error: " . $this->conn->error);
+        }
+
+        $stmt->bind_param("s", $booking_code);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        return $result->fetch_assoc();
+    } 
+
 }
 
 ?>

@@ -40,7 +40,6 @@ class Auth {
 
             if ($rec['user_status'] == 1) {
 
-                
                 if (password_verify($userPwd, $rec['login_password'])) {
 
                     $_SESSION['username'] = $rec['user_name'];
@@ -71,6 +70,5 @@ class Auth {
         }
     }
 }
-
 
 ?>

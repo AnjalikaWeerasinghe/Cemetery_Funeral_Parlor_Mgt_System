@@ -23,7 +23,8 @@ foreach($slots as $row){
     $time = date("g A", strtotime($row['start_time'])) . " - " .
             date("g A", strtotime($row['end_time']));
 
-    $isBooked = !empty($row['slot_id']);
+    // $isBooked = !empty($row['slot_id']);
+    $isBooked = ($row['is_booked'] == 1);
 
     $isDisabled = !$row['is_active'] || $isBooked;
 
@@ -41,8 +42,8 @@ foreach($slots as $row){
             style='cursor:pointer; min-width:120px;'>
 
             ".($isBooked 
-                ? "<span class='badge bg-success mt-2 mb-3'>Available</span>" 
-                : "<span class='badge bg-danger mt-2 mb-3'>Already Booked</span>"
+                ? "<span class='badge bg-danger mt-2 mb-3'>Already Booked</span>"
+                : "<span class='badge bg-success mt-2 mb-3'>Available</span>"
             )."
 
             <div class='slot-time font-weight-bold mb-3'>$time</div>

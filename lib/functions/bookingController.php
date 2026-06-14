@@ -175,6 +175,31 @@ class BookingController extends MainController{
 
     // This function saves all the booking data to the database after the final step
     public function confirmCremationBooking() {
+        // echo "<pre>";
+
+        // echo "step1: ";
+        // var_dump(isset($_SESSION['booking']['step1']));
+
+        // echo "step2: ";
+        // var_dump(isset($_SESSION['booking']['step2']));
+
+        // echo "step3: ";
+        // var_dump(isset($_SESSION['booking']['step3']));
+
+        // echo "payment: ";
+        // var_dump(isset($_SESSION['booking']['payment']));
+
+        // print_r($_SESSION['booking']);
+
+        // echo "</pre>";
+        // exit;
+
+if (!isset($_SESSION['booking']['step1']) || 
+    !isset($_SESSION['booking']['step2']) || 
+    !isset($_SESSION['booking']['step3']) ||
+    !isset($_SESSION['booking']['payment'])) {
+    return "Incomplete booking data.";
+}
 
         if (!isset($_SESSION['booking']['step1']) || 
             !isset($_SESSION['booking']['step2']) || 
@@ -419,6 +444,7 @@ class BookingController extends MainController{
 
     }
 
+    // Retreive summery of funeral booking to display in the funeral booking table
     public function view_Booking_Data() {
 
         $sql = "SELECT fs.booking_code, d.full_name AS deceased_name, doc.date_of_death, a.applicant_name, a.contact_number, fs.service_type
@@ -444,9 +470,10 @@ class BookingController extends MainController{
                 echo "<td>".$rec['service_type']."</td>";
 
                 echo "<td>
-                        <a href='admin.php?page=funeral_booking_details&code=".$rec['booking_code']."' class='btn btn-sm btn-info'>
+                        <a href='admin.php?page=view_funeral_booking&booking_code=".$rec['booking_code']."' class='btn btn-sm btn-outline-info'>
                             <i class='fa-solid fa-eye'></i> 
                         </a>
+
                         <button class='btn btn-danger btn-sm delete' id='".$rec['booking_code']."'>
                             <i class=\"fa-solid fa-trash\"></i> 
                         </button>
@@ -479,6 +506,50 @@ class BookingController extends MainController{
         return "success";
 
     }
+
+    public function getFuneralBookingDetails_By_BookingCode($booking_code) {
+
+        $sql = "SELECT fs.booking_code,
+                d.title, d.full_name, d.religion, d.nic, d.deceased_address, d.gender, d.date_of_birth, d.deceased_gn_division, d.municipal_council,
+                a.applicant_name, a.relationship_to_deceased, a.contact_number, a.email, a.applicant_gn_division, a.applicant_address,
+                doc.death_certificate_number, doc.registrar_name, doc.date_of_death, doc.cause_of_death, doc.coroner_name, doc.coroner_decision, doc.cremation_permission,
+                    doc.death_certificate, doc.coroner_certificate, doc.family_consent_letter
+                FROM funeral_service_table fs
+                JOIN deceased_table d ON fs.deceased_table_deceased_id = d.deceased_id
+                JOIN applicant_table a ON fs.applicant_table_applicant_id = a.applicant_id
+                JOIN document_table doc ON fs.document_table_document_set_id = doc.document_id
+                WHERE fs.booking_code = ?";
+
+        $stmt = $this->conn->prepare($sql);
+        if(!$stmt){
+            die("SQL Error: " . $this->conn->error);
+        }
+
+        $stmt->bind_param("s", $booking_code);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        return $result->fetch_assoc();
+    }
+
+    // public function getDeceasedByBookingId($bookingCode){
+
+    //     $sql = "SELECT * FROM funeral_service_table WHERE booking_code = ?";
+
+    //     $stmt = $this->conn->prepare($sql);
+    //     if (!$stmt) {
+    //         return ["error" => "Prepare failed"];
+    //     }
+
+    //     $stmt->bind_param("s", $bookingCode);
+    //     $stmt->execute();
+
+    //     $result = $stmt->get_result();
+    //     $data = $result->fetch_assoc();
+
+    //     return $data ?: [];
+        
+    // }
 
 }
 

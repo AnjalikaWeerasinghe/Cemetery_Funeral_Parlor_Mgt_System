@@ -286,7 +286,61 @@ input[type="file"]:hover {
 
 <script>
     $(document).ready(function(){
-        restoreStep2Data();
+        const mode = window.mode;
+        const bookingCode = window.bookingCode;
+
+        if(mode === "create") {
+            restoreStep2Data();
+            // bindCreateEvents();
+        }
+
+        if(mode === "view") {
+            loadDocumentData();
+            disableForm();
+        }
+
+        function loadDocumentData(){
+
+            $.ajax({
+                url: "../routes/funeral_booking/get_funeral_booking_info_route.php",
+                type: "GET",
+                data: { booking_code: bookingCode },
+
+                success: function(res){
+
+                    const data = (typeof res === "string") ? JSON.parse(res) : res;
+
+                    $("#death_certificate_number").val(data.death_certificate_number);
+                    $("#registrar_name").val(data.registrar_name);
+                    $("#date_of_death").val(data.date_of_death);
+                    $("#cause_of_death").val(data.cause_of_death);
+                    $("#coroner_name").val(data.coroner_name);
+                    $("#coroner_decision").val(data.coroner_decision);
+
+                    if(data.cremation_permission){
+                        $(`input[name="cremation_permission"][value="${data.cremation_permission}"]`)
+                            .prop("checked", true);
+                    }
+
+                    // show file names (from DB)
+                    if(data.death_certificate){
+                        $("#death_certificate_status")
+                            .html(`<span class="text-success">Uploaded file exists</span>`);
+                    }
+
+                    if(data.coroner_certificate){
+                        $("#coroner_certificate_status")
+                            .html(`<span class="text-success">Uploaded file exists</span>`);
+                    }
+
+                    if(data.family_consent_letter){
+                        $("#family_consent_letter_status")
+                            .html(`<span class="text-success">Uploaded file exists</span>`);
+                    }
+
+                }
+            });
+        }
 
         function restoreStep2Data() {
             $("#death_certificate_number").val(sessionStorage.getItem("death_certificate_number") || "");
@@ -384,6 +438,8 @@ input[type="file"]:hover {
         $("#document_info").on("submit", function(e) {
             e.preventDefault();
 
+            if(mode !== "create") return;
+
             var formData = new FormData(this);
 
             $.ajax({
@@ -444,6 +500,76 @@ input[type="file"]:hover {
             loadStep(1);
             setActiveStep(1);
         });
+
+        function disableForm(){
+
+            $("#document_info :input").prop("disabled", true);
+            $("input[type='file']").hide();
+            $("#document_info button[type='submit']").hide();
+        }
+
+        // function bindCreateEvents(){
+
+        //     $("input[type='file']").change(function(){
+
+        //         const file = this.files[0];
+        //         if(!file) return;
+
+        //         if(file.size > 2 * 1024 * 1024){
+        //             alert("File size must be below 2MB");
+        //             $(this).val("");
+        //             return;
+        //         }
+
+        //         const allowedTypes = ["application/pdf","image/jpeg","image/png"];
+
+        //         if(!allowedTypes.includes(file.type)){
+        //             alert("Only PDF, JPG, JPEG, PNG allowed");
+        //             $(this).val("");
+        //             return;
+        //         }
+        //     });
+
+        //     $("input[type='file']").change(showFileNames);
+
+        //     $("#document_info").on("submit", submitDocumentForm);
+        // }
+
+        // function submitDocumentForm(e){
+        //     e.preventDefault();
+
+        //     const formData = new FormData($("#document_info")[0]);
+
+        //     $.ajax({
+        //         url: "../routes/funeral_booking/add_document_info_route.php",
+        //         method: "POST",
+        //         data: formData,
+        //         processData: false,
+        //         contentType: false,
+        //         success: function(response){
+
+        //             response = $.trim(response);
+
+        //             if(response === "success"){
+
+        //                 sessionStorage.setItem("death_certificate_number", $("#death_certificate_number").val());
+        //                 sessionStorage.setItem("registrar_name", $("#registrar_name").val());
+        //                 sessionStorage.setItem("date_of_death", $("#date_of_death").val());
+        //                 sessionStorage.setItem("cause_of_death", $("#cause_of_death").val());
+        //                 sessionStorage.setItem("coroner_name", $("#coroner_name").val());
+        //                 sessionStorage.setItem("coroner_decision", $("#coroner_decision").val());
+
+        //                 sessionStorage.setItem("cremation_permission", $('input[name="cremation_permission"]:checked').val());
+
+        //                 unlockStep(3);
+        //                 loadStep(3);
+
+        //             } else {
+        //                 alert(response);
+        //             }
+        //         }
+        //     });
+        // }
     });
     
 </script>

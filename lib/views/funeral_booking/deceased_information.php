@@ -1,4 +1,8 @@
 <!-- Step 1 - Deceased and Applicant Information -->
+<?php 
+$bookingId = $_GET['booking_id'] ?? null;
+$mode = $_GET['mode'] ?? 'create';
+?>
 
 <style>
 :root {
@@ -374,13 +378,81 @@ button {
 
 <script>
     $(document).ready(function(){
-        loadBookingCode();
+        const mode = window.mode;
+        const bookingCode = window.bookingCode;
 
-        restoreStep1Data();
+        console.log("Mode:", mode);
+        console.log("Booking Code:", bookingCode);
+
+        if (mode === "create") {
+            loadBookingCodeIfCreate();
+            restoreStep1DataIfCreate();
+        }
+
+        //Load existing deceased and applicant information if in view mode
+        if(mode !== "create" && bookingCode) {
+            applyMode(mode);
+
+            $.ajax({
+                url: "../routes/funeral_booking/get_funeral_booking_info_route.php",
+                type: "GET",
+                data: { booking_code: bookingCode },
+
+                success: function (res) {
+                    const data = (typeof res === "string") ? JSON.parse(res) : res;
+
+                    $("#full_name").val(data.full_name);
+                    $("#booking_code").val(data.booking_code);
+                    $("#title").val(data.title);
+                    $("#religion").val(data.religion);
+                    $("#gender").val(data.gender);
+                    $("#nic").val(data.nic);
+                    $("#date_of_birth").val(data.date_of_birth);
+
+                    $("#deceased_address").val(data.deceased_address);
+                    $("#deceased_gn_division").val(data.deceased_gn_division);
+                    $("#municipal_council").val(data.municipal_council);
+
+                    $("#applicant_name").val(data.applicant_name);
+                    $("#relationship_to_deceased").val(data.relationship_to_deceased);
+                    $("#contact_number").val(data.contact_number);
+                    $("#email").val(data.email);
+                    $("#applicant_gn_division").val(data.applicant_gn_division);
+                    $("#applicant_address").val(data.applicant_address);
+
+                    if (data.deceased_photo) {
+                        $("#previewImage").attr("src", data.deceased_photo).show();
+                        $("#previewPlaceholder").hide();
+                    }
+
+                    applyMode(mode);
+                }
+            });
+        } else {
+            applyMode(mode);
+        }
+
+        function applyMode(mode) {
+
+            if (mode === "view") {
+                $("#deceased_info :input").not("#booking_code").prop("disabled", true);
+
+                $("#load_step2").hide();
+                $(".upload-btn").hide();
+
+            }
+
+            if (mode === "edit") {
+
+                $("#booking_code").prop("disabled", true); // prevent editing code
+            }
+        }
 
         // This function restores previously entered step 1 data from sessionStorage
         // This is useful when users navigate back to Step 1 from Step 2
-        function restoreStep1Data(){
+        function restoreStep1DataIfCreate(){
+            if(mode !== "create") return;
+
             let savedPreview = sessionStorage.getItem("deceased_photo_preview");
 
             $("#full_name").val(sessionStorage.getItem("full_name"));
@@ -412,7 +484,9 @@ button {
         }
 
         // This function generates a unique booking code based on the selected service type
-        function loadBookingCode(){
+        function loadBookingCodeIfCreate(){
+            if (mode !== "create") return;
+
             const serviceType = localStorage.getItem("selectedBookingService");
 
             // console.log("DEBUG serviceType:", serviceType);
@@ -422,8 +496,6 @@ button {
                 return;
             }
 
-            $("#booking_code").val("Generating..");
-
             $.ajax({
                 url: "../routes/funeral_booking/generate_booking_code.php",
                 type: "POST",
@@ -431,7 +503,6 @@ button {
                 success: function (response) {
                     // console.log("PHP RESPONSE:", response);
                     $("#booking_code").val(response.trim());
-
                     // localStorage.setItem("bookingCode", response);
                 },
                 error: function (xhr) {
@@ -443,6 +514,8 @@ button {
         // Handle form submission for deceased and applicant information
         $("#deceased_info").on("submit", function(e) {
             e.preventDefault();
+
+            if (mode === "view") return;
 
             $("#service_type").val(localStorage.getItem("selectedBookingService"));
 
@@ -494,6 +567,8 @@ button {
 
         // This function handles the image preview when a user selects a photo for the deceased
         $("#deceased_photo").change(function(e){
+            if (mode === "view") return;
+
             let file = e.target.files[0];
 
             if(file){
@@ -513,6 +588,8 @@ button {
 
         // Automatically set gender based on the selected title    
         $("#title").change(function(){
+            if (mode === "view") return;
+
             let title = $(this).val();
 
             if(title === "Mr"){
