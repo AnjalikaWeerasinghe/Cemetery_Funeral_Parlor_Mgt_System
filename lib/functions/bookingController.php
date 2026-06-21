@@ -43,9 +43,15 @@ class BookingController extends MainController{
         $relationship_to_deceased = $data['relationship_to_deceased'] ?? '';
         $contact_number = $data['contact_number'] ?? '';
         $applicant_address = $data['applicant_address'] ?? '';
+        $title = $data['title'] ?? '';
+        $religion = $data['religion'] ?? '';
+        $applicant_nic = $data['applicant_nic'] ?? '';
+        $email = $data['email'] ?? '';
+        $applicant_gn_division = $data['applicant_gn_division'] ?? '';
 
-        if (empty($full_name) || empty($nic) || empty($applicant_name) || empty($relationship_to_deceased) || empty($contact_number) || 
-        empty($applicant_address)) {
+        if (empty($title) || empty($full_name) || empty($nic) ||empty($religion) || 
+            empty($applicant_name) || empty($relationship_to_deceased) || empty($applicant_nic) || empty($contact_number) || empty($email) || empty($applicant_gn_division) || 
+            empty($applicant_address)) {
 
             echo "Please fill the required fields.";
             exit();
@@ -194,13 +200,6 @@ class BookingController extends MainController{
         // echo "</pre>";
         // exit;
 
-if (!isset($_SESSION['booking']['step1']) || 
-    !isset($_SESSION['booking']['step2']) || 
-    !isset($_SESSION['booking']['step3']) ||
-    !isset($_SESSION['booking']['payment'])) {
-    return "Incomplete booking data.";
-}
-
         if (!isset($_SESSION['booking']['step1']) || 
             !isset($_SESSION['booking']['step2']) || 
             !isset($_SESSION['booking']['step3']) ||
@@ -263,13 +262,14 @@ if (!isset($_SESSION['booking']['step1']) ||
             }
 
             $sql2 = "INSERT INTO applicant_table (
-                    applicant_name, relationship_to_deceased, contact_number, email, applicant_gn_division, applicant_address)
-                    VALUES (?, ?, ?, ?, ?, ?)";
+                    applicant_name, relationship_to_deceased, applicant_nic, applicant_nic_front, applicant_nic_back, contact_number, email, applicant_gn_division, applicant_address)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
             $stmt2 = $this->conn->prepare($sql2);
 
-            $stmt2->bind_param("ssssss", 
-                $step1['applicant_name'], $step1['relationship_to_deceased'], $step1['contact_number'], $step1['email'], $step1['applicant_gn_division'], $step1['applicant_address']
+            $stmt2->bind_param("sssssssss", 
+                $step1['applicant_name'], $step1['relationship_to_deceased'], $step1['applicant_nic'], $step1['applicant_nic_front'],
+                $step1['applicant_nic_back'], $step1['contact_number'], $step1['email'], $step1['applicant_gn_division'], $step1['applicant_address']
             );
 
             if(!$stmt2->execute()){

@@ -24,7 +24,7 @@ if($ash_collection_method === "memorial"){
     }
 }
 
-if($collect_ash === "0" && $ash_collection_method === "memorial"){
+if($collect_ash === "1" && $ash_collection_method === "memorial"){
     echo "Invalid ash collection method.";
     exit();
 }

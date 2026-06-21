@@ -247,6 +247,12 @@ include_once('header.php');
                     case 'cremationTimeSlots':
                         include 'funeral_booking/scheduling_cremation_slots.php';
                         break;
+                    case 'burialPlotDesign':
+                        include 'funeral_booking/plot_design.php';
+                        break;
+                    case 'burialPlotSection':
+                        include 'funeral_booking/burial_plot_section.php';
+                        break;
 
                     case 'roleSettings':
                         include 'system_settings/role_settings.php';

@@ -278,11 +278,12 @@
         let collect_ash = sessionStorage.getItem("collect_ash");
         let deceasedPhoto = sessionStorage.getItem("deceased_photo");
 
+        console.log(sessionStorage.getItem("deceased_photo"));
         console.log("Photo Name:", deceasedPhoto);
-        console.log("Image Path:", "../uploads/images/" + deceasedPhoto);
+        console.log("Image Path:", "../uploads/deceased_photoes/" + deceasedPhoto);
 
         if(deceasedPhoto){
-            $("#deceased_photo").attr("src","../uploads/images/" + data.deceasedPhoto).show();
+            $("#deceased_photo").attr("src", "/Cemetery_Funeral_Parlor_Mgt_System/lib/" + deceasedPhoto).show();
         }
 
         $("#title").text(sessionStorage.getItem("title"));

@@ -326,3 +326,32 @@
     </div>
 
 </div>
+
+<script>
+    $(document).ready(function(){
+
+        loadCemeterySections();
+
+        $('#cem_section_id, #plot_type').change(function(){
+            loadAvailablePlots();
+        });
+
+        $('#plotContainer').on('click', '.plot-card', function(){
+            $('.plot-card').removeClass('plot-selected');
+            $(this).addClass('plot-selected');
+
+            $('#selected_plot_id').val($(this).data('plot-id'));
+            $('#selected_section').text($(this).data('section-name'));
+            $('#selected_plot').text($(this).data('plot-number'));
+            $('#selected_grave_type').text($(this).data('grave-type'));
+
+            updatePriceSummary();
+        });
+
+        $('#burial_info').submit(function(e){
+            e.preventDefault();
+            saveBurialInformation();
+        });
+
+    });
+</script>

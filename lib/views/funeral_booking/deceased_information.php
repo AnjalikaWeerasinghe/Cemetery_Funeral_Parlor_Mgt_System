@@ -189,6 +189,57 @@ button {
     border-radius:0 10px 10px 0;
 }
 
+.uploaded-file-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+
+    background:linear-gradient(
+        135deg, rgba(201,164,76,.12), rgba(232,217,163,.25)
+    );
+
+    color:#8a6d1f;
+    border:1px solid rgba(201,164,76,.35);
+    border-radius:12px;
+
+    padding:5px 7px;
+    margin-top:5px;
+
+    font-size:13px;
+    font-weight:600;
+
+    box-shadow:0 4px 12px rgba(201,164,76,.12);
+}
+
+.uploaded-file-badge i{
+    color:#c9a44c;
+    font-size:14px;
+}
+
+.premium-preview-btn{
+    display:inline-flex;
+    align-items:center;
+    text-decoration:none;
+
+    background:linear-gradient(
+        135deg, #c9a44c, #e8d9a3
+    );
+
+    color:#2b2b2b;
+    font-weight:600;
+
+    padding:5px 8px;
+    border-radius:12px;
+
+    transition:.3s ease;
+}
+
+.premium-preview-btn:hover{
+    color:#2b2b2b;
+    transform:translateY(-2px);
+    box-shadow:0 8px 20px rgba(201,164,76,.30);
+}
+
 </style>
 
 <div class="container-fluid">
@@ -268,7 +319,7 @@ button {
 
                                 <div class="col-md-6 mb-3">
                                     <label for="date_of_birth" class="form-label">DOB</label>
-                                    <input type="date" name="date_of_birth" id="date_of_birth" class="form-control">
+                                    <input type="date" name="date_of_birth" id="date_of_birth" class="form-control" required>
                                 </div>
                             </div>
 
@@ -280,12 +331,72 @@ button {
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="deceased_gn_division" class="form-label">G. N. Division</label>
-                                    <input type="text" name="deceased_gn_division" id="deceased_gn_division" class="form-control" placeholder="Enter Grama Niladari division">
+                                    <select name="deceased_gn_division" id="deceased_gn_division" class="form-select" placeholder="Enter Grama Niladari division">
+                                        <option value="">Select GN Division</option>
+                                        <option value="Gampola East">Gampola East</option>
+                                        <option value="Bothalapitiya">Bothalapitiya</option>
+                                        <option value="Illawathura">Illawathura</option>
+                                        <option value="Gampola West">Gampola West</option>
+                                        <option value="Polkubura">Polkubura</option>
+                                        <option value="Aragoda">Aragoda</option>
+                                        <option value="Kurukude">Kurukude</option>
+                                        <option value="Kudamake">Kudamake</option>
+                                        <option value="Jayamalapura">Jayamalapura</option>
+                                        <option value="Godagama">Godagama</option>
+                                        <option value="Singhapitiya South">Singhapitiya South</option>
+                                        <option value="Kahatapitiya">Kahatapitiya</option>
+                                        <option value="Ilangawaththa">Ilangawaththa</option>
+                                        <option value="Unambuwa">Unambuwa</option>
+                                        <option value="Mounttemple">Mounttemple</option>
+                                        <option value="Kirinda">Kirinda</option>
+                                        <option value="Galgediyawa">Galgediyawa</option>
+                                        <option value="Udowita">Udowita</option>
+                                        <option value="Rathmalkaduwa">Rathmalkaduwa</option>
+                                        <option value="Singhapitiya North">Singhapitiya North</option>
+                                        <option value="Hapugaspitiya">Hapugaspitiya</option>
+                                        <option value="Kirapane">Kirapane</option>
+                                        <option value="Ranawala">Ranawala</option>
+                                        <option value="Bowala">Bowala</option>
+                                        <option value="Egoda Kalugamuwa">Egoda Kalugamuwa</option>
+                                        <option value="Other">Other</option>
+                                    </select>
                                 </div>
 
                                 <div class="col-md-6 mb-3">
-                                    <label for="municipal_council" class="form-label">Area of Urban Council</label>
-                                    <input type="text" name="municipal_council" id="municipal_council" class="form-control" placeholder="Enter municipal council">
+                                    <label for="municipal_council" class="form-label">Local Authority</label>
+                                    <select name="municipal_council" id="municipal_council" class="form-select" placeholder="Select urban council">
+                                        <option value="">Select Local Authority</option>
+                                        <option value="Gampola">Gampola</option>
+                                        <option value="Wattegama">Wattegama</option>
+                                        <option value="Kadugannawa">Kadugannawa</option>
+                                        <option value="Nawalapitiya">Nawalapitiya</option>
+                                        <option value="Kolonnawa">Kolonnawa</option>
+                                        <option value="Seethawakapura">Seethawakapura</option>
+                                        <option value="Maharagama">Maharagama</option>
+                                        <option value="Boralesgamuwa">Boralesgamuwa</option>
+                                        <option value="Kesbewa">Kesbewa</option>
+                                        <option value="Kuliyapitiya">Kuliyapitiya</option>
+                                        <option value="Puttalam">Puttalam</option>
+                                        <option value="Chilaw">Chilaw</option>
+                                        <option value="Ambalangoda">Ambalangoda</option>
+                                        <option value="Hikkaduwa">Hikkaduwa</option>
+                                        <option value="Weligama">Weligama</option>
+                                        <option value="Tangalle">Tangalle</option>
+                                        <option value="Point Pedro">Point Pedro</option>
+                                        <option value="Valvettithurai">Valvettithurai</option>
+                                        <option value="Chavakachcheri">Chavakachcheri</option>
+                                        <option value="Mannar">Mannar</option>
+                                        <option value="Kattankudi">Kattankudi</option>
+                                        <option value="Eravur">Eravur</option>
+                                        <option value="Ampara">Ampara</option>
+                                        <option value="Trincomalee">Trincomalee</option>
+                                        <option value="Kinniya">Kinniya</option>
+                                        <option value="Haputale">Haputale</option>
+                                        <option value="Balangoda">Balangoda</option>
+                                        <option value="Embilipitiya">Embilipitiya</option>
+                                        <option value="Kegalle">Kegalle</option>
+                                        <option value="Other">Other</option>
+                                    </select>
                                 </div>
                             </div>
 
@@ -334,6 +445,39 @@ button {
                     </div>
 
                     <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="applicant_nic" class="form-label">Applicant NIC</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0">
+                                    <i class="fa-solid fa-id-card text-secondary"></i>
+                                </span>
+                                <input type="text" name="applicant_nic" id="applicant_nic" class="form-control border-start-0" pattern="[0-9]{9}[vVxX]|[0-9]{12}" placeholder="Enter NIC" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <label for="applicant_nic_upload" class="form-label">Upload NIC Copy *</label>
+                        <div class="col-md-6 mb-3">
+                            <input type="file" name="applicant_nic_front" id="applicant_nic_front" class="form-control">
+                            <div class="d-flex align-items-center gap-2 mt-2">
+                                <div id="applicant_nic_front_status"></div>
+                                <div id="nicFrontPreview"></div>
+                            </div>
+                            <small class="text-muted">Upload PDF or Image (Max 2MB) - Upload NIC front page</small>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <input type="file" name="applicant_nic_back" id="applicant_nic_back" class="form-control">
+                            <div class="d-flex align-items-center gap-2 mt-2">
+                                <div id="applicant_nic_back_status"></div>
+                                <div id="nicBackPreview"></div>
+                            </div>
+                            <small class="text-muted">Upload PDF or Image (Max 2MB) - Upload NIC back page</small>
+                        </div>
+                    </div>
+
+                    <div class="row">
                         <div class="col-md-4 mb-3">
                             <label for="contact_number" class="form-label">Contact Number *</label>
                             <div class="input-group">
@@ -356,7 +500,35 @@ button {
 
                         <div class="col-md-4 mb-3">
                             <label for="applicant_gn_division" class="form-label">G. N. Division</label>
-                            <input type="text" name="applicant_gn_division" id="applicant_gn_division" class="form-control" placeholder="Enter Grama Niladari division">
+                            <select name="applicant_gn_division" id="applicant_gn_division" class="form-select" placeholder="Enter Grama Niladari division">
+                                <option value="">Select GN Division</option>
+                                <option value="Gampola East">Gampola East</option>
+                                <option value="Bothalapitiya">Bothalapitiya</option>
+                                <option value="Illawathura">Illawathura</option>
+                                <option value="Gampola West">Gampola West</option>
+                                <option value="Polkubura">Polkubura</option>
+                                <option value="Aragoda">Aragoda</option>
+                                <option value="Kurukude">Kurukude</option>
+                                <option value="Kudamake">Kudamake</option>
+                                <option value="Jayamalapura">Jayamalapura</option>
+                                <option value="Godagama">Godagama</option>
+                                <option value="Singhapitiya South">Singhapitiya South</option>
+                                <option value="Kahatapitiya">Kahatapitiya</option>
+                                <option value="Ilangawaththa">Ilangawaththa</option>
+                                <option value="Unambuwa">Unambuwa</option>
+                                <option value="Mounttemple">Mounttemple</option>
+                                <option value="Kirinda">Kirinda</option>
+                                <option value="Galgediyawa">Galgediyawa</option>
+                                <option value="Udowita">Udowita</option>
+                                <option value="Rathmalkaduwa">Rathmalkaduwa</option>
+                                <option value="Singhapitiya North">Singhapitiya North</option>
+                                <option value="Hapugaspitiya">Hapugaspitiya</option>
+                                <option value="Kirapane">Kirapane</option>
+                                <option value="Ranawala">Ranawala</option>
+                                <option value="Bowala">Bowala</option>
+                                <option value="Egoda Kalugamuwa">Egoda Kalugamuwa</option>
+                                <option value="Other">Other</option>
+                            </select>
                         </div>
                     </div>
 
@@ -378,11 +550,19 @@ button {
 
 <script>
     $(document).ready(function(){
+
+        let today = new Date();
+
+        today.setDate(today.getDate() -1); // Prevent user from selecting current and future dates
+        
+        let maxDate = today.toISOString().split('T')[0];
+
+        $("#date_of_birth").attr("max", maxDate);
+        
         const mode = window.mode;
         const bookingCode = window.bookingCode;
 
         console.log("Mode:", mode);
-        console.log("Booking Code:", bookingCode);
 
         if (mode === "create") {
             loadBookingCodeIfCreate();
@@ -415,6 +595,7 @@ button {
 
                     $("#applicant_name").val(data.applicant_name);
                     $("#relationship_to_deceased").val(data.relationship_to_deceased);
+                    $("#applicant_nic").val(data.applicant_nic);
                     $("#contact_number").val(data.contact_number);
                     $("#email").val(data.email);
                     $("#applicant_gn_division").val(data.applicant_gn_division);
@@ -423,6 +604,22 @@ button {
                     if (data.deceased_photo) {
                         $("#previewImage").attr("src", data.deceased_photo).show();
                         $("#previewPlaceholder").hide();
+                    }
+
+                    if(data.applicant_nic_front){
+                        $("#nicFrontPreview").html(
+                            `<a href="${data.applicant_nic_front}" target="_blank">
+                                View NIC Front
+                            </a>`
+                        );
+                    }
+
+                    if(data.applicant_nic_back){
+                        $("#nicBackPreview").html(
+                            `<a href="${data.applicant_nic_back}" target="_blank">
+                                View NIC Back
+                            </a>`
+                        );
                     }
 
                     applyMode(mode);
@@ -470,15 +667,65 @@ button {
             $("#applicant_name").val(sessionStorage.getItem("applicant_name"));
             $("#relationship_to_deceased").val(sessionStorage.getItem("relationship_to_deceased"));
 
+            $("#applicant_nic").val(sessionStorage.getItem("applicant_nic"));
+            
             $("#contact_number").val(sessionStorage.getItem("contact_number"));
             $("#email").val(sessionStorage.getItem("email"));
 
             $("#applicant_gn_division").val(sessionStorage.getItem("applicant_gn_division"));
             $("#applicant_address").val(sessionStorage.getItem("applicant_address"));
 
-            if(savedPreview){
-                $("#previewImage").attr("src", savedPreview).show();
+            const deceasedPhoto = sessionStorage.getItem("deceased_photo");
+
+            if(deceasedPhoto){
+                $("#previewImage").attr("src", "/Cemetery_Funeral_Parlor_Mgt_System/lib/" + deceasedPhoto).show();
                 $("#previewPlaceholder").hide();
+            }
+
+            const nicFrontFile = sessionStorage.getItem("applicant_nic_front_path");
+
+            if(nicFrontFile){
+
+                const nicFrontPath = "/Cemetery_Funeral_Parlor_Mgt_System/lib/" + sessionStorage.getItem("applicant_nic_front_path");
+
+                $("#applicant_nic_front_status").html(
+                    `<span class="uploaded-file-badge">
+                        <i class="fas fa-check-circle me-1 m-1"></i> ${sessionStorage.getItem("applicant_nic_front_name")}
+                    </span>`
+                );
+
+                $("#nicFrontPreview").html(
+                    `<a href="${nicFrontPath}" target="_blank" class="premium-preview-btn mt-2">
+                        <i class="fas fa-eye me-2"></i>View NIC Front
+                    </a>`
+                );
+            }
+
+            const nicBackFile = sessionStorage.getItem("applicant_nic_back_path");
+
+            if(nicBackFile){
+
+                const nicBackPath = "/Cemetery_Funeral_Parlor_Mgt_System/lib/" + sessionStorage.getItem("applicant_nic_back_path");
+
+                $("#applicant_nic_back_status").html(
+                    `<span class="uploaded-file-badge">
+                        <i class="fas fa-check-circle me-1 m-1"></i> ${sessionStorage.getItem("applicant_nic_back_name")}
+                    </span>`
+                );
+
+                $("#nicBackPreview").html(
+                    `<a href="${nicBackPath}" target="_blank" class="premium-preview-btn mt-2">
+                        <i class="fas fa-eye me-2"></i>View NIC Back
+                    </a>`
+                );
+            }
+
+            if(sessionStorage.getItem("applicant_nic_back_name")) {
+                $("#applicant_nic_back").removeAttr("required");
+            }
+
+             if(sessionStorage.getItem("applicant_nic_front_name")) {
+                $("#applicant_nic_front").removeAttr("required");
             }
 
         }
@@ -531,9 +778,9 @@ button {
                 success:function(response){
                     console.log("Response:", response);
 
-                    response = response.trim();
+                    response = JSON.parse(response);
 
-                    if(response === "success"){
+                    if(response.status === "success"){
 
                     // store data from Step 1 in sessionStorage to restore it when user comes back to Step 1 from Step 2
                         sessionStorage.setItem("full_name", $("#full_name").val());
@@ -549,11 +796,23 @@ button {
 
                         sessionStorage.setItem("applicant_name", $("#applicant_name").val());
                         sessionStorage.setItem("relationship_to_deceased", $("#relationship_to_deceased").val());
+                        sessionStorage.setItem("applicant_nic", $("#applicant_nic").val());
+                        
                         sessionStorage.setItem("contact_number", $("#contact_number").val());
                         sessionStorage.setItem("email", $("#email").val());
                         sessionStorage.setItem("applicant_gn_division", $("#applicant_gn_division").val());
                         sessionStorage.setItem("applicant_address", $("#applicant_address").val());
-                        
+
+                        sessionStorage.setItem("applicant_nic_front_path", response.nic_front_path);
+                        sessionStorage.setItem("applicant_nic_back_path", response.nic_back_path);
+                        sessionStorage.setItem("deceased_photo", response.deceased_photo);
+
+                        const nicFront = $("#applicant_nic_front")[0].files[0]?.name || sessionStorage.getItem("applicant_nic_front_name");
+                        sessionStorage.setItem("applicant_nic_front_name", nicFront);
+
+                        const nicBack = $("#applicant_nic_back")[0].files[0]?.name || sessionStorage.getItem("applicant_nic_back_name");
+                        sessionStorage.setItem("applicant_nic_back_name", nicBack);
+
                         unlockStep(2);
                         loadStep(2);
 
@@ -597,6 +856,27 @@ button {
             }
             else if(title === "Mrs" || title === "Miss"){
                 $("#gender").val("Female");
+            }
+        });
+
+        $("input[type='file']").change(function(){
+
+            const file = this.files[0];
+
+            if(!file) return;
+
+            if(file.size > 2 * 1024 * 1024){
+                alert("File size must be below 2MB");
+                $(this).val("");
+                return;
+            }
+
+            const allowedTypes = ["application/pdf", "image/jpeg", "image/png", "image/jpg", "image/webp"];
+
+            if(!allowedTypes.includes(file.type)){
+                alert("Only PDF, JPG, JPEG, PNG, and WEBP files are allowed.")
+                $(this).val("");
+                return;
             }
         });
 

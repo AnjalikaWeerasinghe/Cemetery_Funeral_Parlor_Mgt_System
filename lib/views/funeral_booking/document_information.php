@@ -171,6 +171,57 @@ input[type="file"]:hover {
     transform: scale(0.97);
 }
 
+.uploaded-file-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+
+    background:linear-gradient(
+        135deg, rgba(201,164,76,.12), rgba(232,217,163,.25)
+    );
+
+    color:#8a6d1f;
+    border:1px solid rgba(201,164,76,.35);
+    border-radius:12px;
+
+    padding:5px 7px;
+    margin-top:5px;
+
+    font-size:13px;
+    font-weight:600;
+
+    box-shadow:0 4px 12px rgba(201,164,76,.12);
+}
+
+.uploaded-file-badge i{
+    color:#c9a44c;
+    font-size:14px;
+}
+
+.premium-preview-btn{
+    display:inline-flex;
+    align-items:center;
+    text-decoration:none;
+
+    background:linear-gradient(
+        135deg, #c9a44c, #e8d9a3
+    );
+
+    color:#2b2b2b;
+    font-weight:600;
+
+    padding:5px 8px;
+    border-radius:12px;
+
+    transition:.3s ease;
+}
+
+.premium-preview-btn:hover{
+    color:#2b2b2b;
+    transform:translateY(-2px);
+    box-shadow:0 8px 20px rgba(201,164,76,.30);
+}
+
 </style>
 
 <div class="container-fluid">
@@ -214,8 +265,11 @@ input[type="file"]:hover {
 
                 <div class="mb-3">
                     <label for="death_certificate" class="form-label">Death Certificate *</label>
-                    <input type="file" name="death_certificate" id="death_certificate" class="form-control">
-                    <div id="death_certificate_status"></div>
+                    <input type="file" name="death_certificate" id="death_certificate" class="form-control" required>
+                    <div class="d-flex align-items-center gap-2 mt-2">
+                        <div id="death_certificate_status"></div>
+                        <div id="deathCertificatePreview"></div>
+                    </div>
                     <small class="text-muted">Upload PDF or Image (Max 2MB)</small>
                 </div>
 
@@ -239,7 +293,10 @@ input[type="file"]:hover {
                 <div class="mb-3">
                     <label for="coroner_certificate" class="form-label">Inquirer's Certificate of Death</label>
                     <input type="file" name="coroner_certificate" id="coroner_certificate" class="form-control">
-                    <div id="coroner_certificate_status"></div>
+                    <div class="d-flex align-items-center gap-2 mt-2">
+                        <div id="coroner_certificate_status"></div>
+                        <div id="coronerCertificatePreview"></div>
+                    </div>
                     <small class="text-muted">Upload PDF or Image (Max 2MB)</small>
                 </div>
 
@@ -262,8 +319,11 @@ input[type="file"]:hover {
 
                 <div class="mb-3">
                     <label for="family_consent_letter" class="form-label">Family Consent Letter *</label>
-                    <input type="file" name="family_consent_letter" id="family_consent_letter" class="form-control">
-                    <div id="family_consent_letter_status"></div>
+                    <input type="file" name="family_consent_letter" id="family_consent_letter" class="form-control" required>
+                    <div class="d-flex align-items-center gap-2 mt-2">
+                        <div id="family_consent_letter_status"></div>
+                        <div id="familyConsentLetterPreview"></div>
+                    </div>
                     <small class="text-muted">Upload PDF or Image (Max 2MB)</small>
                 </div>
 
@@ -324,18 +384,27 @@ input[type="file"]:hover {
 
                     // show file names (from DB)
                     if(data.death_certificate){
-                        $("#death_certificate_status")
-                            .html(`<span class="text-success">Uploaded file exists</span>`);
+                        $("#deathCertificatePreview").html(`
+                            <a href="${data.death_certificate}" target="_blank" class="premium-preview-btn">
+                                View Death Certificate
+                            </a>
+                        `);
                     }
 
                     if(data.coroner_certificate){
-                        $("#coroner_certificate_status")
-                            .html(`<span class="text-success">Uploaded file exists</span>`);
+                        $("#coronerCertificatePreview").html(`
+                            <a href="${data.coroner_certificate}" target="_blank" class="premium-preview-btn">
+                                View Coroner Certificate
+                            </a>
+                        `);
                     }
 
                     if(data.family_consent_letter){
-                        $("#family_consent_letter_status")
-                            .html(`<span class="text-success">Uploaded file exists</span>`);
+                        $("#familyConsentLetterPreview").html(`
+                            <a href="${data.family_consent_letter}" target="_blank" class="premium-preview-btn">
+                                View Family Consent Letter
+                            </a>
+                        `);
                     }
 
                 }
@@ -358,16 +427,42 @@ input[type="file"]:hover {
                 $(`input[name="cremation_permission"][value="${cremationPermission}"]`).prop("checked", true);
             }
 
-            if(sessionStorage.getItem("death_certificate_name")){
+            const deathCertificateFile = sessionStorage.getItem("death_certificate_path");
+
+            if(deathCertificateFile){
+
+                const deathCertificatePath = "/Cemetery_Funeral_Parlor_Mgt_System/lib/" + deathCertificateFile;
+
                 $("#death_certificate_status").html(
-                    `<span class="text-success">Previously uploaded: ${sessionStorage.getItem("death_certificate_name")}</span>`
+                    `<div class="uploaded-file-badge">
+                        <i class="fas fa-check-circle me-2"></i> <span>${sessionStorage.getItem("death_certificate_name")}</span>
+                    </div>`
                 );
+
+                $("#deathCertificatePreview").html(
+                    `<a href="${deathCertificatePath}" target="_blank" class="premium-preview-btn mt-2">
+                        <i class="fas fa-eye me-2"></i>View Death Certificate
+                    </a>`
+                );
+
             }
 
-            let coronerFile = sessionStorage.getItem("coroner_certificate_name");
-            if(coronerFile){
+            const coronerCertificateFile = sessionStorage.getItem("coroner_certificate_path");
+
+            if(coronerCertificateFile){
+
+                const coronerFilePath = "/Cemetery_Funeral_Parlor_Mgt_System/lib/" + coronerCertificateFile;
+
                 $("#coroner_certificate_status").html(
-                    `<span class="text-success">Previously uploaded: ${coronerFile}</span>`
+                    `<div class="uploaded-file-badge">
+                        <i class="fas fa-check-circle me-2"></i> <span>${sessionStorage.getItem("coroner_certificate_name")}</span>
+                    </div>`
+                );
+
+                $("#coronerCertificatePreview").html(
+                    `<a href="${coronerFilePath}" target="_blank" class="premium-preview-btn mt-2">
+                        <i class="fas fa-eye me-2"></i>View Coroner Certificate
+                    </a>`
                 );
             }
 
@@ -377,9 +472,22 @@ input[type="file"]:hover {
             //     );
             // }
 
-            if(sessionStorage.getItem("family_consent_letter_name")){
+            const familyConsentFile = sessionStorage.getItem("family_consent_letter_path");
+
+            if(familyConsentFile){
+
+                const familyConsentPath = "/Cemetery_Funeral_Parlor_Mgt_System/lib/" + familyConsentFile;
+
                 $("#family_consent_letter_status").html(
-                    `<span class="text-success">Previously uploaded: ${sessionStorage.getItem("family_consent_letter_name")}</span>`
+                    `<div class="uploaded-file-badge">
+                        <i class="fas fa-check-circle me-2"></i> <span>${sessionStorage.getItem("family_consent_letter_name")}</span>
+                    </div>`
+                );
+
+                $("#familyConsentLetterPreview").html(
+                    `<a href="${familyConsentPath}" target="_blank" class="premium-preview-btn mt-2">
+                        <i class="fas fa-eye me-2"></i>View Family Consent Letter
+                    </a>`
                 );
             }
 
@@ -451,9 +559,9 @@ input[type="file"]:hover {
                 success:function(response){
                     // console.log("Response:", response);
 
-                    response = $.trim(response);
+                    response = JSON.parse(response);
 
-                    if(response === "success"){
+                    if(response.status === "success"){
 
                         sessionStorage.setItem("death_certificate_number", $("#death_certificate_number").val());
                         sessionStorage.setItem("registrar_name", $("#registrar_name").val());
@@ -463,6 +571,10 @@ input[type="file"]:hover {
                         sessionStorage.setItem("coroner_decision", $("#coroner_decision").val());
                         
                         sessionStorage.setItem("cremation_permission", $('input[name="cremation_permission"]:checked').val());
+
+                        sessionStorage.setItem("death_certificate_path", response.death_certificate_path);
+                        sessionStorage.setItem("family_consent_letter_path", response.family_consent_letter_path);
+                        sessionStorage.setItem("coroner_certificate_path", response.coroner_certificate_path);
 
                         const deathFile = $("#death_certificate")[0].files[0]?.name || sessionStorage.getItem("death_certificate_name");
                         sessionStorage.setItem("death_certificate_name", deathFile);

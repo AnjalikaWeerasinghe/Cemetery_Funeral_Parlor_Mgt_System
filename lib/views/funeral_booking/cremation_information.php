@@ -925,7 +925,6 @@ input[type="file"]:hover {
             // disable all inputs
             $("#cremation_info :input").prop("disabled", true);
 
-            // hide buttons / interactions
             $("#load_step2").hide();
             $(".slot-card").css("pointer-events", "none");
             $("input[type='file']").hide();
@@ -933,6 +932,21 @@ input[type="file"]:hover {
             $(document).off("click", ".slot-card");
             $("#cremation_info").off("submit");
         }
+
+        function setAreaTypeAutomatically(){
+
+            const localAuthority = sessionStorage.getItem("municipal_council");
+
+            if(!localAuthority) return;
+
+            if(localAuthority.trim().toLowerCase() === "gampola"){
+                $("#area_type").val("municipal_limit");
+            } else {
+                $("#area_type").val("outside_municipal_limit");
+            }
+        }
+
+        setAreaTypeAutomatically();
 
     });
 
