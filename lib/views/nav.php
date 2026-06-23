@@ -123,7 +123,7 @@ if (session_status() === PHP_SESSION_NONE) {
         </li>
 
         <li class="nav-item">
-            <a class="nav-link" href="#">
+            <a class="nav-link" href="admin.php?page=burialPlotSection">
                 <i class="fa-solid fa-map-location-dot me-2"></i>Plot & Grave Management
             </a>
         </li>
@@ -139,8 +139,7 @@ if (session_status() === PHP_SESSION_NONE) {
             <div class="collapse sidebar-submenu" id="funeralMenu">
                 <a href="admin.php?page=funeralBookings">Funeral Bookings</a>
                 <a href="admin.php?page=cremationTimeSlots">Cremation Time Slots</a>
-                <a href="admin.php?page=burialPlotDesign">Burial Plot Design</a>
-                <a href="admin.php?page=burialPlotSection">Burial Plot Section Design</a>
+                <!-- <a href="admin.php?page=burialPlotSection">Burial Plot Allocation Management</a> -->
             </div>
 
         </li>
