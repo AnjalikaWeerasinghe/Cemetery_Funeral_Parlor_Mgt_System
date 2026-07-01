@@ -55,10 +55,14 @@
 
                 <h3 class="text-center mb-4">Create Account</h3>
 
-                <form action="routes/signup.php" method="POST">
+                <form id="signup_form" method="POST" autocomplete="off">
 
                     <div class="mb-3">
-                        <input type="text" name="full_name" class="form-control" placeholder="Full Name" required>
+                        <input type="text" name="first_name" class="form-control" placeholder="First Name" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <input type="text" name="last_name" class="form-control" placeholder="Last Name" required>
                     </div>
 
                     <div class="mb-3">
@@ -66,19 +70,20 @@
                     </div>
 
                     <div class="mb-3">
-                        <input type="text" name="nic" class="form-control" placeholder="NIC Number" required>
+                        <input type="text" name="nic" class="form-control" placeholder="NIC Number" pattern="^([0-9]{9}[vVxX]|[0-9]{12})$" required>
                     </div>
 
                     <div class="mb-3">
-                        <input type="text" name="contact" class="form-control" placeholder="Contact Number" required>
+                        <input type="text" name="contact" class="form-control" placeholder="Contact Number" pattern="^07[0-9]{8}$" required>
                     </div>
 
                     <div class="mb-3">
-                        <input type="text" name="address" class="form-control" placeholder="Address" required>
+                        <textarea name="address" class="form-control" rows="3" placeholder="Address" required></textarea>
                     </div>
 
                     <div class="mb-3">
-                        <input type="password" name="password" class="form-control" placeholder="Password" required>
+                        <input type="password" id="password" name="password" class="form-control" placeholder="Password" minlength="8" required>
+                        <small class="text-muted">Password must contain atleast 8 characters.</small>
                     </div>
 
                     <div class="mb-3">
@@ -103,3 +108,63 @@
     </div>
 
 </section>
+
+<script>
+    $(document).ready(function() {
+        $("#signup_form").on("submit", function(e){
+            e.preventDefault();
+
+            let password = $("input[name='password']").val();
+            let confirmPassword = $("input[name='confirm_password']").val();
+
+            if (password !== confirmPassword) {
+                alert("Passwords do not match.");
+                return;
+            }
+
+            let formData = new FormData(this);
+
+            $.ajax({
+                url: "lib/routes/signup_route.php",
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+
+                beforeSend: function () {
+                    $("button[type='submit']")
+                        .prop("disabled", true)
+                        .text("Creating...");
+                },
+
+                success: function (response) {
+
+                    response = response.trim();
+
+                    if (response == "success") {
+                        alert("Account created successfully.");
+
+                        $("#signup_form")[0].reset();
+
+                        window.location.href = "index.php?page=login";
+
+                    } else {
+                        alert(response);
+                    }
+
+                },
+
+                error: function (xhr) {
+                    alert(xhr.responseText);
+                },
+
+                complete: function () {
+                    $("button[type='submit']").prop("disabled", false).text("Sign Up");
+                }
+
+            });
+
+        })
+
+    })
+</script>

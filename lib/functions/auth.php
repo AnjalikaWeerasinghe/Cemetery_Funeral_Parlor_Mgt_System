@@ -54,19 +54,19 @@ class Auth {
                         header("Location: index.php?page=member");
                         exit;
                     } else {
-                        echo "Invalid role!";
+                        return "Invalid user role.";
                     }
 
                 } else {
-                    echo "Please check your password!";
+                    return "Invalid email or password.";
                 }
 
             } else {
-                echo "Your account is deactivated!";
+                return "Your account has been deactivated.";
             }
 
         } else {
-            echo "User not found!";
+            return "Invalid email or password.";
         }
     }
 }

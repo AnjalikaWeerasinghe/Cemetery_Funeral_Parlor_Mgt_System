@@ -13,8 +13,10 @@ class MemberController extends MainController {
     public function addNewMember($data) {
 
         if (!$this->conn) {
-        die("Database connection is NULL");
+            die("Database connection is NULL");
         }
+
+        
 
         $number = new Numbering();
         $memberCode =  $number->generateUniqueNumber("member_code", "member_table", "CEM-MEM-");
@@ -124,6 +126,76 @@ class MemberController extends MainController {
         );
 
         return $result->execute() ? "updated" : "error";
+    }
+
+    public function registerNewMember($data) {
+
+        if($data['password'] != $data['confirm_password']){
+            return "Passwords do not match";
+        }
+
+        $sql = "SELECT member_id FROM member_table WHERE email = ? OR nic = ? ";
+
+        $result = $this->conn->prepare($sql);
+
+        $result->bind_param("ss", 
+            $data['email'], $data['nic']
+        );
+
+        $result->execute();
+
+        if($result->get_result()->num_rows > 0){
+            return "Email or NIC already exists";
+        }
+
+        $number = new Numbering();
+        $memberCode =  $number->generateUniqueNumber("member_code", "member_table", "CEM-MEM-");
+
+        $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
+
+        $this->conn->begin_transaction();
+
+        try {
+            // Insert new member to the login table
+            $loginInsertSql = "INSERT INTO login_table (user_name, user_email, login_password, user_role, user_status)
+                        VALUES (?, ?, ?, 'Member', 1)";
+
+            $result = $this->conn->prepare($loginInsertSql);
+
+            $userName = $data['first_name']. " " . $data['last_name'];
+
+            $result->bind_param("sss",
+                    $userName, $data['email'], $hashedPassword);
+
+            $result->execute();
+
+            $loginUserId = $this->conn->insert_id;
+
+            // Insert new member to the member table
+            $memberInsertSql = "INSERT INTO member_table (member_code, first_name, middle_name, last_name, nic, gender, date_of_birth, 
+                contact_number, address, email, password_hash, member_status, image, login_table_user_id)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Active', '', ?)";
+
+            $result = $this->conn->prepare($memberInsertSql);
+
+            $result->bind_param("ssssssssssssss",
+            $memberCode, $data['first_name'], $data['middle_name'], $data['last_name'], $data['nic'], $data['gender'], $data['date_of_birth'],
+            $data['contact_number'], $data['address'], $data['email'], $hashedPassword, $data['member_status'], $data['image'], $loginUserId);
+
+            $result->execute();
+
+            $this->conn->commit();
+
+            return "success";            
+
+        } catch (Exception $e) {
+            $this->conn->rollback();
+
+            return $e->getMessage();
+        }
+
+        return "success";
+        
     }
 
 }

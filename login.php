@@ -2,10 +2,11 @@
 
 include_once('lib/functions/auth.php');
 
+$message = "";
+
 if(isset($_POST['login'])){
   $result = new Auth();
-  $validation = $result->login($_POST['email'],$_POST['pwd']);
-  echo($validation);
+  $message = $result->login($_POST['email'],$_POST['pwd']);
 }
 
 ?>
@@ -19,6 +20,9 @@ if(isset($_POST['login'])){
     
     <link rel="stylesheet" href="styles/css/bootstrap.min.css">
     <link rel="stylesheet" href="styles/css/all.min.css">
+    <link rel="stylesheet" href="styles/css/sweetalert2.min.css">
+    
+    <script src="js/sweetalert2.all.min.js"></script>
 </head>
 
 <body class="bg-light">
@@ -34,8 +38,18 @@ if(isset($_POST['login'])){
                 </div>
 
                 <div class="card-body">
+                    <?php if (!empty($message)) : ?>
+                        <script>
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Login Failed',
+                                text: '<?php echo addslashes($message); ?>',
+                                confirmButtonColor: '#8b6f47'
+                            });
+                        </script>
+                    <?php endif; ?>
 
-                    <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
+                    <form action="index.php?page=login" method="post">
 
                         <div class="input-group mb-3">
                             <span class="input-group-text bg-white">
