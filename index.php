@@ -1,18 +1,32 @@
 <?php
-// session_start();
-
-// if (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin') {
-//     header("Location: lib/views/admin.php");
-//     exit;
-// }
-
 include_once('lib/functions/auth.php');
+
+include_once('lib/routes/notification/load_notifications_route.php');
 
 if(isset($_POST['login'])){
     $auth = new Auth();
     $auth->login($_POST['email'], $_POST['pwd']);
 }
 ?>
+
+<?php
+if (isset($_SESSION['login_success'])) {
+    $message = $_SESSION['login_success'];
+    unset($_SESSION['login_success']);
+?>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    Swal.fire({
+        icon: "success",
+        title: "Login Successful",
+        text: "<?php echo addslashes($message); ?>",
+        confirmButtonColor: "#8b6f47",
+        timer: 3500,
+        showConfirmButton: false
+    });
+});
+</script>
+<?php } ?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -23,9 +37,11 @@ if(isset($_POST['login'])){
 
     <link rel="stylesheet" href="styles/css/bootstrap.min.css">
     <link rel="stylesheet" href="styles/css/all.min.css">
+    <link rel="stylesheet" href="styles/css/sweetalert2.min.css">
 
     <script src="js/bootstrap.bundle.min.js"></script>
     <script src="js/jquery.js"></script>
+    <script src="js/sweetalert2.all.min.js"></script>
 
     <style>
 
@@ -142,6 +158,35 @@ if(isset($_POST['login'])){
             transform: translateY(-5px);
         }
 
+        .notification-dropdown{
+            width:360px;
+            max-height:450px;
+            overflow-y:auto;
+            border-radius:12px;
+        }
+
+        .notification-item{
+            white-space:normal;
+            padding:12px 15px;
+            transition:.2s;
+        }
+
+        .notification-item:hover{
+            background:#f8f9fa;
+        }
+
+        .notification-item.unread{
+            background:#fff8e1;
+            border-left:4px solid #d4af37;
+        }
+
+        .notification-message{
+            display:-webkit-box;
+            -webkit-line-clamp:2;
+            -webkit-box-orient:vertical;
+            overflow:hidden;
+        }
+
         @media (max-width: 768px){
 
             .logo-img{
@@ -201,9 +246,71 @@ if(isset($_POST['login'])){
                 </ul>
             </div>
 
+            <?php if(isset($_SESSION['username']) && $_SESSION['role'] == "Member"): ?>
+
+                <div class="dropdown me-2">
+
+                    <button class="btn btn-dark position-relative" data-bs-toggle="dropdown">
+                        <i class="fa-solid fa-bell"></i>
+                        <?php if($notificationCount > 0): ?>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                <?= $notificationCount ?? 0 ?>
+                            </span>
+                        <?php endif; ?>
+                    </button>
+
+                    <div class="dropdown-menu dropdown-menu-end notification-dropdown shadow">
+
+                        <div class="dropdown-header d-flex justify-content-between">
+                            <span>
+                                <i class="fa-solid fa-bell me-2"></i>Notifications
+                            </span>
+
+                            <span class="badge bg-warning text-dark">
+                                <?= $notificationCount ?>
+                            </span>
+                        </div>
+
+                        <?php if(!empty($notifications)): ?>
+
+                            <?php foreach($notifications as $notification): ?>
+                                <a class="dropdown-item notification-item <?= !$notification['is_read'] ? 'unread' : '' ?>" href="lib/routes/notification/open_member_notification.php?id=<?= $notification['notification_id'] ?>">
+                                    <div class="fw-bold">
+                                        <?= htmlspecialchars($notification['title']) ?>
+                                    </div>
+                                    <small class="text-muted d-block notification-message">
+                                        <?= htmlspecialchars($notification['message']) ?>
+                                    </small>
+                                    <?php if(!empty($notification['created_at'])): ?>
+                                        <small class="text-secondary">
+                                            <?= date("d M Y h:i A", strtotime($notification['created_at'])) ?>
+                                        </small>
+                                    <?php endif; ?>
+                                </a>
+                            <?php endforeach; ?>
+
+                        <?php else: ?>
+                            <div class="text-center p-4 text-muted">
+                                <i class="fa-regular fa-bell-slash fa-2x mb-2"></i>
+                                <div>No notifications</div>
+                            </div>
+                        <?php endif; ?>
+
+                        <div class="dropdown-divider"></div>
+
+                        <a href="index.php?page=mem_notifications" class="dropdown-item text-center fw-bold">
+                            View All Notifications
+                        </a>
+
+                    </div>
+
+                </div>
+
+            <?php endif; ?>
+
             <div class="d-flex ms-auto">
 
-            <?php if(isset($_SESSION['username'])): ?>
+                <?php if(isset($_SESSION['username'])): ?>
 
                 <div class="dropdown">
                     <button type="button" class="btn btn-dark dropdown-toggle text-white" data-bs-toggle="dropdown">
@@ -215,11 +322,11 @@ if(isset($_POST['login'])){
 
                         <li>
                             <a class="dropdown-item" href="index.php?page=profile">
-                                <i class="fa-solid fa-user me-2"></i>Profile
+                                <i class="fa-solid fa-user me-2"></i>My Profile
                             </a>
                         </li>
 
-                        <?php if($_SESSION['role'] === 'Admin'): ?>
+                        <?php if($_SESSION['role'] === 'Admin' || $_SESSION['role'] === 'Staff'): ?>
                             <li>
                                 <a class="dropdown-item" href="lib/views/admin.php">
                                     <i class="fa-solid fa-user-gear me-2"></i>Admin Panel
@@ -307,6 +414,10 @@ if(isset($_POST['login'])){
                 break;
             case 'parlorInfo':
                 include 'lib/views/funeral_booking/parlor_information.php';
+                break;
+
+            case 'mem_notifications':
+                include 'lib/views/notification/member_notifications.php';
                 break;
 
             default:

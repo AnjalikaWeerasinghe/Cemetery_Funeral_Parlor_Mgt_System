@@ -444,8 +444,8 @@
             1: baseRoute + "funeral_booking/deceased_information.php",
             2: baseRoute + "funeral_booking/document_information.php",
             3: baseRoute + "funeral_booking/burial_information.php",
-            4: baseRoute + "funeral_booking/confirmation.php",
-            5: baseRoute + "funeral_booking/booking_payment.php"
+            4: baseRoute + "funeral_booking/burial_confirmation.php",
+            5: baseRoute + "funeral_booking/booking_burial_payment.php"
         };
 
         $("#bookingContent").load(routes[step]);

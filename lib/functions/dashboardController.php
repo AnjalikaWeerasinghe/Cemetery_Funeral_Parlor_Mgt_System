@@ -31,6 +31,32 @@ class DashboardController extends MainController{
         return $cremations;
     }
 
+    public function get_Upcoming_Burials(){
+
+        $sql = "SELECT d.full_name AS deceased_name, b.burial_date, fs.booking_status, fs.booking_code
+                FROM burial_request_table b
+                INNER JOIN funeral_service_table fs ON b.funeral_service_table_funeral_service_id = fs.funeral_service_id
+                INNER JOIN deceased_table d ON fs.deceased_table_deceased_id = d.deceased_id
+                WHERE b.burial_date >= CURDATE()
+                ORDER BY b.burial_date ASC";
+
+        $result = $this->conn->query($sql);
+
+        $burials = [];
+
+        if ($result && $result->num_rows > 0) {
+
+            while($rec = $result->fetch_assoc()) {
+
+                $burials[] = $rec;
+
+            }
+
+        }
+
+        return $burials;
+    }
+
     public function getDashboardCounts(){
 
         $sql = "SELECT
@@ -44,26 +70,33 @@ class DashboardController extends MainController{
         return $result->fetch_assoc();
     }
 
+    public function getMonthlyBurialCremationStats(){
 
-    // public function get_Upcoming_Burials(){
+        $sql = "SELECT 
+                    DATE_FORMAT(MIN(booking_created_at),'%b') AS month,
+                    SUM(CASE WHEN service_type='Burial' THEN 1 ELSE 0 END) AS burials,
+                    SUM(CASE WHEN service_type='Cremation' THEN 1 ELSE 0 END) AS cremations
+                FROM funeral_service_table
+                WHERE YEAR(booking_created_at)=YEAR(CURDATE())
+                GROUP BY YEAR(booking_created_at), MONTH(booking_created_at)
+                ORDER BY MONTH(booking_created_at)";
 
-    //     $sql = "SELECT d.full_name AS deceased_name, fs.date_time, fs.status
-    //             FROM funeral_service_table fs
-    //             JOIN deceased_table d ON fs.deceased_table_deceased_id = d.deceased_id
-    //             WHERE fs.service_type = 'Burial' AND fs.date_time >= NOW()
-    //             ORDER BY fs.date_time ASC";
 
-    //     $result = $this->conn->query($sql);
-    //     $burials = [];
+        $result = $this->conn->query($sql);
 
-    //     if ($result && $result->num_rows > 0) {
-    //         while($rec = $result->fetch_assoc()) {
-    //             $burials[] = $rec;
-    //         }
-    //     }
+        if (!$result) {
+            die("SQL Error: " . $this->conn->error);
+        }
 
-    //     return $burials;
-    // }
+        $data = [];
+
+        while($row = $result->fetch_assoc()){
+            $data[] = $row;
+        }
+
+        return $data;
+    }
+
 }
 
 ?>

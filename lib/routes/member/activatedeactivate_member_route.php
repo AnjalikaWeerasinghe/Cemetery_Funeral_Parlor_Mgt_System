@@ -2,7 +2,9 @@
 include_once('../../functions/memberController.php');
 
 $member = new MemberController();
-$result = $member->deleteMember($_GET['id']);
+
+$result = $member->activateDeactivateMember($_POST['id'], $_POST['status']);
+
 echo($result);
 
 ?>

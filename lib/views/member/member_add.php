@@ -1,272 +1,424 @@
 <?php
-  $member_id = isset($_GET['member_id']) ? $_GET['member_id'] : null;
+    $member_id = $_GET['member_id'] ?? '';
 ?>
 
 <style>
-#preview {
-    width: 150px;
-    height: 150px;
-    border: 2px dashed #ced4da;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    border-radius: 10px;
-    background-color: #f8f9fa;
-    color: #6c757d;
-    font-size: 14px;
-}
+    :root {
+        --primary: #111111;
+        --secondary: #1b1b1b;
+        --gold: #c9a227;
+        --gold-light: #e8c760;
 
-#preview img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
+        --text: #2c2c2c;
+        --card: #ffffff;
+        --border: #e8e8e8;
+        --bg: #f5f5f5;
+    }
+
+    body {
+        background: var(--bg);
+        font-family: 'Segoe UI', sans-serif;
+        color: var(--text);
+    }
+
+    .cem-wrapper {
+        padding: 20px;
+    }
+
+    .cem-header {
+        background: linear-gradient(135deg,#111,#242424);
+        color: #fff;
+        padding: 22px 28px;
+        border-bottom: 4px solid var(--gold);
+    }
+
+    .cem-card {
+        border: none;
+        border-radius: 18px;
+        background: white;
+        box-shadow: 0 12px 30px rgba(0,0,0,.08);
+    }
+
+    .section-box {
+        border: none;
+        border-radius: 16px;
+        background: #f9f9f9;
+        padding: 22px;
+        box-shadow: 0 3px 12px rgba(0,0,0,.05);
+        margin-bottom: 22px;
+    }
+
+    .section-title {
+        color: var(--gold);
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        border-left: 4px solid var(--gold);
+        padding-left: 12px;
+        margin-bottom: 18px;
+    }
+
+    .form-control, .form-select {
+        height: 48px;
+        border-radius: 10px;
+        border: 1px solid #ddd;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--gold);
+        box-shadow: 0 0 0 .18rem rgba(201,162,39,.18);
+    }
+
+    .photo-card {
+        border-radius: 18px;
+        padding: 25px;
+        background: white;
+        text-align: center;
+        border: 1px solid #eee;
+        box-shadow: 0 6px 18px rgba(0,0,0,.05);
+    }
+
+    .photo-upload-wrapper {
+        width: 180px;
+        height: 180px;
+        margin: auto;
+        border-radius: 50%;
+        border: 3px dashed var(--gold);
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fafafa;
+    }
+
+    .upload-btn {
+        background: var(--gold);
+        color: #111;
+        padding: 10px 22px;
+        border-radius: 30px;
+        cursor: pointer;
+        font-weight: 600;
+        margin-top: 20px;
+    }
+
+    .btn-cem {
+        background: linear-gradient(135deg,#111,#2d2d2d);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 12px 30px;
+    }
+
+    .btn-cem:hover {
+        background: linear-gradient(135deg,#000,#111);
+        box-shadow: 0 10px 20px rgba(0,0,0,.18);
+    }
+
+    .btn-outline-secondary {
+        border: 2px solid var(--gold);
+        color: var(--gold);
+    }
+
 </style>
 
-<div class="container-fluid" id="content">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
-      <h5 class="mb-0">Add New Member</h5>
+<div class="container-fluid cem-wrapper">
 
-      <a href="admin.php?page=member" class="btn btn-light btn-sm bg-warning">
-        <i class="fa-solid fa-arrow-left" data-bs-toggle="tooltip" data-bs-placement="top" title="Back to Member Management"></i>
-      </a>
+    <div class="card cem-card">
+
+        <div class="cem-header d-flex justify-content-between align-items-center">
+
+            <div>
+                <h4 class="fw-bold mb-1">
+                    <i class="fa fa-user-plus me-2"></i>Member Registration
+                </h4>
+                <p class="mb-0 opacity-75">
+                    Register a new cemetery member
+                </p>
+            </div>
+
+            <a href="admin.php?page=member" class="btn btn-light btn-sm">
+                <i class="fa fa-arrow-left me-1"></i> Back
+            </a>
+
+        </div>
+
+        <div class="card-body p-4">
+
+            <form id="submit_form" enctype="multipart/form-data">
+
+                <input type="hidden" id="member_id" name="member_id">
+
+                <div class="row g-4">
+
+                    <div class="col-lg-8">
+
+                        <div class="section-box">
+
+                            <div class="section-title">Personal Information</div>
+
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <input type="text" id="first_name" name="first_name" class="form-control" placeholder="First Name *">
+                                </div>
+
+                                <div class="col-md-4">
+                                    <input type="text" id="middle_name" name="middle_name" class="form-control" placeholder="Middle Name">
+                                </div>
+
+                                <div class="col-md-4">
+                                    <input type="text" id="last_name" name="last_name" class="form-control" placeholder="Last Name *">
+                                </div>
+
+                                <div class="col-md-3">
+                                    <input type="text" id="nic" name="nic" class="form-control" pattern="[0-9]{9}[vVxX]|[0-9]{12}" placeholder="NIC *">
+                                </div>
+
+                                <div class="col-md-3">
+                                    <select id="gender" name="gender" class="form-select">
+                                        <option value="">Gender</option>
+                                        <option>Male</option>
+                                        <option>Female</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <input type="date" id="date_of_birth" name="date_of_birth" class="form-control">
+                                </div>
+
+                                <div class="col-md-3">
+                                    <input type="text" id="contact_number" name="contact_number" class="form-control" pattern="^(\+94|94|0)7[01245678][0-9]{7}$" placeholder="Contact">
+                                </div>
+
+                                <div class="col-12">
+                                    <textarea id="address" name="address" class="form-control" rows="2" placeholder="Address"></textarea>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="section-box mt-4">
+
+                            <div class="section-title">
+                                Account Details
+                            </div>
+
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <input type="email" id="email" name="email" class="form-control" placeholder="Email *">
+                                </div>
+
+                                <div class="col-md-4">
+                                    <input type="password" name="password_hash" class="form-control" placeholder="Password *">
+                                </div>
+
+                                <div class="col-md-4">
+                                    <input type="password" name="confirm_password" class="form-control" placeholder="Confirm Password *">
+                                </div>
+
+                                <div class="col-md-4">
+                                    <select id="member_status" name="member_status" class="form-select">
+                                        <option value="Active">Active</option>
+                                        <option value="Inactive">Inactive</option>
+                                    </select>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-lg-4">
+
+                        <div class="photo-card">
+                            <h6 class="section-title mb-4">Profile Information</h6>
+
+                            <div class="photo-upload-wrapper mx-auto">
+                                <img id="previewImage" src="" style="display:none;">
+                                <div id="previewPlaceholder">
+                                    <i class="fa-solid fa-image"></i>
+                                    <p class="mt-2 mb-0">Upload Photo</p>
+                                </div>
+                            </div>
+
+                            <label class="upload-btn mt-4">
+                                <i class="fa-solid fa-upload me-2"></i>Choose Photo
+                                <input type="file" hidden id="image" name="image" accept="image/*">
+                            </label>
+
+                            <hr>
+
+                            <div class="mb-3">
+                                <label class="form-label">Member Code</label>
+                                <input type="text" class="form-control" id="member_code" readonly>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <button type="reset" class="btn btn-light">
+                        Clear
+                    </button>
+
+                    <a href="admin.php?page=member" class="btn btn-outline-secondary">
+                        Cancel
+                    </a>
+
+                    <button type="submit" class="btn btn-cem">
+                        <i class="fa fa-save me-2"></i>Save Member
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+
     </div>
 
-    <div class="card-body">
-      <form id="submit_form" method="POST" autocomplete="off" enctype="multipart/form-data">
-
-        <h6 class="border-bottom pb-2 mb-3 text-primary">Personal Information</h6>
-
-        <input type="hidden" name="member_id" id="member_id">
-
-        <div class="row">
-          <div class="col-md-4 mb-3">
-            <label for="first_name" class="form-label">First Name *</label>
-            <input type="text" name="first_name" id="first_name" class="form-control" required>
-          </div>
-
-          <div class="col-md-4 mb-3">
-            <label for="middle_name" class="form-label">Middle Name</label>
-            <input type="text" name="middle_name" id="middle_name" class="form-control">
-          </div>
-
-          <div class="col-md-4 mb-3">
-            <label for="last_name" class="form-label">Last Name *</label>
-            <input type="text" name="last_name" id="last_name" class="form-control" required>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col-md-3 mb-3">
-            <label for="nic" class="form-label">NIC *</label>
-            <input type="text" name="nic" id="nic" class="form-control" required>
-          </div>
-
-          <div class="col-md-3 mb-3">
-            <label for="gender" class="form-label">Gender</label>
-            <select name="gender" id="gender" class="form-select">
-              <option value="">Select</option>
-              <option value="Male">Male</option>
-              <option value="Female">Female</option>
-            </select>
-          </div>
-
-          <div class="col-md-3 mb-3">
-            <label for="date_of_birth" class="form-label">DOB</label>
-            <input type="date" name="date_of_birth" id="date_of_birth" class="form-control">
-          </div>
-
-          <div class="col-md-3 mb-3">
-            <label for="contact_number" class="form-label">Contact Number</label>
-            <input type="text" name="contact_number" id="contact_number" class="form-control">
-          </div>
-        </div>
-
-        <div class="mb-3">
-          <label for="address" class="form-label">Address</label>
-          <textarea name="address" id="address" rows="2" class="form-control"></textarea>
-        </div>
-
-        <h6 class="border-bottom pb-2 mb-3 text-primary">Account Details</h6>
-
-        <div class="row">
-          <div class="col-md-4 mb-3">
-            <label class="form-label">Email *</label>
-            <input type="email" class="form-control" name="email" id="email" autocomplete="off" placeholder="Enter email" required>
-          </div>
-
-          <div class="col-md-4 mb-3">
-            <label class="form-label">Password *</label>
-            <input type="password" class="form-control" name="password_hash" autocomplete="new-password" placeholder="Enter password" required>
-          </div>
-
-          <div class="col-md-4 mb-3">
-            <label class="form-label">Status</label>
-            <select name="member_status" id="member_status" class="form-select">
-              <option value="Active">Active</option>
-              <option value="Inactive">Inactive</option>
-            </select>
-          </div>
-
-        </div>
-
-        <div class="row">
-          <div class="col-md-8 mb-3">
-            <label class="form-label" for="image">Profile Image</label>
-            <input type="file" name="image" id="image" class="form-control" accept="image/*">
-          </div>
-
-          <div class="col-md-4 mb-3">
-            <label for="member_code" class="form-label">Member Code</label>
-            <input type="text" name="member_code" id="member_code" class="form-control" readonly>
-          </div>
-        </div>
-
-        <div id="preview" class="col-md-6 mb-3">
-          Image preview
-        </div>
-
-        <div class="d-flex gap-2">
-          <button type="submit" class="btn btn-success">
-            Save 
-          </button>
-
-          <button type="reset" class="btn btn-secondary">
-            Clear
-          </button>
-        </div>
-
-      </form>
-
-      <!-- Success Alert -->
-      <!-- <div class="alert alert-success mt-3 d-none" id="success_alert">
-        <strong id="success_msg"></strong>
-      </div> -->
-
-    </div>
-  </div>
-</div>
-
-<!-- Success Modal -->
-<div class="modal fade" id="successModal" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-
-      <div class="modal-header bg-success text-white">
-        <h5 class="modal-title">Success</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-
-      <div class="modal-body text-center">
-        <p id="modal_message">Member added successfully!</p>
-      </div>
-
-      <div class="modal-footer">
-        <button type="button" class="btn btn-success" data-bs-dismiss="modal">
-          OK
-        </button>
-      </div>
-
-    </div>
-  </div>
 </div>
 
 <script>
-  $(document).ready(function(){
+$(document).ready(function () {
+    const $form = $("#submit_form");
+    const $submitBtn = $form.find("button[type='submit']");
+    const defaultBtnHtml = $submitBtn.html();
 
     function loadMemberCode(){
-      $("#member_code").val("Generating...");
+        $("#member_code").val("Generating..");
 
-      $.ajax({
-        url: "../routes/member/generate_member_code.php",
-        type: "GET",
-        success: function (response) {
-          $("#member_code").val(response);
-        }
-      });
+        $.ajax({
+            url: "../routes/member/generate_member_code.php",
+            type: "GET",
+            success: function (response) {
+                $("#member_code").val(response);
+            },
+            error: function () {
+                $("#member_code").val("Error");
+            }
+        });
     }
 
     loadMemberCode();
+    
+    $("#submit_form").submit(function (e) {
+        e.preventDefault();
 
-    $("#image").on("change", function() {
-      const file = this.files[0];
+        const password = $("input[name='password_hash']").val();
+        const confirmPassword = $("input[name='confirm_password']").val();
 
-      if (file) {
-        $("#preview").text("Preview will appear here.");
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          $("#preview").html('<img src="' + e.target.result + '" alt="Preview">');
-        };
-        reader.readAsDataURL(file);
-      } else {
-        $("#preview").html("Image preview");
-      }
+        if (password !== confirmPassword) {
+            Swal.fire({
+                icon: "warning",
+                title: "Password Mismatch",
+                text: "Password and Confirm Password do not match."
+            });
+            return;
+        }
+
+        let formData = new FormData(this);
+
+        $.ajax({
+            url: "../routes/member/add_member_route.php",
+            type: "POST",
+            data: formData,
+            contentType: false,
+            processData: false,
+            beforeSend: function(){
+                $("button[type='submit']").prop("disabled", true).text("Saving...");
+            },
+            success: function(response){
+                if(response === "success"){
+                    Swal.fire({
+                        icon: "success",
+                        title: "Member Added Successfully",
+                        showConfirmButton: false,
+                        timer: 3500
+                    }).then(() => {
+                        $("#root").load("member/member.php");
+                    });
+                } else {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Failed to Add Member",
+                        text: response
+                    });
+                }
+            },
+            error: function(xhr, status, error){
+                $("button[type='submit']").prop("disabled", false).text("Save Member");
+                Swal.fire({
+                    icon: "error",
+                    title: "Server Error",
+                    text: "An error occurred while processing your request."
+                });
+            },
+            complete: function(){
+                $("button[type='submit']").prop("disabled", false).text("Save Member");
+            }
+        });
+
     });
 
     $("#submit_form").on("reset", function(){
         setTimeout(function(){
             loadMemberCode(); 
+
+            $("#previewImage").attr("src", "").hide();
+            $("#previewPlaceholder").show();
         }, 100); 
     });
 
-    // Form Submit
-    $("#submit_form").on("submit", function(e){
-      e.preventDefault();
+    $("#image").change(function(e){
 
-      let formData = new FormData(this);
+        let file = e.target.files[0];
 
-      let isUpdate = $("#member_id").val();
+        if(file){
+            let reader = new FileReader();
 
-      let url = isUpdate
-        ? "../routes/member/update_member_route.php"
-        : "../routes/member/add_member_route.php"
+            reader.onload = function(event){
+                $("#previewImage").attr("src", event.target.result).show();
+                $("#previewPlaceholder").hide();
+            };
 
-      $.ajax({
-        url: url,
-        type: "POST",
-        data: formData,
-        contentType: false,
-        processData: false,
-        beforeSend: function(){
-          $("button[type='submit']").prop("disabled", true).text("Saving...");
-        },
-        success: function(response){
-
-          // $("#success_msg").html(response);
-          // $("#success_alert").removeClass("d-none");
-
-          let message = isUpdate
-            ? "Member updated successfully!"
-            : "Member added successfully!";
-          $("#modal_message").text(message);
-
-          // $("#successModal").modal("show");
-          var modal = new bootstrap.Modal(document.getElementById('successModal'));
-          modal.show();
-
-          // Reset form
-          $("#submit_form")[0].reset();
-          $("#preview").html("Image preview");
-          $("#member_id").val('');
-
-          loadMemberCode();
-
-          // setTimeout(function(){
-          //   $("#success_alert").addClass("d-none");
-          // }, 3000);
-
-        },
-        error: function(xhr){
-          alert("Error: " + xhr.responseText);
-        },
-        complete: function(){
-          $("button[type='submit']").prop("disabled", false).text("Save");
+            reader.readAsDataURL(file);
         }
-      });
 
     });
 
-  });
+    $("input[type='file']").change(function(){
+
+        const file = this.files[0];
+
+        if(!file) return;
+
+        if(file.size > 2 * 1024 * 1024){
+            Swal.fire({
+                icon: "warning",
+                title: "File Too Large",
+                text: "Please upload an image smaller than 2 MB."
+            });
+            $(this).val("");
+            return;
+        }
+
+        const allowedTypes = ["application/pdf", "image/jpeg", "image/png", "image/jpg", "image/webp"];
+
+        if(!allowedTypes.includes(file.type)){
+            Swal.fire({
+                icon: "warning",
+                title: "Invalid File",
+                text: "Only JPG, JPEG, PNG and WEBP images are allowed."
+            });
+            $(this).val("");
+            return;
+        }
+    });
+
+});
+
 </script>

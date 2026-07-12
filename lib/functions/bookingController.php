@@ -2,6 +2,8 @@
 session_start();
 include_once('main.php');
 include_once('numberGeneration.php');
+include_once('notificationController.php');
+include_once('mailController.php');
 
 // Purpose: This class contains methods for managing funeral booking operations
 class BookingController extends MainController{
@@ -166,6 +168,23 @@ class BookingController extends MainController{
         return "success";
     }
 
+    public function saveBurialInformation($data){
+
+        $burial_date = $data['burial_date'] ?? '';
+        $area_type = $data['area_type'] ?? '';
+        $grave_type = $data['grave_type'] ?? '';
+        $section_id = $data['section_id'] ?? '';
+        $request_note = $data['request_note'] ?? '';
+
+        if (
+            empty($burial_date) || empty($area_type) || empty($grave_type) || empty($section_id)
+        ) {
+            return "Please fill the required fields.";
+        }
+
+        return "success";
+    }
+
     // This function saves the payment information to the session for later use in the booking process. 
     // It also performs validation on the required fields to ensure that payment details are complete before proceeding to the final booking confirmation step.
     public function savePaymentInformation($data) {
@@ -181,24 +200,6 @@ class BookingController extends MainController{
 
     // This function saves all the booking data to the database after the final step
     public function confirmCremationBooking() {
-        // echo "<pre>";
-
-        // echo "step1: ";
-        // var_dump(isset($_SESSION['booking']['step1']));
-
-        // echo "step2: ";
-        // var_dump(isset($_SESSION['booking']['step2']));
-
-        // echo "step3: ";
-        // var_dump(isset($_SESSION['booking']['step3']));
-
-        // echo "payment: ";
-        // var_dump(isset($_SESSION['booking']['payment']));
-
-        // print_r($_SESSION['booking']);
-
-        // echo "</pre>";
-        // exit;
 
         if (!isset($_SESSION['booking']['step1']) || 
             !isset($_SESSION['booking']['step2']) || 
@@ -262,14 +263,15 @@ class BookingController extends MainController{
             }
 
             $sql2 = "INSERT INTO applicant_table (
-                    applicant_name, relationship_to_deceased, applicant_nic, applicant_nic_front, applicant_nic_back, contact_number, email, applicant_gn_division, applicant_address)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                    applicant_name, relationship_to_deceased, applicant_nic, applicant_nic_front, applicant_nic_back, contact_number, email, applicant_gn_division, applicant_address, member_table_member_id)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
             $stmt2 = $this->conn->prepare($sql2);
 
-            $stmt2->bind_param("sssssssss", 
+            $stmt2->bind_param("sssssssssi", 
                 $step1['applicant_name'], $step1['relationship_to_deceased'], $step1['applicant_nic'], $step1['applicant_nic_front'],
-                $step1['applicant_nic_back'], $step1['contact_number'], $step1['email'], $step1['applicant_gn_division'], $step1['applicant_address']
+                $step1['applicant_nic_back'], $step1['contact_number'], $step1['email'], $step1['applicant_gn_division'], $step1['applicant_address'],
+                $step1['member_table_member_id']
             );
 
             if(!$stmt2->execute()){
@@ -350,7 +352,7 @@ class BookingController extends MainController{
             }
 
             // If memorial design is provided, insert into memorial_table
-
+           
             if ($step3['ash_collection_method'] === "memorial") {
 
                 $design = $step3['memorial']['design'];
@@ -387,18 +389,6 @@ class BookingController extends MainController{
                     $design['name'], $design['message'], $icon, $font, $theme, $step3['memorial']['image'], $funeral_service_id
                 );
 
-                // echo "<pre>";
-
-                // var_dump($design['name']);
-                // var_dump($design['message']);
-                // var_dump($icon);
-                // var_dump($font);
-                // var_dump($theme);
-                // var_dump($step3['memorial']['image']);
-                // var_dump($funeral_service_id);
-
-                // exit;
-
                 if(!$stmt6->execute()){
                     throw new Exception($stmt6->error);
                 }
@@ -406,8 +396,8 @@ class BookingController extends MainController{
             }
 
             // Step 4 insertion - Payment Information
-
-            $sql7 = "INSERT INTO payment_table (
+           
+           $sql7 = "INSERT INTO payment_table (
                     payment_code, payment_method, payment_status, transaction_reference, service_cost, memorial_cost, total_payment, paid_amount, payment_date, funeral_service_table_funeral_service_id)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
@@ -427,6 +417,9 @@ class BookingController extends MainController{
 
             $this->conn->commit();
 
+            // Create Notification Generartion part
+            $this->sendBookingNotification($service_type, $booking_code, $funeral_service_id);
+
             unset($_SESSION['booking']); // Clear session data after database insertion
 
             return [
@@ -444,15 +437,232 @@ class BookingController extends MainController{
 
     }
 
+    public function confirmBurialBooking() {
+
+        if (!isset($_SESSION['booking']['step1']) || 
+            !isset($_SESSION['booking']['step2']) || 
+            !isset($_SESSION['booking']['step3']) ||
+            !isset($_SESSION['booking']['payment'])) {
+                return "Incomplete booking data.";
+        }
+
+        if(!isset($_SESSION['booking']['booking_code'])){
+
+            $_SESSION['booking']['booking_code'] =
+                $this->getNewBookingCode("Burial");
+        }
+
+        $booking_code = $_SESSION['booking']['booking_code'];
+
+        $step1 = $_SESSION['booking']['step1'];
+        $step2 = $_SESSION['booking']['step2'];
+        $step3 = $_SESSION['booking']['step3'];
+        $step4 = $_SESSION['booking']['payment'];
+
+        $this->conn->begin_transaction();
+
+        try{
+            $checkSql = "SELECT deceased_id FROM deceased_table WHERE nic = ?";
+
+            $checkStmt = $this->conn->prepare($checkSql);
+
+            $checkStmt->bind_param("s", $step1['nic']);
+
+            $checkStmt->execute();
+
+            $result = $checkStmt->get_result();
+
+            if($result->num_rows > 0){
+
+                $row = $result->fetch_assoc();
+                $deceased_id = $row['deceased_id'];
+
+            } else {
+
+                $sql1 = "INSERT INTO deceased_table (
+                        full_name, title, religion, deceased_photo, nic, gender, date_of_birth, deceased_address, deceased_gn_division, municipal_council)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                
+                $stmt1 = $this->conn->prepare($sql1);
+
+                $stmt1->bind_param("ssssssssss", 
+                    $step1['full_name'], $step1['title'], $step1['religion'], $step1['deceased_photo'], $step1['nic'], $step1['gender'], $step1['date_of_birth'], $step1['deceased_address'], $step1['deceased_gn_division'], $step1['municipal_council']
+                );
+
+                if(!$stmt1->execute()){
+                    throw new Exception($stmt1->error);
+                }
+
+                $deceased_id = $stmt1->insert_id;
+
+            }
+
+            $sql2 = "INSERT INTO applicant_table (
+                    applicant_name, relationship_to_deceased, applicant_nic, applicant_nic_front, applicant_nic_back, contact_number, email, applicant_gn_division, applicant_address, member_table_member_id)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+            $stmt2 = $this->conn->prepare($sql2);
+
+            $stmt2->bind_param("sssssssssi", 
+                $step1['applicant_name'], $step1['relationship_to_deceased'], $step1['applicant_nic'], $step1['applicant_nic_front'],
+                $step1['applicant_nic_back'], $step1['contact_number'], $step1['email'], $step1['applicant_gn_division'], $step1['applicant_address'],
+                $step1['member_table_member_id']
+            );
+
+            if(!$stmt2->execute()){
+                throw new Exception($stmt2->error);
+            }
+
+            $applicant_id = $stmt2->insert_id;
+
+            //Step 2 insertion - Document Information
+            $coroner_name = $step2['coroner_name'] ?? null;
+
+            $coroner_decision = $step2['coroner_decision'] ?? null;
+
+            $coroner_certificate = $step2['coroner_certificate'] ?? null;
+
+            $sql3  = "INSERT INTO document_table (
+                    death_certificate_number, registrar_name, date_of_death, cause_of_death, coroner_name, coroner_decision, cremation_permission, verification_status,
+                    death_certificate, coroner_certificate, family_consent_letter)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+            $stmt3 = $this->conn->prepare($sql3);
+
+            $stmt3->bind_param("ssssssissss", 
+                $step2['death_certificate_number'], $step2['registrar_name'], $step2['date_of_death'], $step2['cause_of_death'], $coroner_name, $coroner_decision, $step2['cremation_permission'], $step2['verification_status'],
+                $step2['death_certificate'], $coroner_certificate, $step2['family_consent_letter']
+            );
+
+            if(!$stmt3->execute()){
+                throw new Exception($stmt3->error);
+            }
+
+            $document_id = $stmt3->insert_id;
+
+            $service_type = "Burial";
+
+            $booking_status = "Pending";
+
+            $booking_created_at = date("Y-m-d H:i:s");
+
+            $sql4 = "INSERT INTO funeral_service_table (
+                    booking_code, service_type, booking_status, booking_created_at, 
+                    deceased_table_deceased_id, applicant_table_applicant_id, document_table_document_set_id) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+            $stmt4 = $this->conn->prepare($sql4);
+
+            if(!$stmt4){
+                die("SQL4 Error: " . $this->conn->error);
+            }
+
+            $stmt4->bind_param("ssssiii", 
+                $booking_code, $service_type, $booking_status, $booking_created_at,
+                $deceased_id, $applicant_id, $document_id
+            );
+
+            if(!$stmt4->execute()){
+                throw new Exception($stmt4->error);
+            }
+
+            $funeral_service_id = $stmt4->insert_id;
+
+            $sql5 = "INSERT INTO burial_request_table (
+                    burial_date, area_type, grave_type, section_id, request_note, funeral_service_table_funeral_service_id)
+                    VALUES (?, ?, ?, ?, ?, ?)";
+
+            $stmt5 = $this->conn->prepare($sql5);
+
+            $stmt5->bind_param("sssisi",
+                $step3['burial']['burial_date'], $step3['burial']['area_type'], $step3['burial']['grave_type'], $step3['burial']['section_id'], $step3['burial']['request_note'], $funeral_service_id
+            );
+
+            if(!$stmt5->execute()){
+                throw new Exception($stmt5->error);
+            }
+
+            $sql6 = "INSERT INTO payment_table (
+                    payment_code, payment_method, payment_status, transaction_reference, service_cost, total_payment, paid_amount, payment_date, funeral_service_table_funeral_service_id)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+            $stmt6 = $this->conn->prepare($sql6);
+
+            if(!$stmt6){
+                die("Payment SQL Error: " . $this->conn->error);
+            }
+
+            $stmt6->bind_param("ssssdddsi", 
+                $step4['payment_code'], $step4['payment_method'], $step4['payment_status'], $step4['transaction_reference'], $step4['service_cost'], $step4['total_payment'], $step4['paid_amount'], $step4['payment_date'], $funeral_service_id
+            );
+
+            if(!$stmt6->execute()){
+                throw new Exception($stmt6->error);
+            }
+
+            $this->conn->commit();
+
+            // Generate request notification 
+            $this->sendBurialBookingNotification($service_type, $booking_code, $funeral_service_id);
+
+            unset($_SESSION['booking']); // Clear session data after database insertion
+
+            return [
+                "status" => "success",
+                "booking_code" => $booking_code
+            ];
+            
+        }
+        catch(Exception $e){
+
+            $this->conn->rollback();
+            return "Error saving booking: " . $e->getMessage();
+
+        }
+    }
+
+    public function sendBookingNotification($service_type, $booking_code, $funeral_service_id) {
+
+        $notification = new NotificationController();
+
+        $sender_id = $_SESSION['user_id'];
+        $receiver_id = $_SESSION['user_id'];
+        $receiver_role = "Admin";
+
+        $title = "New {$service_type} Booking";
+
+        $message = "A booking-{$booking_code} has been created and is awaiting approval.";
+
+        return $notification->createNotification(
+            $sender_id, $receiver_id, $receiver_role, $title, $message, $service_type, $funeral_service_id, "funeral_service_table"
+        );
+    }
+
+    public function sendBurialBookingNotification($service_type, $booking_code, $funeral_service_id) {
+
+        $notification = new NotificationController();
+
+        $sender_id = $_SESSION['user_id'];
+        $receiver_id = $_SESSION['user_id'];
+        $receiver_role = "Admin";
+
+        $title = "New {$service_type} Booking";
+
+        $message = "A booking-{$booking_code} has been created and is awaiting for approval and plot allocation.";
+
+        return $notification->createNotification(
+            $sender_id, $receiver_id, $receiver_role, $title, $message, $service_type, $funeral_service_id, "funeral_service_table"
+        );
+    }
+
     // Retreive summery of funeral booking to display in the funeral booking table
     public function view_Booking_Data() {
 
-        $sql = "SELECT fs.booking_code, d.full_name AS deceased_name, doc.date_of_death, a.applicant_name, a.contact_number, fs.service_type
+        $sql = "SELECT fs.funeral_service_id, fs.booking_code, fs.booking_status, d.full_name AS deceased_name, doc.date_of_death, a.applicant_name, a.contact_number, fs.service_type
                 FROM funeral_service_table fs
-                JOIN deceased_table d ON fs.deceased_table_deceased_id = d.deceased_id
-                JOIN applicant_table a ON fs.applicant_table_applicant_id = a.applicant_id
-                JOIN document_table doc ON fs.document_table_document_set_id = doc.document_id
-                WHERE fs.booking_status = 'Pending'
+                INNER JOIN deceased_table d ON fs.deceased_table_deceased_id = d.deceased_id
+                INNER JOIN applicant_table a ON fs.applicant_table_applicant_id = a.applicant_id
+                INNER JOIN document_table doc ON fs.document_table_document_set_id = doc.document_id
                 ORDER BY fs.booking_created_at DESC";
 
         $result = $this->conn->query($sql);
@@ -461,29 +671,113 @@ class BookingController extends MainController{
             
             while($rec = $result->fetch_assoc()) {
 
+                    switch($rec['booking_status']){
+
+                    case "Pending":
+                        $status = "<span class='badge bg-warning text-dark'>Pending</span>";
+                        break;
+
+                    case "Confirmed":
+                        $status = "<span class='badge bg-success'>Confirmed</span>";
+                        break;
+
+                    case "Cancelled":
+                        $status = "<span class='badge bg-danger'>Cancelled</span>";
+                        break;
+
+                    default:
+                        $status = "<span class='badge bg-secondary'>Unknown</span>";
+                }
+
                 echo "<tr>";
+
                 echo "<td>".$rec['booking_code']."</td>";
+
                 echo "<td>".$rec['deceased_name']."</td>";
+
                 echo "<td>".$rec['date_of_death']."</td>";
+
                 echo "<td>".$rec['applicant_name']."</td>";
+
                 echo "<td>".$rec['contact_number']."</td>";
+
                 echo "<td>".$rec['service_type']."</td>";
 
-                echo "<td>
-                        <a href='admin.php?page=view_funeral_booking&booking_code=".$rec['booking_code']."' class='btn btn-sm btn-outline-info'>
-                            <i class='fa-solid fa-eye'></i> 
-                        </a>
+                echo "<td>".$rec['booking_status']."</td>";
 
-                        <button class='btn btn-danger btn-sm delete' id='".$rec['booking_code']."'>
-                            <i class=\"fa-solid fa-trash\"></i> 
-                        </button>
-                     </td>";
+                echo "<td class='text-center'>";
+
+                    echo "<div class='btn-group'>";
+                        echo "
+                            <a href='admin.php?page=view_funeral_booking&booking_code=".$rec['booking_code']."' class='btn btn-sm btn-outline-info view' title='View Booking'>
+                                <i class='fa-solid fa-eye'></i> 
+                            </a>
+                        ";
+
+                        if($rec['booking_status'] == "Pending"){
+                            echo "
+                            <button class='btn btn-sm btn-outline-success approveBooking' data-id='".$rec['funeral_service_id']."' title='Confirm Booking'>
+                                <i class='fa-solid fa-check'></i>
+                            </button>";
+
+                            echo "
+                            <button class='btn btn-sm btn-outline-danger rejectBooking' data-id='".$rec['funeral_service_id']."' title='Cancell Booking'>
+                                <i class='fa-solid fa-xmark'></i>
+                            </button>";
+                        }
+
+                        if($rec['booking_status'] == "Confirmed"){
+
+                            echo "
+                            <button class='btn btn-sm btn-outline-success completeBooking' data-id='".$rec['funeral_service_id']."' title='Mark as Completed'>
+                                <i class='fa-solid fa-check-double'></i>
+                            </button>";
+                        }
+
+                        echo "
+                            <button class='btn btn-outline-secondary btn-sm edit' data-id='".$rec['booking_code']."' data-bs-toggle='tooltip' title='Edit Booking'>
+                                <i class='fa-solid fa-pen'></i> 
+                            </button>
+                        ";
+                    echo "</div";
+
+                echo "</td>";
+                
                 echo "</tr>";
             }
             
         } else {
             return "<tr><td colspan='7' class='text-center'>No bookings found.</td></tr>";
         }
+    }
+
+    public function approveBooking($funeral_service_id) {
+
+        $sql = "UPDATE funeral_service_table SET booking_status='Confirmed'
+                WHERE funeral_service_id = ?";
+
+        $stmt = $this->conn->prepare($sql);
+
+        $stmt->bind_param("i",$funeral_service_id);
+
+        if($stmt->execute()){
+            $this->notifyApprovedApplicant($funeral_service_id);
+            return true;
+        }
+
+        return false;
+    }
+
+    public function rejectBooking($funeral_service_id) {
+
+        $sql = "UPDATE funeral_service_table SET booking_status='Cancelled'
+                WHERE funeral_service_id=?";
+
+        $stmt = $this->conn->prepare($sql);
+
+        $stmt->bind_param("i",$funeral_service_id);
+
+        return $stmt->execute();
     }
 
     public function saveParlorInformation() {
@@ -532,24 +826,118 @@ class BookingController extends MainController{
         return $result->fetch_assoc();
     }
 
-    // public function getDeceasedByBookingId($bookingCode){
+    public function getBookingDashboardStats() {
 
-    //     $sql = "SELECT * FROM funeral_service_table WHERE booking_code = ?";
+        $sql = "SELECT COUNT(*) AS total_bookings,
+                SUM(CASE WHEN booking_status = 'Pending' THEN 1 ELSE 0 END) AS pending_bookings,
+                SUM(CASE WHEN booking_status = 'Confirmed' THEN 1 ELSE 0 END) AS approved_bookings,
+                SUM(CASE WHEN booking_status = 'Cancelled' THEN 1 ELSE 0 END) AS cancelled_bookings
+                FROM funeral_service_table";
 
-    //     $stmt = $this->conn->prepare($sql);
-    //     if (!$stmt) {
-    //         return ["error" => "Prepare failed"];
-    //     }
+        $result = $this->conn->query($sql);
 
-    //     $stmt->bind_param("s", $bookingCode);
-    //     $stmt->execute();
+        if($result){
+            return $result->fetch_assoc();
+        }
 
-    //     $result = $stmt->get_result();
-    //     $data = $result->fetch_assoc();
+        return [
+            "total_bookings" => 0,
+            "pending_bookings" => 0,
+            "approved_bookings" => 0,
+            "cancelled_bookings" => 0
+        ];
+    }
 
-    //     return $data ?: [];
+    public function getMemberIdByNic($nic) {
+
+        $sql = "SELECT member_id FROM member_table WHERE nic = ?";
+
+        $stmt = $this->conn->prepare($sql);
+
+        $stmt->bind_param("s", $nic);
+
+        $stmt->execute();
+
+        $result = $stmt->get_result();
+
+        if($result->num_rows > 0){
+            return $result->fetch_assoc()['member_id'];
+        }
+
+        return "success";
+    }
+
+    public function getApplicantDetails($funeral_service_id) {
         
-    // }
+        $sql = "SELECT a.member_table_member_id, a.applicant_name, a.email, fs.booking_code
+            FROM funeral_service_table fs
+            INNER JOIN applicant_table a
+            ON fs.applicant_table_applicant_id = a.applicant_id
+            WHERE fs.funeral_service_id = ?";
+
+        $result = $this->conn->prepare($sql);
+
+        $result->bind_param("i", $funeral_service_id);
+
+        $result->execute();
+
+        return $result->get_result()->fetch_assoc();
+    }
+
+    private function notifyApprovedApplicant($funeral_service_id) {
+
+        $applicant = $this->getApplicantDetails($funeral_service_id);
+
+        if(!$applicant){
+            return;
+        }
+
+        // Notification Alert Sending
+        $notification = new NotificationController();
+
+        if(!empty($applicant['member_table_member_id'])){
+            $notification->createNotification(
+                1,  // Sender is consider as Admin
+                $applicant['member_table_member_id'],
+                "Member",
+                "Booking Approved",
+                "Your funeral booking (".$applicant['booking_code'].") has been approved.",
+                "Cremation",
+                $funeral_service_id,
+                "funeral_service_table"
+            );
+        }
+
+        // Email Sending
+        $body = "
+            <h2>Funeral Booking Approved</h2>
+            Dear <b>{$applicant['applicant_name']}</b>,<br><br>
+            We are pleased to inform you that your funeral booking has been <b>approved</b>.<br><br>
+            <b>Booking Code :</b> {$applicant['booking_code']}<br><br>
+            Thank you.<br><br>
+
+            Gampola Urban Council
+        ";
+
+        generateMail(
+            $applicant['email'],
+            $applicant['applicant_name'],
+            "Funeral Booking Approved",
+            $body
+        );
+    }
+
+    public function completeBooking($id){
+
+        $sql = "UPDATE funeral_service_table
+                SET booking_status = 'Completed'
+                WHERE funeral_service_id = ?";
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $id);
+
+        return $stmt->execute();
+    }
 
 }
 

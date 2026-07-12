@@ -167,6 +167,12 @@ if (session_status() === PHP_SESSION_NONE) {
 
         <li class="nav-item">
             <a class="nav-link" href="#">
+                <i class="fa-solid fa-warehouse me-2"></i>Resource Management
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link" href="admin.php?page=report">
                 <i class="fa-solid fa-chart-line me-2"></i>Reports
             </a>
         </li>

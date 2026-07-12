@@ -141,6 +141,23 @@ class BurialPlotController extends MainController {
         $this->conn->query("UPDATE plot_table SET is_reserved=$newStatus WHERE cem_section_id=$id");
     }
 
+    public function loadBurialSections(){
+
+        $sql = "SELECT cem_section_id, section_name
+                FROM burial_plot_section_table
+                ORDER BY section_name ASC";
+
+        $result = $this->conn->query($sql);
+
+        $sections = [];
+
+        while($row = $result->fetch_assoc()){
+            $sections[] = $row;
+        }
+
+        echo json_encode($sections);
+    }
+
 }
 
 ?>

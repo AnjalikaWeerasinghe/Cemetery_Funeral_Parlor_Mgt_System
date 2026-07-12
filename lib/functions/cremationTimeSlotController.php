@@ -72,6 +72,21 @@ class CremationTimeSlotController extends MainController {
 
         return "Slot status updated";
     }
+
+    public function getSlotBookingDetails() {
+
+        $sql = "SELECT s.slot_id, s.day, s.start_time, s.end_time, s.slot_type,
+            fs.booking_code, fs.booking_status, d.full_name, a.applicant_name
+            FROM schedule_slots_table s
+            LEFT JOIN cremation_table c ON c.schedule_slots_table_slot_id = s.slot_id
+            LEFT JOIN funeral_service_table fs ON fs.funeral_service_id = c.funeral_service_table_funeral_service_id
+            LEFT JOIN deceased_table d ON d.deceased_id = fs.deceased_table_deceased_id
+            LEFT JOIN applicant_table a ON a.applicant_id = fs.applicant_table_applicant_id
+            WHERE s.slot_id = ?"
+        ;
+
+        return $this->conn->query($sql);
+    }
 }
 
 ?>

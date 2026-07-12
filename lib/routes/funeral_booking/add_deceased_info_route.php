@@ -120,6 +120,10 @@ $_POST['applicant_nic_back'] = $nicBackFileName;
 
 $deceasedinfo = new BookingController();
 
+$member_table_member_id = $deceasedinfo->getMemberIdByNIC($applicant_nic);
+
+$_POST['member_table_member_id'] = $member_table_member_id;
+
 $deceasedinfo->saveDeceasedInformation($_POST, $_FILES);
 
 // Store the submitted data in the session for later use in the booking process
@@ -146,7 +150,9 @@ $_SESSION['booking']['step1'] = [
     "applicant_address" => $applicant_address,
 
     "applicant_nic_front" => $nicFrontFileName,
-    "applicant_nic_back" => $nicBackFileName
+    "applicant_nic_back" => $nicBackFileName,
+
+    "member_table_member_id" => $member_table_member_id
 ];
 
 echo json_encode([

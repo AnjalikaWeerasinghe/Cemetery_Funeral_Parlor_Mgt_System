@@ -23,11 +23,11 @@ foreach ($requiredFields as $field) {
     }
 }
 
-$imageName = '';
+$imagePath = '';
 
 if (!empty($_FILES['image']['name'])) {
 
-    $allowedExts = ['jpg', 'jpeg', 'png', 'gif'];
+    $allowedExts = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
     $originalName = $_FILES['image']['name'];
     $tmpName = $_FILES['image']['tmp_name'];
     $imageExt = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
@@ -37,8 +37,11 @@ if (!empty($_FILES['image']['name'])) {
         exit();
     }
 
-    $imageName = uniqid('img_') . '.' . $imageExt;
-    $uploadPath = '../../uploads/images/' . $imageName;
+    $fileName = uniqid('mem_img') . '.' . $imageExt;
+
+    $uploadPath = '../../uploads/images/' . $fileName;
+
+    $imagePath = 'uploads/images/' . $fileName;
 
     if (!move_uploaded_file($tmpName, $uploadPath)) {
         echo "Image upload failed.";
@@ -58,7 +61,7 @@ $data = [
     'email' => sanitize_input($_POST['email']),
     'password_hash' => sanitize_input($_POST['password_hash']),
     'member_status' => sanitize_input($_POST['member_status'] ?? ''),
-    'image' => $imageName
+    'image' => $imagePath
 ];
 
 $result = $member->addNewMember($data);

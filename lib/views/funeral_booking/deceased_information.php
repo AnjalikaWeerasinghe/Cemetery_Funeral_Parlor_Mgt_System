@@ -484,7 +484,7 @@ button {
                                 <span class="input-group-text bg-white border-end-0">
                                     <i class="fa-solid fa-phone text-secondary"></i>
                                 </span>
-                                <input type="text" name="contact_number" id="contact_number" class="form-control border-start-0" required>
+                                <input type="text" name="contact_number" id="contact_number" pattern="^(\+94|94|0)7[01245678][0-9]{7}$" class="form-control border-start-0" placeholder="+94/0-7XXXXXXXX" required>
                             </div>
                         </div>
                         
@@ -494,7 +494,7 @@ button {
                                 <span class="input-group-text bg-white border-end-0">
                                     <i class="fa-solid fa-envelope text-secondary"></i>
                                 </span>
-                                <input type="email" class="form-control border-start-0" name="email" id="email" autocomplete="off" placeholder="Enter email">
+                                <input type="email" class="form-control border-start-0" name="email" id="email" autocomplete="off" placeholder="xxx@yyy.zzz">
                             </div>
                         </div>
 
@@ -739,7 +739,7 @@ button {
             // console.log("DEBUG serviceType:", serviceType);
 
             if(!serviceType){
-                alert("No service type selected. Please select a service first.");
+                showError("No service type selected. Please select a service first.");
                 return;
             }
 
@@ -866,7 +866,7 @@ button {
             if(!file) return;
 
             if(file.size > 2 * 1024 * 1024){
-                alert("File size must be below 2MB");
+                showError("File size must be below 2MB");
                 $(this).val("");
                 return;
             }
@@ -874,7 +874,7 @@ button {
             const allowedTypes = ["application/pdf", "image/jpeg", "image/png", "image/jpg", "image/webp"];
 
             if(!allowedTypes.includes(file.type)){
-                alert("Only PDF, JPG, JPEG, PNG, and WEBP files are allowed.")
+                showError("Only PDF, JPG, JPEG, PNG, and WEBP files are allowed.")
                 $(this).val("");
                 return;
             }

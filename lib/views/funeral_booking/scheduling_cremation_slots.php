@@ -368,17 +368,18 @@
 
     $(document).on("click", ".slot-card", function(){
 
-        if($(this).hasClass("bg-secondary")) return;
-
-        if($(this).hasClass("slot-disabled")) return;
-
         $(".slot-card").removeClass("slot-selected");
-
         $(this).addClass("slot-selected");
 
         let slotId = $(this).data("id");
 
-        $("#selected_slot").val(slotId);
+        $.post("../routes/funeral_booking/cremation_slot/get_slot_details_route.php", {
+                slot_id: slotId
+            },
+            function(response){
+                $("#selectedSlotPanel").html(response);
+            }
+        );
 
     });
 

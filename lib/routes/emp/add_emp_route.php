@@ -12,14 +12,6 @@ function sanitize_input($data) {
     return htmlspecialchars(trim($data), ENT_QUOTES, 'UTF-8');
 }
 
-// Function to sanitize input
-// function sanitize_input($data) {
-//     $data = trim($data);
-//     $data = stripslashes($data);
-//     $data = htmlspecialchars($data);
-//     return $data;
-// }
-
 $requiredFields = [
     'first_name', 'last_name', 'nic', 'email', 'password_hash', 'system_role'
 ];
@@ -32,11 +24,11 @@ foreach ($requiredFields as $field) {
 }
 
 //Image Upload
-$imageName = '';
+$imagePath = '';
 
 if (!empty($_FILES['image']['name'])) {
 
-    $allowedExts = ['jpg', 'jpeg', 'png', 'gif'];
+    $allowedExts = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
     $originalName = $_FILES['image']['name'];
     $tmpName = $_FILES['image']['tmp_name'];
     $imageExt = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
@@ -46,8 +38,11 @@ if (!empty($_FILES['image']['name'])) {
         exit();
     }
 
-    $imageName = uniqid('img_') . '.' . $imageExt;
-    $uploadPath = '../../uploads/images/' . $imageName;
+    $fileName = uniqid('stf_img') . '.' . $imageExt;
+
+    $uploadPath = '../../uploads/images/' . $fileName;
+
+    $imagePath = 'uploads/images/' . $fileName;
 
     if (!move_uploaded_file($tmpName, $uploadPath)) {
         echo "Image upload failed.";
@@ -55,24 +50,8 @@ if (!empty($_FILES['image']['name'])) {
     }
 }
 
-// $imageName = $_FILES['image_sample']['name'] ?? '';
-// $imageTmpName = $_FILES['image_sample']['tmp_name'] ?? '';
-// $imageExt = pathinfo($imageName, PATHINFO_EXTENSION);
-// $allowedExts = array('jpg', 'jpeg', 'png', 'gif');
-// if(!in_array($imageExt, $allowedExts) && $imageName != ''){
-//     echo ("Invalid image file type.");
-//     exit();
-// }
-// $path = '../../uploads/images/';
-// $customImageName = uniqid('img_') . '.' . $imageExt;
-// $imageName = $customImageName;
-// if($imageName != ''){
-//     move_uploaded_file($imageTmpName, $path . $imageName);
-// }
-
 // Sanitize input data
 $data = [
-    // 'staff_code' => $staff_code,
     'first_name' => sanitize_input($_POST['first_name']),
     'middle_name' => sanitize_input($_POST['middle_name'] ?? ''),
     'last_name' => sanitize_input($_POST['last_name']),
@@ -88,23 +67,9 @@ $data = [
     'salary' => !empty($_POST['salary']) ? $_POST['salary'] : 0,
     'email' => sanitize_input($_POST['email']),
     'password_hash' => !empty($_POST['password_hash']) ? $_POST['password_hash'] : null,
-    'image' => $imageName,
+    'image' => $imagePath,
     'system_role' => sanitize_input($_POST['system_role'])
 ];
-
-
-// $email = sanitize_input($_POST['exampleInputEmail1'] ?? '');
-// $password = sanitize_input($_POST['exampleInputPassword1'] ?? '');
-// $role = sanitize_input($_POST['exampleSelect1'] ?? '');
-
-// if(empty($_POST['exampleInputEmail1']) || empty($_POST['exampleInputPassword1']) || empty($_POST['exampleSelect1'])){
-//     echo ("All fields are required!");
-//     exit();
-// }
-// else{
-// $result = $user->insert_user($email,$password,$role);
-// echo($result);
-// }
 
 $result = $staff->insert_staff($data);
 

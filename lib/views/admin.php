@@ -1,14 +1,34 @@
 <?php
 session_start();
 
-if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'Admin') {
+if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['Admin', 'Staff'])) {
     header("Location: ../../index.php?page=login");
     exit;
 }
 
 //include header page 
 include_once('header.php');
+include_once('../routes/notification/load_notifications_route.php');
 ?>
+
+<?php
+if (isset($_SESSION['login_success'])) {
+    $message = $_SESSION['login_success'];
+    unset($_SESSION['login_success']);
+?>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    Swal.fire({
+        icon: "success",
+        title: "Login Successful",
+        text: "<?php echo addslashes($message); ?>",
+        confirmButtonColor: "#8b6f47",
+        timer: 3500,
+        showConfirmButton: false
+    });
+});
+</script>
+<?php } ?>
 
 <?php
     $page = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
@@ -77,6 +97,22 @@ include_once('header.php');
         font-size: 12px;
     }
 
+    .notification-item.unread{
+        background:#fff9e8;
+        border-left:4px solid #d4af37;
+    }
+
+    .notification-item.unread:hover{
+        background:#fef3c7;
+    }
+
+    .notification-message{
+        display:-webkit-box;
+        -webkit-line-clamp:2;
+        -webkit-box-orient:vertical;
+        overflow:hidden;
+    }
+
 }
 
 @media (max-width: 576px){
@@ -132,13 +168,91 @@ include_once('header.php');
                     </div>
                 </form>
 
-                <form action="../routes/notification.php" method="post">
+                <div class="dropdown">
 
-                    <button type="submit" class="btn btn-dark">
+                    <button class="btn btn-dark position-relative" type="button" data-bs-toggle="dropdown">
                         <i class="fa-solid fa-bell"></i>
+                        <?php if(($notificationCount ?? 0) > 0): ?>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                <?= $notificationCount ?>
+                            </span>
+                        <?php endif; ?>
+
                     </button>
 
-                </form>
+                    <div class="dropdown-menu dropdown-menu-end notification-dropdown shadow">
+
+                        <div class="dropdown-header d-flex justify-content-between align-items-center">
+                            <span><i class="fa-solid fa-bell me-2"></i>Notifications</span>
+                            <span class="badge bg-warning text-dark">
+                                <?= $notificationCount ?? 0 ?>
+                            </span>
+                        </div>
+
+                        <?php if(!empty($notifications)): ?>
+
+                            <?php foreach($notifications as $notification): ?>
+
+                                <a href="../routes/notification/open_notification.php?id=<?= $notification['notification_id'] ?>"
+                                    class="dropdown-item notification-item <?= !$notification['is_read'] ? 'unread' : '' ?>">
+
+                                    <div class="d-flex">
+
+                                        <div class="notification-icon me-3">
+                                            <?php if($notification['notification_type']=="Cremation"): ?>
+                                                <i class="fa-solid fa-fire text-danger"></i>
+                                            <?php elseif($notification['notification_type']=="Burial"): ?>
+                                                <i class="fa-solid fa-cross text-success"></i>
+                                            <?php else: ?>
+                                                <i class="fa-solid fa-bell text-warning"></i>
+                                            <?php endif; ?>
+                                        </div>
+
+                                        <div class="flex-grow-1">
+                                            <div class="fw-bold">
+                                                <?= htmlspecialchars($notification['title']) ?>
+                                            </div>
+
+                                            <?php if(!$notification['is_read']): ?>
+                                                <span class="badge bg-danger ms-2">NEW</span>
+                                            <?php endif; ?>
+
+                                            <small class="text-muted d-block notification-message">
+                                                <?= htmlspecialchars($notification['message']) ?>
+                                            </small>
+
+                                            <?php if(!empty($notification['created_at'])): ?>
+                                                <small class="text-secondary">
+                                                    <?= date("d M Y h:i A", strtotime($notification['created_at'])) ?>
+                                                </small>
+                                            <?php endif; ?>
+
+                                        </div>
+
+                                    </div>
+
+                                </a>
+
+                            <?php endforeach; ?>
+
+                        <?php else: ?>
+
+                            <div class="text-center py-4 text-muted">
+                                <i class="fa-regular fa-bell-slash fa-2x mb-2"></i>
+                                <div>No notifications</div>
+                            </div>
+
+                        <?php endif; ?>
+
+                        <div class="dropdown-divider"></div>
+
+                        <a href="admin.php?page=notifications" class="dropdown-item text-center fw-bold">
+                            View All Notifications
+                        </a>
+
+                    </div>
+
+                </div>
 
                 <div class="dropdown">
 
@@ -200,7 +314,7 @@ include_once('header.php');
                         break; 
                         
                     case 'member':
-                        include 'member/member_view.php';
+                        include 'member/member.php';
                         break;
                     case 'addMember':
                         include 'member/member_add.php';
@@ -263,6 +377,14 @@ include_once('header.php');
                         include 'deceased/get_deceased_view.php';
                         break;
 
+                    case 'notifications':
+                        include 'notification/notification.php';
+                        break;
+
+                    case 'report':
+                        include 'report/report.php';
+                        break;
+
                     default:
                         include 'dashboard.php';
                 }
@@ -294,6 +416,31 @@ include_once('header.php');
             }
 
         }
+
+        let previousCount = 0;
+
+        function loadNotifications(){
+
+            $.get("../routes/notification/load_notifications_route.php", function(data){
+                $(".badge").text(data.count);
+
+                if(data.count > previousCount){
+                    Swal.fire({
+                        icon: "info",
+                        title: "New Booking",
+                        text: "A new funeral booking requires approval.",
+                        timer: 3000,
+                        showConfirmButton: false
+                    });
+                }
+                previousCount = data.count;
+            }, "json");
+
+        }
+
+        loadNotifications();
+
+        setInterval(loadNotifications, 10000);
 
     });
 

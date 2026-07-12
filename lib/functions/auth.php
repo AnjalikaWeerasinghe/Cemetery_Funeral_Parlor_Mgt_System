@@ -46,11 +46,13 @@ class Auth {
                     $_SESSION['user_id'] = $rec['user_id'];
                     $_SESSION['role'] = $rec['user_role'];
 
-                    if ($rec['user_role'] === 'Admin') {
+                    if ($rec['user_role'] === 'Admin' || $rec['user_role'] === 'Staff') {
+                        $_SESSION['login_success'] = "Welcome to the General Cemetery, Gampola. You are redirected to the Admin Dashboard, " . $rec['user_name'] . "!";
                         header('Location: lib/views/admin.php');
                         exit;
 
                     } else if ($rec['user_role'] === 'Member'){
+                        $_SESSION['login_success'] = "Welcome to the General Cemetery, Gampola, " . $rec['user_name'] . "!";
                         header("Location: index.php?page=member");
                         exit;
                     } else {
@@ -58,7 +60,7 @@ class Auth {
                     }
 
                 } else {
-                    return "Invalid email or password.";
+                    return "Invalid Email or Password.";
                 }
 
             } else {
@@ -66,7 +68,7 @@ class Auth {
             }
 
         } else {
-            return "Invalid email or password.";
+            return "Invalid Email or Password.";
         }
     }
 }
