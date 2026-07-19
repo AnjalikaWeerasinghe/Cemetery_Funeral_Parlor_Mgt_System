@@ -320,6 +320,14 @@ document.addEventListener("DOMContentLoaded", function () {
                         include 'member/member_add.php';
                         break;
 
+                    case 'supplier':
+                        include 'supplier/supplier.php';
+                        break;
+
+                    case 'inventory':
+                        include 'inventory/inventory.php';
+                        break;
+
                     case 'funeralBookings':
                         include 'funeral_booking/funeral_booking_details.php';
                         break;
@@ -374,7 +382,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         break;
 
                     case 'view_deceased_details':
-                        include 'deceased/get_deceased_view.php';
+                        include 'deceased/deceased_view.php';
                         break;
 
                     case 'notifications':

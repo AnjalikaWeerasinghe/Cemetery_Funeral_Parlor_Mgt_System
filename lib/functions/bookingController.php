@@ -415,6 +415,8 @@ class BookingController extends MainController{
                 throw new Exception($stmt7->error);
             }
 
+            $payment_id = $stmt7->insert_id;
+
             $this->conn->commit();
 
             // Create Notification Generartion part
@@ -424,7 +426,8 @@ class BookingController extends MainController{
 
             return [
                 "status" => "success",
-                "booking_code" => $booking_code
+                "booking_code" => $booking_code,
+                "payment_id" => $payment_id
             ];
 
         }

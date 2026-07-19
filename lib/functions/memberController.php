@@ -91,7 +91,7 @@ class MemberController extends MainController {
         if(!empty($search)) {
             $sqlView = "SELECT * FROM member_table 
                 WHERE member_code LIKE ? OR first_name LIKE ? OR middle_name LIKE ? OR last_name LIKE ? OR nic LIKE ? OR email LIKE ? OR contact_number LIKE ? OR address LIKE ?
-                ORDER BY member_id DESC;";
+                ORDER BY member_id DESC";
 
             $resultView = $this->conn->prepare($sqlView);
 
@@ -103,7 +103,7 @@ class MemberController extends MainController {
 
             $resultView = $resultView->get_result();
         } else {
-            $sqlView = "SELECT * FROM member_table ORDER BY member_id DESC;";
+            $sqlView = "SELECT * FROM member_table ORDER BY member_id DESC";
 
             $resultView = $this->conn->query($sqlView);
         }

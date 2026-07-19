@@ -131,9 +131,9 @@ label {
                     <label>Report Type</label>
                     <select class="form-select" id="reportType">
                         <option value="">Select Report</option>
-                        <option value="monthly_cremation">Monthly Cremation</option>
-                        <option value="burial">Burial Report</option>
-                        <option value="revenue">Revenue Report</option>
+                        <option value="monthly_income">Monthly Income Report</option>
+                        <option value="monthly_expense">Monthly Expense Report</option>
+                        <option value="monthly_revenue">Revenue Report</option>
                         <option value="member">Member Report</option>
                     </select>
                 </div>
@@ -141,27 +141,29 @@ label {
                 <div class="col-lg-3 mb-3">
                     <label>Month</label>
                     <select class="form-select" id="month">
-                        <option>January</option>
-                        <option>February</option>
-                        <option>March</option>
-                        <option>April</option>
-                        <option>May</option>
-                        <option>June</option>
-                        <option>July</option>
-                        <option>August</option>
-                        <option>September</option>
-                        <option>October</option>
-                        <option>November</option>
-                        <option>December</option>
+                        <option value="">Select month</option>
+                        <option value="01">January</option>
+                        <option value="02">February</option>
+                        <option value="03">March</option>
+                        <option value="04">April</option>
+                        <option value="05">May</option>
+                        <option value="06">June</option>
+                        <option value="07">July</option>
+                        <option value="08">August</option>
+                        <option value="09">September</option>
+                        <option value="10">October</option>
+                        <option value="11">November</option>
+                        <option value="12">December</option>
                     </select>
                 </div>
 
                 <div class="col-lg-2 mb-3">
                     <label>Year</label>
                     <select class="form-select" id="year">
-                        <option>2026</option>
-                        <option>2025</option>
-                        <option>2024</option>
+                        <option value="2027">2027</option>
+                        <option value="2026">2026</option>
+                        <option value="2025">2025</option>
+                        <option value="2024">2024</option>
                     </select>
                 </div>
 
@@ -282,8 +284,8 @@ label {
             let month = $("#month").val();
             let year = $("#year").val();
 
-            if(reportType==""){
-                alert("Please select report type");
+            if(reportType=="" || month=="" || year==""){
+                alert("Please select report type, month and year.");
                 return;
             }
 

@@ -4,39 +4,106 @@ include_once('main.php');
 
 class ReportController extends MainController{
 
-    public function generateReport()
-{
-    if (!isset($_POST['action']) || $_POST['action'] != "generateReport") {
-        return;
+    public function generateReport($reportType, $month, $year){
+
+        switch ($reportType) {
+
+            case "monthly_income":
+                $sql = "SELECT
+                        SUM(CASE WHEN fs.service_type = 'Burial' THEN p.service_cost ELSE 0 END) AS burial_income,
+                        SUM(CASE WHEN fs.service_type = 'Cremation' THEN p.service_cost ELSE 0 END) AS cremation_income,
+                        SUM(COALESCE(p.memorial_cost,0)) AS memorial_income
+                    FROM payment_table p
+                    INNER JOIN funeral_service_table fs ON fs.funeral_service_id = p.funeral_service_table_funeral_service_id
+                    WHERE MONTH(p.payment_date) = ?
+                    AND YEAR(p.payment_date) = ? AND p.payment_status = 'Paid'";
+
+                $stmt = $this->conn->prepare($sql);
+                $stmt->bind_param("ii", $month, $year);
+                $stmt->execute();
+
+                $result = $stmt->get_result();
+                $row = $result->fetch_assoc();
+
+                $burialIncome    = $row['burial_income'] ?? 0;
+                $cremationIncome = $row['cremation_income'] ?? 0;
+                $memorialIncome  = $row['memorial_income'] ?? 0;
+
+                $grandTotal = $burialIncome + $cremationIncome + $memorialIncome;
+
+                $reportData = [
+                    [
+                        "service" => "Burial",
+                        "total_income" => $burialIncome
+                    ],
+                    [
+                        "service" => "Cremation",
+                        "total_income" => $cremationIncome
+                    ],
+                    [
+                        "service" => "Memorial",
+                        "total_income" => $memorialIncome
+                    ]
+                ];
+
+                $fromDate = date("Y-m-01", strtotime("$year-$month-01"));
+                $toDate   = date("Y-m-t", strtotime("$year-$month-01"));
+
+                require_once(__DIR__ . "/../views/report/monthly_income_report.php");
+                break;
+
+            case "monthly_expense":
+                require_once(__DIR__ . "/../views/report/monthly_expense_report.php");
+                break;
+
+            case "revenue":
+                require_once(__DIR__ . "/../views/report/revenue_report.php");
+                break;
+
+            case "member":
+                require_once(__DIR__ . "/../views/report/member_report.php");
+                break;
+
+            default:
+                echo "<div class='alert alert-danger'>Invalid Report Type.</div>";
+                break;
+        }
     }
 
-    $reportType = $_POST['reportType'];
-    $month      = $_POST['month'];
-    $year       = $_POST['year'];
+    public function getMonthlyIncomeReport($month, $year){
 
-    switch ($reportType) {
+        $sql = "SELECT
+                    fs.service_type,
+                    SUM(p.total_payment) AS total_income
+                FROM funeral_service_table fs
+                INNER JOIN payment_table p
+                ON fs.funeral_service_id = p.funeral_service_table_funeral_service_id
+                WHERE MONTH(p.payment_date)=?
+                AND YEAR(p.payment_date)=?
+                AND p.payment_status='Paid'
+                GROUP BY fs.service_type";
 
-        case "monthly_cremation":
-            require_once(__DIR__ . "/../views/report/monthly_cremation_report.php");
-            break;
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("ii", $month, $year);
+        $stmt->execute();
 
-        case "burial":
-            require_once(__DIR__ . "/../views/report/burial_report.php");
-            break;
+        $result = $stmt->get_result();
 
-        case "revenue":
-            require_once(__DIR__ . "/../views/report/revenue_report.php");
-            break;
+        $data = [];
+        $grandTotal = 0;
 
-        case "member":
-            require_once(__DIR__ . "/../views/report/member_report.php");
-            break;
+        while ($row = $result->fetch_assoc()) {
+            $grandTotal += $row['total_income'];
+            $data[] = $row;
+        }
 
-        default:
-            echo "<div class='alert alert-danger'>Invalid Report Type.</div>";
-            break;
+        echo json_encode([
+            "from" => date("Y-m-01", strtotime("$year-$month-01")),
+            "to" => date("Y-m-t", strtotime("$year-$month-01")),
+            "grandTotal" => $grandTotal,
+            "data" => $data
+        ]);
     }
-}
 }
 
 ?>

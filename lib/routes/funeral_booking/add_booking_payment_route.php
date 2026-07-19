@@ -40,6 +40,10 @@ $_SESSION['booking']['payment'] = [
     'payment_date' => date("Y-m-d H:i:s")
 ];
 
-echo "success";
+echo json_encode([
+
+    "status"=>"success",
+
+]);
 
 ?>

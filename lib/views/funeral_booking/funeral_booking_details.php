@@ -250,7 +250,7 @@
                     });
                 },
                 error: function() {
-                    alert('Failed to load bookings.');
+                    showError('Failed to load bookings.');
                 }
             });
         }
@@ -295,7 +295,7 @@
                     },
                     dataType: "json",
                     success:function(response){
-                        alert(response.message);
+                        showSuccess(response.message);
 
                         loadBookings();
                     },
@@ -321,7 +321,7 @@
                     },
                     dataType: "json",
                     success:function(response){
-                        alert(response.message);
+                        showSuccess(response.message);
 
                         loadBookings();
                     },

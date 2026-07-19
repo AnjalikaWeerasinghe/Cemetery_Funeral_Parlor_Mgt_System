@@ -166,9 +166,17 @@ if (session_status() === PHP_SESSION_NONE) {
         </li>
 
         <li class="nav-item">
-            <a class="nav-link" href="#">
-                <i class="fa-solid fa-warehouse me-2"></i>Resource Management
-            </a>
+            <button class="sidebar-dropdown-btn" data-bs-toggle="collapse" data-bs-target="#resourceMenu">
+                <span>
+                    <i class="fa-solid fa-warehouse me-2"></i>Resource Management
+                </span>
+            </button>
+
+            <div class="collapse sidebar-submenu" id="resourceMenu">
+                <a href="admin.php?page=supplier">Supplier Details</a>
+                <a href="admin.php?page=inventory">Inventory Details</a>
+            </div>
+            
         </li>
 
         <li class="nav-item">
