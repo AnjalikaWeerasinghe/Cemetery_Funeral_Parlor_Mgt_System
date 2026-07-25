@@ -137,6 +137,19 @@ class EmpController extends MainController{
 
     }
 
+    public function getStaffMemberDashboardStats(){
+
+        $sql = "SELECT COUNT(*) AS total_members,
+            SUM(CASE WHEN member_status = 'Active' THEN 1 ELSE 0 END)
+            AS active_members,
+            SUM(CASE WHEN member_status = 'Inactive' THEN 1 ELSE 0 END)
+            AS inactive_members,
+            SUM(CASE WHEN MONTH(created_at) = MONTH(CURDATE()) AND YEAR(created_at) = YEAR(CURDATE()) THEN 1 ELSE 0 END) 
+            AS new_members
+            FROM member_table";
+        
+    }
+
 }
 
 

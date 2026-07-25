@@ -159,8 +159,8 @@ if (session_status() === PHP_SESSION_NONE) {
             </button>
 
             <div class="collapse sidebar-submenu" id="userMenu">
-                <a href="admin.php?page=staff">Staff Details</a>
-                <a href="admin.php?page=member">Member Details</a>
+                <a href="admin.php?page=staff">Staff Management</a>
+                <a href="admin.php?page=member">Member Management</a>
             </div>
 
         </li>
@@ -173,8 +173,8 @@ if (session_status() === PHP_SESSION_NONE) {
             </button>
 
             <div class="collapse sidebar-submenu" id="resourceMenu">
-                <a href="admin.php?page=supplier">Supplier Details</a>
-                <a href="admin.php?page=inventory">Inventory Details</a>
+                <a href="admin.php?page=supplier">Supplier Management</a>
+                <a href="admin.php?page=inventory">Inventory Management</a>
             </div>
             
         </li>

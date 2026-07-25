@@ -327,7 +327,9 @@
 </style>
 
 <?php
-    $isAdmin = (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin');
+    $isAdmin = (isset($_SESSION['role']) && in_array($_SESSION['role'], ['Admin', 'Staff']));
+    
+    $isBookingAllowed = (isset($_SESSION['role']) && in_array($_SESSION['role'], ['Admin', 'Member', 'Staff']));
 ?>
 
 <div class="booking-wrapper mt-4">
@@ -409,7 +411,10 @@
 <script>
     let completedStep = 1;
 
-    const baseRoute = "<?php echo (strpos($_SERVER['PHP_SELF'], 'admin.php') !== false) 
+    console.log("Booking Code:", "<?= $bookingCode ?? 'EMPTY' ?>");
+    console.log("Role:", "<?= $_SESSION['role'] ?>");
+
+    const baseRoute = "<?php echo (strpos($_SERVER['PHP_SELF'], 'admin.php') !== false)
         ? '../views/' 
         : 'lib/views/'; ?>";
 
@@ -420,7 +425,36 @@
 
         loadStep(1);
 
+        if(window.bookingCode === ""){
+            generateBookingCode("Burial");
+        }
+
     });
+
+    function generateBookingCode(serviceType){
+
+        let route = "<?php echo strpos($_SERVER['PHP_SELF'], 'admin.php') !== false 
+            ? '../routes/funeral_booking/generate_booking_code.php'
+            : 'lib/routes/funeral_booking/generate_booking_code.php'; ?>";
+
+        console.log("Calling URL:", route);
+
+        $.post(route,
+            {
+                service_type: serviceType
+            },
+            function(response){
+                window.bookingCode = response;
+                console.log("Generated Code:", window.bookingCode);
+
+                sessionStorage.setItem("booking_code", window.bookingCode);
+            }
+        ).fail(function(xhr){
+            console.log("Failed URL:", url);
+            console.log(xhr.responseText);
+        });
+
+    }
 
     function setActiveStep(step) {
 

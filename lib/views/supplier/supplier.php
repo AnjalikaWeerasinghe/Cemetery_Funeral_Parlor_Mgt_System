@@ -201,22 +201,22 @@
 
 <script>
     $(document).ready(function(){
-        loadMembers();
-        loadMemberDashboardStats();
-
-        function loadMembers(search = ""){
+        loadSuppliers();
+        loadSupplierDashboardStats();
+        
+        function loadSuppliers(search = ""){
             $.ajax({
-                url: "../routes/member/view_member_route.php",
+                url: "../routes/supplier/view_supplier_route.php",
                 type: "GET",
                 data: {search: search},
                 success: function(data){
-                    if ($.fn.DataTable.isDataTable("#memberTable")) {
-                        $("#memberTable").DataTable().destroy();
+                    if ($.fn.DataTable.isDataTable("#supplierTable")) {
+                        $("#supplierTable").DataTable().destroy();
                     }
 
-                    $("#member_data").html(data);
+                    $("#supplier_data").html(data);
 
-                    $("#memberTable").DataTable({
+                    $("#supplierTable").DataTable({
                         pageLength: 10,
                         dom: "rtip", // Remove the default search box
                         lengthMenu: [5, 10, 25, 50],
@@ -226,82 +226,23 @@
                         responsive: true
                     });
 
-                    var table = $("#memberTable").DataTable();
+                    var table = $("#supplierTable").DataTable();
 
-                    $("#searchMember").on("keyup", function(){
+                    $("#searchSupplier").on("keyup", function(){
                         table.search(this.value).draw();
                     });
                 }
             });
         }
 
-        $(document).on("click", ".member-status", function () {
-
-            let btnId = $(this).attr("id");
-            let status = $(this).data("status");
-            let memberName = $(this).data("name");
-
-            let action = (status === "Active") ? "activate" : "deactivate";
-
-            Swal.fire({
-                title: "Are you sure?",
-                html: `Do you want to ${action} the account of <br><b>${memberName}</b>?`,
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: status === "Active" ? "#198754" : "#d33",
-                cancelButtonColor: "#6c757d",
-                confirmButtonText: "Yes, " + action + "!",
-                cancelButtonText: "Cancel",
-                reverseButtons: true
-            }).then((result) => {
-
-                if(result.isConfirmed) {
-
-                    $.post("../routes/member/activatedeactivate_member_route.php", {
-                        id: btnId,
-                        status: status
-                    }, function (response) {
-                        response = response.trim();
-
-                        if (response === "success") {
-
-                            Swal.fire({
-                                icon: "success",
-                                title: "Success",
-                                html: `<b>${memberName}</b> has been ${action}d successfully.`,
-                                confirmButtonColor: "#198754",
-                                timer: 3500,
-                                showConfirmButton: false
-                            }).then(() => {
-                                loadMembers();
-                                loadMemberDashboardStats();
-                            });
-
-                            loadMembers();
-                        } else {
-                            Swal.fire({
-                                icon: "error",
-                                title: "Operation Failed",
-                                text: "Something went wrong. Please try again.",
-                                confirmButtonColor: "#d33"
-                            });
-                        }
-                    });
-
-                }
-
-            });
-
-        });
-
         $(document).on("click", ".addSupplierBtn", function(){
             $("#root").load("supplier/supplier_add.php");
         });
 
         $(document).on("click", ".view", function() {
-            let memberId = $(this).data("id");
+            let supplierId = $(this).data("id");
 
-            $("#root").load("member/member_view.php?member_id=" + memberId);
+            $("#root").load("supplier/supplier_view.php?supplier_id=" + supplierId);
         })
 
         $(document).on("click", ".edit", function(e){
@@ -309,34 +250,29 @@
 
             let id = $(this).data("id");
 
-            $("#root").load("member/member_edit.php?member_id=" + id, function(){
+            $("#root").load("supplier/supplier_edit.php?supplier_id=" + id, function(){
 
                 $.ajax({
-                    url: "../routes/member/get_member_route.php",
-                    type: "POST",
-                    data: { member_id: id },
+                    url: "../routes/supplier/get_supplier_route.php",
+                    type: "GET",
+                    data: { supplier_id: id },
                     dataType: "json",
 
                     success: function(response){
 
-                        $("#member_id").val(response.member_id);
-                        $("#first_name").val(response.first_name);
-                        $("#middle_name").val(response.middle_name);
-                        $("#last_name").val(response.last_name);
-                        $("#nic").val(response.nic);
-                        $("#gender").val(response.gender);
-                        $("#date_of_birth").val(response.date_of_birth);
+                        $("#supplier_id").val(response.supplier_id);
+                        $("#supplier_code").text(response.supplier_code);
+
+                        $("#supplier_name").val(response.supplier_name);
+                        $("#contact_person").val(response.contact_person);
                         $("#contact_number").val(response.contact_number);
                         $("#address").val(response.address);
+
                         $("#email").val(response.email);
-                        $("#member_status").val(response.member_status);
-                        $("#member_code").val(response.member_code);
+                        $("#registration_number").val(response.registration_number);
+                        $("#supplier_status").val(response.supplier_status);
 
-                        if(response.image){
-                            $("#preview").html(`<img src="/Cemetery_Funeral_Parlor_Mgt_System/uploads/images/${response.image}" width="100">`);
-                        }
-
-                        $("button[type='submit']").text("Update Member");
+                        $("button[type='submit']").text("Update Supplier");
                     },
 
                     error: function(xhr){
@@ -348,17 +284,77 @@
 
         });
 
-        function loadMemberDashboardStats(){
+        $(document).on("click", ".supplier-status", function () {
 
-            $.post("../routes/member/get_member_dashboard_stats_route.php",
+            let btnId = $(this).attr("id");
+            let status = $(this).data("status");
+            let supplierName = $(this).data("name");
+
+            let action = (status === "Active") ? "activate" : "deactivate";
+
+            Swal.fire({
+                title: "Are you sure?",
+                html: `Do you want to ${action} the account of <br><b>${supplierName}</b>?`,
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: status === "Active" ? "#198754" : "#d33",
+                cancelButtonColor: "#6c757d",
+                confirmButtonText: "Yes, " + action + "!",
+                cancelButtonText: "Cancel",
+                reverseButtons: true
+            }).then((result) => {
+
+                if(result.isConfirmed) {
+
+                    $.post("../routes/supplier/activatedeactivate_supplier_route.php", {
+                        id: btnId,
+                        status: status
+                    }, function (response) {
+                        response = response.trim();
+
+                        if (response === "success") {
+
+                            Swal.fire({
+                                icon: "success",
+                                title: "Success",
+                                html: `<b>${supplierName}</b> has been ${action}d successfully.`,
+                                confirmButtonColor: "#198754",
+                                timer: 3500,
+                                showConfirmButton: false
+                            }).then(() => {
+                                loadSuppliers();
+                                loadSupplierDashboardStats();
+                            });
+
+                            loadSuppliers();
+                        } else {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Operation Failed",
+                                text: "Something went wrong. Please try again.",
+                                confirmButtonColor: "#d33"
+                            });
+                        }
+                        
+                    });
+
+                }
+
+            });
+
+        });
+
+        function loadSupplierDashboardStats(){
+
+            $.post("../routes/supplier/get_supplier_dashboard_stats_route.php",
             function(data){
                 
                 data = JSON.parse(data);
 
-                $("#totalMembers").html(data.total_members);
-                $("#activeMembers").html(data.active_members);
-                $("#inactiveMembers").html(data.inactive_members);
-                $("#newMembers").html(data.new_members);
+                $("#totalSuppliers").html(data.total_suppliers);
+                $("#activeSuppliers").html(data.active_suppliers);
+                $("#inactiveSuppliers").html(data.inactive_suppliers);
+                $("#newSuppliers").html(data.new_suppliers);
 
             });
         }

@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['Admin', 'Staff'])) {
+if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['Admin', 'Staff', 'Member'])) {
     header("Location: ../../index.php?page=login");
     exit;
 }
@@ -404,6 +404,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 <script>
     document.getElementById("menu-toggle").addEventListener("click", function () {
+        window.userMode = "admin";
 
         const sidebar = document.getElementById("sidebar-wrapper");
 

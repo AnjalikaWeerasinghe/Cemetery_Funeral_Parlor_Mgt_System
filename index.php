@@ -15,16 +15,18 @@ if (isset($_SESSION['login_success'])) {
     unset($_SESSION['login_success']);
 ?>
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-    Swal.fire({
-        icon: "success",
-        title: "Login Successful",
-        text: "<?php echo addslashes($message); ?>",
-        confirmButtonColor: "#8b6f47",
-        timer: 3500,
-        showConfirmButton: false
+    window.userMode = "member";
+    
+    document.addEventListener("DOMContentLoaded", function () {
+        Swal.fire({
+            icon: "success",
+            title: "Login Successful",
+            text: "<?php echo addslashes($message); ?>",
+            confirmButtonColor: "#8b6f47",
+            timer: 3500,
+            showConfirmButton: false
+        });
     });
-});
 </script>
 <?php } ?>
 

@@ -11,7 +11,7 @@ if ($member_id) {
     $result = $member->getMemberById((int)$member_id);
     echo json_encode($result);
 } else {
-    echo json_encode(["error" => "member_id missing"]);
+    echo json_encode(["error" => "Member ID missing"]);
 }
 
 ?>

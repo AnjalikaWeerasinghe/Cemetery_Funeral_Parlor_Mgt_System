@@ -565,7 +565,7 @@ button {
         console.log("Mode:", mode);
 
         if (mode === "create") {
-            loadBookingCodeIfCreate();
+            // loadBookingCodeIfCreate();
             restoreStep1DataIfCreate();
         }
 
@@ -651,6 +651,8 @@ button {
             if(mode !== "create") return;
 
             let savedPreview = sessionStorage.getItem("deceased_photo_preview");
+
+            $("#booking_code").val(sessionStorage.getItem("booking_code"));
 
             $("#full_name").val(sessionStorage.getItem("full_name"));
             $("#booking_code").val(sessionStorage.getItem("booking_code"));
@@ -768,8 +770,28 @@ button {
 
             var formData = new FormData(this);
 
+            // let route;
+
+            // if(window.userMode === "admin"){
+            //     route = "routes/funeral_booking/add_deceased_info_route.php";
+            // }
+            // else if(window.userMode === "staff"){
+            //     route = "../routes/funeral_booking/add_deceased_info_route.php";
+            // }
+            // else{
+            //     route = "lib/routes/funeral_booking/add_deceased_info_route.php";
+            // }
+
+            let route = "<?php echo strpos($_SERVER['PHP_SELF'], 'admin.php') !== false 
+                ? '../routes/funeral_booking/add_deceased_info_route.php'
+                : 'lib/routes/funeral_booking/add_deceased_info_route.php'; ?>";
+
+            console.log("Route:", route);
+
+            console.log("Current PHP:", "<?php echo $_SERVER['PHP_SELF']; ?>");
+
             $.ajax({
-                url: "../routes/funeral_booking/add_deceased_info_route.php",
+                url: route,
                 method: "POST",
                 data : formData,
                 processData: false,

@@ -661,11 +661,12 @@ class BookingController extends MainController{
     // Retreive summery of funeral booking to display in the funeral booking table
     public function view_Booking_Data() {
 
-        $sql = "SELECT fs.funeral_service_id, fs.booking_code, fs.booking_status, d.full_name AS deceased_name, doc.date_of_death, a.applicant_name, a.contact_number, fs.service_type
+        $sql = "SELECT fs.funeral_service_id, fs.booking_code, fs.booking_status, d.full_name AS deceased_name, doc.date_of_death, a.applicant_name, a.contact_number, fs.service_type, br.plot_table_plot_id
                 FROM funeral_service_table fs
                 INNER JOIN deceased_table d ON fs.deceased_table_deceased_id = d.deceased_id
                 INNER JOIN applicant_table a ON fs.applicant_table_applicant_id = a.applicant_id
                 INNER JOIN document_table doc ON fs.document_table_document_set_id = doc.document_id
+                LEFT JOIN burial_request_table br ON fs.funeral_service_id = br.funeral_service_table_funeral_service_id
                 ORDER BY fs.booking_created_at DESC";
 
         $result = $this->conn->query($sql);
@@ -730,10 +731,23 @@ class BookingController extends MainController{
                         }
 
                         if($rec['booking_status'] == "Confirmed"){
-
                             echo "
                             <button class='btn btn-sm btn-outline-success completeBooking' data-id='".$rec['funeral_service_id']."' title='Mark as Completed'>
                                 <i class='fa-solid fa-check-double'></i>
+                            </button>";
+                        }
+
+                        if($rec['service_type'] == "Burial" && $rec['booking_status'] == "Confirmed" && empty($rec['plot_table_plot_id'])){
+                            echo "
+                            <button class='btn btn-sm btn-outline-primary allocatePlot' data-id='".$rec['funeral_service_id']."' title='Allocate Burial Plot'>
+                                <i class='fa-solid fa-map-location-dot'></i>
+                            </button>";
+                        }
+
+                        if($rec['service_type'] == "Burial" && !empty($rec['plot_table_plot_id'])){
+                            echo "
+                            <button class='btn btn-sm btn-outline-secondary viewPlot' data-id='".$rec['plot_table_plot_id']."' title='View Allocated Plot'>
+                                <i class='fa-solid fa-location-dot'></i>
                             </button>";
                         }
 

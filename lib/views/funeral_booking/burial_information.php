@@ -455,10 +455,14 @@ h6 {
                 return;
             }
 
+            let route = "<?php echo (strpos($_SERVER['PHP_SELF'], 'admin.php') !== false) 
+                ? '../routes/funeral_booking/add_burial_info_route.php'
+                : 'lib/routes/funeral_booking/add_burial_info_route.php'; ?>";
+
             let formData = new FormData(this);
 
             $.ajax({
-                url: "../routes/funeral_booking/add_burial_info_route.php",
+                url: route,
                 method: "POST",
                 data: formData,
                 processData: false,
@@ -471,6 +475,7 @@ h6 {
                         sessionStorage.setItem("area_type", $("#area_type").val());
                         sessionStorage.setItem("grave_type", $("#grave_type").val());
                         sessionStorage.setItem("section_id", $("#section_id").val());
+                        sessionStorage.setItem("section_name", $("#section_name").val());
                         sessionStorage.setItem("request_note", $("#request_note").val());
 
                         unlockStep(4);
@@ -509,9 +514,12 @@ h6 {
         setAreaTypeAutomatically();
 
         function loadBurialView(bookingCode) {
+            let route = "<?php echo (strpos($_SERVER['PHP_SELF'], 'admin.php') !== false) 
+                ? '../routes/funeral_booking/get_funeral_booking_info_route.php'
+                : 'lib/routes/funeral_booking/get_funeral_booking_info_route.php'; ?>";
 
             $.ajax({
-                url: "../routes/funeral_booking/get_funeral_booking_info_route.php",
+                url: route,
                 type: "GET",
                 data: {
                     booking_code: bookingCode
@@ -551,9 +559,12 @@ h6 {
         }
 
         function loadBurialSections(selectedSection = ""){
+            let route = "<?php echo (strpos($_SERVER['PHP_SELF'], 'admin.php') !== false) 
+                ? 'routes/funeral_booking/load_burial_sections_route.php'
+                : 'lib/routes/funeral_booking/load_burial_sections_route.php'; ?>";
 
             $.ajax({
-                url: "../routes/funeral_booking/load_burial_sections_route.php",
+                url: route,
                 type: "GET",
                 dataType: "json",
                 success:function(data){

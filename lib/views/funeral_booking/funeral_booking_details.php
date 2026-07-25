@@ -216,6 +216,23 @@
 
 </div>
 
+<div class="modal fade" id="plotModal">
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Allocated Plot Details</h5>
+
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body" id="plotDetails">
+            </div>
+        </div>
+
+    </div>
+</div>
+
 <script>
     $(document).ready(function() {
         loadBookings();
@@ -275,7 +292,6 @@
 
             let id = $(this).data("id");
 
-
         })
 
         $(document).on("click", ".view", function(e){
@@ -285,51 +301,104 @@
         $(document).on("click",".approveBooking",function(){
             let funeral_service_id=$(this).data("id");
 
-            if(confirm("Confirm this booking?")){
+            Swal.fire({
+                title: "Confirm this booking?",
+                icon: "success",
+                showCancelButton: true,
+                confirmButtonText: "Yes, Confirm"
+            }).then((result)=>{
 
-                $.ajax({
-                    url: "../routes/funeral_booking/approve_booking_route.php",
-                    method: "POST",
-                    data: {
-                        funeral_service_id:funeral_service_id
-                    },
-                    dataType: "json",
-                    success:function(response){
-                        showSuccess(response.message);
+                if(result.isConfirmed){
+                    $.ajax({
+                        url: "../routes/funeral_booking/approve_booking_route.php",
+                        method: "POST",
+                        data: {
+                            funeral_service_id:funeral_service_id
+                        },
+                        dataType: "json",
+                        success:function(response){
+                            showSuccess(response.message);
 
-                        loadBookings();
-                    },
-                    error:function(xhr){
-                        console.log(xhr.responseText);
-                    }
+                            loadBookings();
+                        },
+                        error:function(xhr){
+                            console.log(xhr.responseText);
+                        }
 
-                });
-            }
+                    });
 
+                }
+
+            });
         });
 
         $(document).on("click",".rejectBooking",function(){
             let funeral_service_id=$(this).data("id");
 
-            if(confirm("Cancel this booking?")){
+            Swal.fire({
+                title: "Cancel this booking?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Yes, Cancel"
+            }).then((result)=>{
 
-                $.ajax({
-                    url: "../routes/funeral_booking/reject_booking_route.php",
-                    method: "POST",
-                    data: {
-                        funeral_service_id:funeral_service_id
-                    },
-                    dataType: "json",
-                    success:function(response){
-                        showSuccess(response.message);
+                if(result.isConfirmed){
+                    $.ajax({
+                        url: "../routes/funeral_booking/reject_booking_route.php",
+                        method: "POST",
+                        data: {
+                            funeral_service_id:funeral_service_id
+                        },
+                        dataType: "json",
+                        success:function(response){
+                            showSuccess(response.message);
 
-                        loadBookings();
-                    },
-                    error:function(xhr){
-                        console.log(xhr.responseText);
+                            loadBookings();
+                        },
+                        error:function(xhr){
+                            console.log(xhr.responseText);
+                        }
+                    });
+
+                }
+
+            });
+
+        });
+
+        $(document).on("click", ".allocatePlot", function () {
+            console.log("Allocate button clicked");
+
+            let funeralServiceId = $(this).data("id");
+
+            console.log("Funeral Service ID:", funeralServiceId);
+
+            $("#root").load("funeral_booking/burial_plot_allocation.php?funeral_service_id=" + funeralServiceId,
+                function(response, status, xhr){
+                    console.log("Load status:", status);
+                    if(status === "error"){
+                        console.log("Error:", xhr.status, xhr.statusText);
                     }
-                });
-            }
+                }
+
+            );
+            
+        });
+
+        $(document).on("click",".viewPlot",function(){
+            let plotId = $(this).data("id");
+
+            console.log("Plot ID:", plotId);
+
+            $.post("../routes/funeral_booking/burial_plot/view_allocated_plot_route.php",
+                {
+                    plot_id: plotId
+                },
+                function(response){
+                    $("#plotDetails").html(response);
+                    $("#plotModal").modal("show");
+                }
+            );
 
         });
 

@@ -204,8 +204,12 @@ $(document).ready(function(){
             }
         }
 
+        let route = "<?php echo (strpos($_SERVER['PHP_SELF'], 'admin.php') !== false) 
+            ? '../routes/funeral_booking/add_booking_payment_route.php'
+            : 'lib/routes/funeral_booking/add_booking_payment_route.php'; ?>";
+
         $.ajax({
-            url: "../routes/funeral_booking/add_booking_payment_route.php",
+            url: route,
             method: "POST",
             data: {
                 payment_method: pay_method,
@@ -214,24 +218,51 @@ $(document).ready(function(){
                 paid_amount: sessionStorage.getItem("total_amount")
             },
             success: function(res){
+                let paymentResponse = JSON.parse(res);
                 console.log(res);
 
-                if(res.trim() === "success"){
+                if(paymentResponse.status === "success"){
+
+                    let proute = "<?php echo (strpos($_SERVER['PHP_SELF'], 'admin.php') !== false) 
+                        ? '../routes/funeral_booking/confirm_burial_booking_route.php'
+                        : 'lib/routes/funeral_booking/confirm_burial_booking_route.php'; ?>";
 
                     $.ajax({
-                        url: "../routes/funeral_booking/confirm_burial_booking_route.php",
+                        url: proute,
                         method: "POST",
                         success: function(confirmRes){
                             console.log(confirmRes);
 
-                            if(confirmRes.includes("success")){
-                                alert("Payment successful! Your booking is confirmed.");
+                            let response = JSON.parse(confirmRes);
 
-                                sessionStorage.clear();
+                            if(response.status === "success"){
 
-                                $("#bookingContent").load("views/funeral_booking/booking_confirmation.php");
-                            } else {
-                                alert(confirmRes);
+                                Swal.fire({
+                                    title: "Payment Successful!",
+                                    text: "Your booking has been confirmed.",
+                                    icon: "success",
+                                    showCancelButton: true,
+                                    confirmButtonText: "Generate Invoice",
+                                    cancelButtonText: "View Booking"
+                                }).then((result)=>{
+
+                                    if(result.isConfirmed){
+
+                                        window.location.href =
+                                        "funeral_booking/invoice.php?payment_id=" + response.payment_id;
+
+                                    }
+                                    else{
+
+                                        sessionStorage.clear();
+
+                                        $("#bookingContent")
+                                        .load("views/funeral_booking/booking_confirmation.php");
+
+                                    }
+
+                                });
+
                             }
                         },
                         error: function(err){

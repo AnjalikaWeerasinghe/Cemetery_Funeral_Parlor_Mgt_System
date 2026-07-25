@@ -548,10 +548,14 @@ input[type="file"]:hover {
 
             if(mode !== "create") return;
 
+            let route = "<?php echo (strpos($_SERVER['PHP_SELF'], 'admin.php') !== false) 
+                ? '../routes/funeral_booking/add_document_info_route.php'
+                : 'lib/routes/funeral_booking/add_document_info_route.php'; ?>";
+
             var formData = new FormData(this);
 
             $.ajax({
-                url: "../routes/funeral_booking/add_document_info_route.php",
+                url: route,
                 method: "POST",
                 data : formData,
                 processData: false,

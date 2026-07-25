@@ -321,6 +321,7 @@
 
         $("#grave_type").text(sessionStorage.getItem("grave_type"));
         $("#section_id").text(sessionStorage.getItem("section_id"));
+        $("#section_id").text(sessionStorage.getItem("section_name"));
         
         $("#request_note").text(sessionStorage.getItem("request_note") || "None");
 

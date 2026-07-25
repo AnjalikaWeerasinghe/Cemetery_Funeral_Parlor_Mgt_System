@@ -1,40 +1,179 @@
-<!-- <style>
-    #preview {
-      margin-top: 10px;
-      width: 150px;
-      height: 150px;
-      border: 2px dashed #ccc;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      border-radius: 10px;
-      background-color: #f9f9f9;
+<style>
+    body{
+        background:#f4f6fb;
     }
 
-    #preview img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
+    .card{
+        border-radius:18px;
     }
 
-    #status {
-      margin-top: 10px;
-      color: green;
+    .table{
+        margin-bottom:0;
     }
-</style> -->
 
-<div class="container-fluid mt-2">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4>Staff Management</h4>
+    .table thead{
+        background:#1f2937;
+        color:white;
+    }
 
-        <div>
-            <input type="text" id="searchStaff" class="form-control d-inline-block w-auto" placeholder="Search staff...">
-            <a href="admin.php?page=addStaff" class="btn btn-primary ms-2 mb-1" id="emp_add">
-                <i class="fa-solid fa-user"></i>
-                Add Staff
-            </a>
+    .table thead th{
+        border:none;
+        font-weight:600;
+        padding:18px;
+    }
+
+    .table tbody td{
+        padding:18px;
+        vertical-align:middle;
+        border-color:#eef2f7;
+    }
+
+    .table tbody tr{
+        transition:.25s;
+    }
+
+    .table tbody tr:hover{
+        background:#f8fbff;
+        transform:scale(1.002);
+    }
+
+    .search-box{
+        width:260px;
+        padding-left:40px;
+        border-radius:30px;
+    }
+
+    .search-icon{
+        position:absolute;
+        left:15px;
+        top:50%;
+        transform:translateY(-50%);
+        color:#999;
+    }
+
+    .btn-primary{
+        border-radius:10px;
+        padding:10px 18px;
+        font-weight:600;
+    }
+
+    .btn-group .btn{
+        margin-right:4px;
+        border-radius:10px !important;
+    }
+
+    .table-responsive{
+        border-radius:18px;
+    }
+
+    .icon-circle{
+        width:55px;
+        height:55px;
+        border-radius:50%;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        color:white;
+        font-size:22px;
+    }
+
+    .bg-primary{
+        background:#4f46e5!important;
+    }
+
+    .bg-success{
+        background:#10b981!important;
+    }
+
+    .bg-warning{
+        background:#f59e0b!important;
+    }
+
+    .bg-info{
+        background:#06b6d4!important;
+    }
+</style>
+
+<div class="container-fluid mt-4">
+
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body d-flex justify-content-between align-items-center">
+            <div>
+                <h3 class="fw-bold mb-1 text-dark"><i class="fa-solid fa-users text-primary me-2"></i>Staff Management</h3>
+                <p class="text-muted mb-0">Manage all registered staff members of the cemetery system.</p>
+            </div>
+
+            <div class="d-flex align-items-center">
+                <div class="position-relative me-3">
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                    <input type="text" id="searchStaff" class="form-control search-box" placeholder="Search staff members...">
+                </div>
+
+                <a class="btn btn-primary shadow-sm addStaffBtn">
+                    <i class="fa-solid fa-user-plus me-2"></i>Add New Staff Member
+                </a>
+            </div>
         </div>
+    </div>
+
+    <div class="row mb-4">
+
+        <div class="col-lg-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <small class="text-muted">Total Staff Members</small>
+                            <h2><div class="fw-bold mt-2" id="totalStaffMembers">0</div></h2>
+                        </div>
+                        <div class="icon-circle bg-primary"><i class="fa-solid fa-users"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <small class="text-muted">Active</small>
+                            <h2><div class="fw-bold mt-2 text-success" id="activeStaffMembers">0</div></h2>
+                        </div>
+                        <div class="icon-circle bg-success"><i class="fa-solid fa-user-check"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <small class="text-muted">Inactive</small>
+                            <h2><div class="fw-bold mt-2 text-warning" id="inactiveStaffMembers">0</div></h2>
+                        </div>
+                        <div class="icon-circle bg-warning"><i class="fa-solid fa-user-slash"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <small class="text-muted">New This Month</small>
+                            <h2><div class="fw-bold mt-2 text-info" id="newStaffMembers">0</div></h2>
+                        </div>
+                        <div class="icon-circle bg-info"><i class="fa-solid fa-user-plus"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <div id="staffTable">
@@ -56,103 +195,34 @@
     </div>
 </div>
 
-<!-- <div class="card border-primary mb-3">
-  <div class="card-header">Staff Management</div>
-  <div class="card-body">
-   <form id="submit_form" enctype="multipart/form-data">
-    <fieldset>
-        <legend>Legend</legend>
-        <div class="row">
-        <label for="staticEmail" class="col-sm-2 col-form-label">Email</label>
-        <div class="col-sm-10">
-            <input type="text" readonly="" class="form-control-plaintext" id="staticEmail" name="staticEmail" value="email@example.com">
-        </div>
-        </div>
-        <div>
-        <label for="exampleInputEmail1" class="form-label mt-4">Email address</label>
-        <input type="email" class="form-control" id="exampleInputEmail1" name="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
-        <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
-        </div>
-        <div>
-        <label for="exampleInputPassword1" class="form-label mt-4">Password</label>
-        <input type="password" class="form-control" id="exampleInputPassword1" name="exampleInputPassword1" placeholder="Password" autocomplete="off">
-        </div>
-        <div>
-        <label for="exampleSelect1" class="form-label mt-4">Example select</label>
-        <select class="form-select" id="exampleSelect1" name="exampleSelect1">
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-        </select>
-        </div>
-        <div>
-            <input type="file" name="image_sample" id="image_sample" class="form-control mt-4" accsept="image/*">
-            
-        </div>
-        <button type="submit" class="btn btn-primary mt-2" id="submit_btn" onclick="return false">Submit</button>
-    </fieldset>
-    </form>
-    <div id="preview"></div>
-    
-    <div class="alert alert-dismissible alert-primary" id="success_alert" style="display:none">
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        <strong id="success_msg"></strong> 
-    </div>
-  </div>
-</div> -->
-
-<!-- <script>
-    $(document).ready(function(){
-        // Preview the selected image
-        $("#image_sample").on("change", function() {
-        const file = this.files[0];
-        if (file) {
-            $("#preview").text("Preview will appear here");
-            const reader = new FileReader();
-            reader.onload = function(event) {
-            $("#preview").html('<img src="' + event.target.result + '" alt="Image Preview">');
-            }
-            reader.readAsDataURL(file);
-        } else {
-            $("#preview").html("Preview will appear here");
-        }
-        });
-        $("#submit_btn").click(function(e){
-            e.preventDefault();
-            
-            var formData = new FormData($("#submit_form")[0]);
-
-            $.ajax({
-                url:"../routes/emp/add_emp_route.php",
-                type:"post",
-                data:formData,
-                contentType: false,
-                processData: false,
-                success:function(data){
-                    $("#success_alert").show();
-                    $("#success_msg").html(data);
-                    setTimeout(function(){
-                        $("#success_alert").hide(1000);
-                    },3000)
-                },
-                error:function(xhr,status,error){
-                    console.log("AJAX Error:", {
-                        xhr: xhr,
-                        status: status,
-                        error: error,
-                        responseText: xhr.responseText
-                    });
-                    alert("Error: " + status + "\nResponse: " + xhr.responseText);
-                }
-            })
-        })
-    })
-</script> -->
 
 <script>
-    $(document).on("click", ".addStaffBtn", function(){
-    $("#content").load("emp_add.php");
+    $(document).ready(function(){
+        loadStaffMemberDashboardStats();
+
+        $(document).on("click", ".addStaffBtn", function(){
+            $("#root").load("emp/emp_add.php");
+        });
+
+        function loadStaffMemberDashboardStats(){
+
+            $.post("../routes/emp/get_emp_dashboard_stats_route.php",
+            function(data){
+                
+                data = JSON.parse(data);
+
+                $("#totalStaffMembers").html(data.total_staffmembers);
+                $("#activeStaffMembers").html(data.active_staffmembers);
+                $("#inactiveStaffMembers").html(data.inactive_staffmembers);
+                $("#newStaffMembers").html(data.new_staffmembers);
+
+            });
+        }
+
     });
+    
+
+    
 
     $(document).ready(function(){
         $.get('../routes/emp/view_emp_route.php', function(data){

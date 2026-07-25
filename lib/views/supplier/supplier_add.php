@@ -1,125 +1,150 @@
 <?php
-    $member_id = $_GET['member_id'] ?? '';
+    $supplier_id = $_GET['supplier_id'] ?? '';
 ?>
 
 <style>
-    :root {
-        --primary: #111111;
-        --secondary: #1b1b1b;
-        --gold: #c9a227;
-        --gold-light: #e8c760;
-
-        --text: #2c2c2c;
-        --card: #ffffff;
-        --border: #e8e8e8;
-        --bg: #f5f5f5;
+    :root{
+        --primary:#111111;
+        --secondary:#1d1d1d;
+        --gold:#c9a227;
+        --gold-light:#e8c760;
+        --background:#f4f6f9;
+        --white:#ffffff;
+        --text:#444;
+        --border:#e5e5e5;
     }
 
-    body {
-        background: var(--bg);
-        font-family: 'Segoe UI', sans-serif;
-        color: var(--text);
+    body{
+        background:var(--background);
+        font-family:'Segoe UI',sans-serif;
+        color:var(--text);
     }
 
-    .cem-wrapper {
-        padding: 20px;
+    .cem-wrapper{
+        padding:25px;
     }
 
-    .cem-header {
-        background: linear-gradient(135deg,#111,#242424);
-        color: #fff;
-        padding: 22px 28px;
-        border-bottom: 4px solid var(--gold);
+    .cem-card{
+        border:none;
+        border-radius:22px;
+        overflow:hidden;
+        background:#fff;
+        box-shadow:0 15px 40px rgba(0,0,0,.08);
     }
 
-    .cem-card {
-        border: none;
-        border-radius: 18px;
-        background: white;
-        box-shadow: 0 12px 30px rgba(0,0,0,.08);
+    .cem-header{
+        background:linear-gradient(135deg,#111,#2c2c2c);
+        color:#fff;
+        padding:25px 30px;
+        border-bottom:4px solid var(--gold);
     }
 
-    .section-box {
-        border: none;
-        border-radius: 16px;
-        background: #f9f9f9;
-        padding: 22px;
-        box-shadow: 0 3px 12px rgba(0,0,0,.05);
-        margin-bottom: 22px;
+    .cem-header h4{
+        font-weight:700;
+        margin-bottom:5px;
     }
 
-    .section-title {
-        color: var(--gold);
-        font-size: 13px;
-        font-weight: 700;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-        border-left: 4px solid var(--gold);
-        padding-left: 12px;
-        margin-bottom: 18px;
+    .section-box{
+        background:#fff;
+        border-radius:18px;
+        padding:25px;
+        border-top:4px solid var(--gold);
+        box-shadow:0 5px 20px rgba(0,0,0,.05);
+        margin-bottom:25px;
     }
 
-    .form-control, .form-select {
-        height: 48px;
-        border-radius: 10px;
-        border: 1px solid #ddd;
+    .section-title{
+        font-size:15px;
+        font-weight:700;
+        color:#111;
+        display:flex;
+        align-items:center;
+        gap:10px;
+        margin-bottom:25px;
     }
 
-    .form-control:focus, .form-select:focus {
-        border-color: var(--gold);
-        box-shadow: 0 0 0 .18rem rgba(201,162,39,.18);
+    .section-title i{
+        color:var(--gold);
     }
 
-    .photo-card {
-        border-radius: 18px;
-        padding: 25px;
-        background: white;
-        text-align: center;
-        border: 1px solid #eee;
-        box-shadow: 0 6px 18px rgba(0,0,0,.05);
+    .code-card{
+        background:#fff;
+        border:2px solid #111;
+        border-radius:18px;
+        padding:25px;
+        text-align:center;
+        margin-bottom:25px;
+        transition:.3s;
     }
 
-    .photo-upload-wrapper {
-        width: 180px;
-        height: 180px;
-        margin: auto;
-        border-radius: 50%;
-        border: 3px dashed var(--gold);
-        overflow: hidden;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: #fafafa;
+    .code-card:hover{
+        border-color:var(--gold);
+        box-shadow:0 8px 20px rgba(0,0,0,.08);
     }
 
-    .upload-btn {
-        background: var(--gold);
-        color: #111;
-        padding: 10px 22px;
-        border-radius: 30px;
-        cursor: pointer;
-        font-weight: 600;
-        margin-top: 20px;
+    .code-card small{
+        color:#666;
+        font-size:13px;
+        letter-spacing:1.5px;
+        text-transform:uppercase;
+        font-weight:600;
     }
 
-    .btn-cem {
-        background: linear-gradient(135deg,#111,#2d2d2d);
-        color: white;
-        border: none;
-        border-radius: 10px;
-        padding: 12px 30px;
+    .code-card h3{
+        margin-top:10px;
+        color:#111;
+        font-weight:700;
+        letter-spacing:2px;
+        font-size:28px;
     }
 
-    .btn-cem:hover {
-        background: linear-gradient(135deg,#000,#111);
-        box-shadow: 0 10px 20px rgba(0,0,0,.18);
+    .input-group-text{
+        background:#fff;
+        border-right:none;
+        color:var(--gold);
     }
 
-    .btn-outline-secondary {
-        border: 2px solid var(--gold);
-        color: var(--gold);
+    .form-control, .form-select{
+        height:48px;
+        border-left:none;
     }
 
+    textarea.form-control{
+        height:110px;
+        resize:none;
+    }
+
+    .form-control:focus, .form-select:focus{
+        border-color:var(--gold);
+        box-shadow:0 0 0 .18rem rgba(201,162,39,.18);
+    }
+
+    .status-card{
+        background:#fafafa;
+        border-radius:15px;
+        padding:20px;
+        border:1px solid #eee;
+    }
+
+    .btn-save{
+        background:linear-gradient(135deg,var(--gold),#b98d17);
+        color:#fff;
+        border:none;
+        padding:12px 35px;
+        border-radius:10px;
+        font-weight:600;
+    }
+
+    .btn-save:hover{
+        color:#fff;
+        transform:translateY(-2px);
+    }
+
+    .btn-cancel{
+        border:2px solid var(--gold);
+        color:var(--gold);
+        padding:11px 25px;
+    }
 </style>
 
 <div class="container-fluid cem-wrapper">
@@ -127,131 +152,108 @@
     <div class="card cem-card">
 
         <div class="cem-header d-flex justify-content-between align-items-center">
-
             <div>
                 <h4 class="fw-bold mb-1">
                     <i class="fa fa-user-plus me-2"></i>Supplier Registration
                 </h4>
-                <p class="mb-0 opacity-75">
-                    Register a new cemetery supplier
-                </p>
+                <p class="mb-0 opacity-75">Register a new cemetery supplier</p>
             </div>
 
             <a href="admin.php?page=supplier" class="btn btn-light btn-sm">
                 <i class="fa fa-arrow-left me-1"></i> Back
             </a>
-
         </div>
 
         <div class="card-body p-4">
 
-            <form id="submit_form" enctype="multipart/form-data">
+            <form id="submit_form">
 
                 <input type="hidden" id="supplier_id" name="supplier_id">
 
-                <div class="row g-4">
+                <div class="row">
 
-                    <div class="col-lg-8">
+                    <div class="col-lg-6">
 
                         <div class="section-box">
 
-                            <div class="section-title">Contact Information</div>
-
-                            <div class="row g-3">
-                                <div class="col-md-4">
-                                    <input type="text" id="first_name" name="first_name" class="form-control" placeholder="First Name *">
-                                </div>
-
-                                <div class="col-md-4">
-                                    <input type="text" id="middle_name" name="middle_name" class="form-control" placeholder="Middle Name">
-                                </div>
-
-                                <div class="col-md-4">
-                                    <input type="text" id="last_name" name="last_name" class="form-control" placeholder="Last Name *">
-                                </div>
-
-                                <div class="col-md-3">
-                                    <input type="text" id="nic" name="nic" class="form-control" pattern="[0-9]{9}[vVxX]|[0-9]{12}" placeholder="NIC *">
-                                </div>
-
-                                <div class="col-md-3">
-                                    <select id="gender" name="gender" class="form-select">
-                                        <option value="">Gender</option>
-                                        <option>Male</option>
-                                        <option>Female</option>
-                                    </select>
-                                </div>
-
-                                <div class="col-md-3">
-                                    <input type="date" id="date_of_birth" name="date_of_birth" class="form-control">
-                                </div>
-
-                                <div class="col-md-3">
-                                    <input type="text" id="contact_number" name="contact_number" class="form-control" pattern="^(\+94|94|0)7[01245678][0-9]{7}$" placeholder="Contact">
-                                </div>
-
-                                <div class="col-12">
-                                    <textarea id="address" name="address" class="form-control" rows="2" placeholder="Address"></textarea>
-                                </div>
-                            </div>
-
-                        </div>
-
-                        <div class="section-box mt-4">
-
                             <div class="section-title">
-                                Account Details
+                                <i class="fa fa-building"></i>Supplier Details
                             </div>
 
-                            <div class="row g-3">
-                                <div class="col-md-4">
-                                    <input type="email" id="email" name="email" class="form-control" placeholder="Email *">
+                            <div class="code-card">
+                                <small>Supplier Code</small>
+                                <h3 id="supplier_code"></h3>
+                                <input type="hidden" id="supplier_code" name="supplier_code">
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Supplier Name</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fa fa-building"></i></span>
+                                    <input type="text" class="form-control" id="supplier_name" name="supplier_name" placeholder="Enter supplier name">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Registration Number</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fa fa-id-card"></i></span>
+                                    <input type="text" class="form-control" id="registration_number" name="registration_number">
+                                </div>
+                            </div>
+
+                            <div class="status-card mb-4">
+                                <h6 class="fw-bold mb-3">Supplier Status</h6>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="supplier_status" value="Active" checked>
+                                    <label class="form-check-label">Active</label>
                                 </div>
 
-                                <div class="col-md-4">
-                                    <input type="password" name="password_hash" class="form-control" placeholder="Password *">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="supplier_status" value="Inactive">
+                                    <label class="form-check-label">Inactive</label>
                                 </div>
-
-                                <div class="col-md-4">
-                                    <input type="password" name="confirm_password" class="form-control" placeholder="Confirm Password *">
-                                </div>
-
-                                <div class="col-md-4">
-                                    <select id="member_status" name="member_status" class="form-select">
-                                        <option value="Active">Active</option>
-                                        <option value="Inactive">Inactive</option>
-                                    </select>
-                                </div>
-
                             </div>
 
                         </div>
 
                     </div>
 
-                    <div class="col-lg-4">
+                    <div class="col-lg-6">
 
-                        <div class="photo-card">
-                            <h6 class="section-title mb-4">Profile Information</h6>
+                        <div class="section-box">
 
-                            <div class="photo-upload-wrapper mx-auto">
-                                <img id="previewImage" src="" style="display:none;">
-                                <div id="previewPlaceholder">
-                                    <i class="fa-solid fa-image"></i>
-                                    <p class="mt-2 mb-0">Upload Photo</p>
+                            <div class="section-title">
+                                <i class="fa fa-address-book"></i>Contact Information
+                            </div>
+
+                            <div class="mb-3">
+                                <label>Contact Person</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fa fa-user"></i></span>
+                                    <input type="text" class="form-control" id="contact_person" name="contact_person">
                                 </div>
                             </div>
 
-                            <label class="upload-btn mt-4">
-                                <i class="fa-solid fa-upload me-2"></i>Choose Photo
-                                <input type="file" hidden id="image" name="image" accept="image/*">
-                            </label>
-
-                            <hr>
+                            <div class="mb-3">
+                                <label>Contact Number</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fa fa-phone"></i></span>
+                                    <input type="text" class="form-control" id="contact_number" name="contact_number">
+                                </div>
+                            </div>
 
                             <div class="mb-3">
-                                <label class="form-label">Member Code</label>
-                                <input type="text" class="form-control" id="member_code" readonly>
+                                <label>Email</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fa fa-envelope"></i></span>
+                                    <input type="email"class="form-control"id="email"name="email">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label>Address</label>
+                                <textarea class="form-control" id="address" name="address" placeholder="Supplier address"></textarea>
                             </div>
 
                         </div>
@@ -260,18 +262,15 @@
 
                 </div>
 
-                <div class="d-flex justify-content-end gap-2 mt-4">
-                    <button type="reset" class="btn btn-light">
-                        Clear
+                <div class="text-end">
+                    <button type="reset" class="btn btn-light">Clear</button>
+
+                    <a href="admin.php?page=supplier" class="btn btn-cancel">Cancel</a>
+
+                    <button type="submit" class="btn btn-save">
+                        <i class="fa fa-save me-2"></i>Save Supplier
                     </button>
 
-                    <a href="admin.php?page=member" class="btn btn-outline-secondary">
-                        Cancel
-                    </a>
-
-                    <button type="submit" class="btn btn-cem">
-                        <i class="fa fa-save me-2"></i>Save Member
-                    </button>
                 </div>
 
             </form>
@@ -281,3 +280,78 @@
     </div>
 
 </div>
+
+<script>
+    $(document).ready(function (){
+        loadSupplierCode();
+
+        function loadSupplierCode() {
+            $("#supplier_code").text("Generating..");
+
+            $.ajax({
+                url: "../routes/supplier/generate_supplier_code.php",
+                type: "GET",
+                success: function (response) {
+                    $("#supplier_code").text(response);
+                    $("#supplier_code").val(response);
+                },
+                error: function () {
+                    $("#supplier_code").text("Error");
+                }
+            });
+        }
+
+        $("#submit_form").submit(function (e) {
+            e.preventDefault();
+
+            let formData = new FormData(this);
+
+            $.ajax({
+                url: "../routes/supplier/add_supplier_route.php",
+                type: "POST",
+                data: formData,
+                contentType: false,
+                processData: false,
+                beforeSend: function(){
+                    $("button[type='submit']").prop("disabled", true).text("Saving...");
+                },
+                success: function(response){
+                    if(response === "success"){
+                        Swal.fire({
+                            icon: "success",
+                            title: "Supplier Added Successfully",
+                            showConfirmButton: false,
+                            timer: 3500
+                        }).then(() => {
+                            $("#root").load("supplier/supplier.php");
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Failed to Add Supplier",
+                            text: response
+                        });
+                    }
+                },
+                error: function(xhr, status, error){
+                    $("button[type='submit']").prop("disabled", false).text("Save Supplier");
+                    Swal.fire({
+                        icon: "error",
+                        title: "Server Error",
+                        text: "An error occurred while processing your request."
+                    });
+                },
+                complete: function(){
+                    $("button[type='submit']").prop("disabled", false).text("Save Supplier");
+                }
+            })
+        })
+
+        $("#submit_form").on("reset", function(){
+            setTimeout(function(){
+                loadSupplierCode(); 
+            }, 100); 
+        });
+
+    })
+</script>
