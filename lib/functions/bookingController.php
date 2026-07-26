@@ -263,7 +263,7 @@ class BookingController extends MainController{
             }
 
             $sql2 = "INSERT INTO applicant_table (
-                    applicant_name, relationship_to_deceased, applicant_nic, applicant_nic_front, applicant_nic_back, contact_number, email, applicant_gn_division, applicant_address, member_table_member_id)
+                    applicant_name, relationship_to_deceased, applicant_nic, applicant_nic_front, applicant_nic_back, contact_number, email, applicant_gn_division, applicant_address, member_table_member_id1)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
             $stmt2 = $this->conn->prepare($sql2);
@@ -419,6 +419,21 @@ class BookingController extends MainController{
 
             $this->conn->commit();
 
+            $_SESSION['last_booking'] = [
+                "booking_code"=>$booking_code,
+                "payment_code"=>$step4['payment_code'],
+                "payment_method"=>$step4['payment_method'],
+                "transaction_reference"=>$step4['transaction_reference'],
+                "payment_date"=>$step4['payment_date'],
+                "full_name"=>$step1['full_name'],
+                "applicant_name"=>$step1['applicant_name'],
+                "service_type"=>$service_type,
+                "service_cost"=>$step4['service_cost'],
+                "memorial_cost"=>$step4['memorial_cost'] ?? 0,
+                "total_payment"=>$step4['total_payment']
+
+            ];
+
             // Create Notification Generartion part
             $this->sendBookingNotification($service_type, $booking_code, $funeral_service_id);
 
@@ -501,7 +516,7 @@ class BookingController extends MainController{
             }
 
             $sql2 = "INSERT INTO applicant_table (
-                    applicant_name, relationship_to_deceased, applicant_nic, applicant_nic_front, applicant_nic_back, contact_number, email, applicant_gn_division, applicant_address, member_table_member_id)
+                    applicant_name, relationship_to_deceased, applicant_nic, applicant_nic_front, applicant_nic_back, contact_number, email, applicant_gn_division, applicant_address, member_table_member_id1)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
             $stmt2 = $this->conn->prepare($sql2);
@@ -603,16 +618,38 @@ class BookingController extends MainController{
                 throw new Exception($stmt6->error);
             }
 
+            $payment_id = $stmt6->insert_id;
+
             $this->conn->commit();
+
+            $_SESSION['last_booking'] = [
+                "booking_code"=>$booking_code,
+                "payment_code"=>$step4['payment_code'],
+                "payment_method"=>$step4['payment_method'],
+                "transaction_reference"=>$step4['transaction_reference'],
+                "payment_date"=>$step4['payment_date'],
+                "full_name"=>$step1['full_name'],
+                "applicant_name"=>$step1['applicant_name'],
+                "service_type"=>$service_type,
+                "service_cost"=>$step4['service_cost'],
+                "memorial_cost"=>$step4['memorial_cost'] ?? 0,
+                "total_payment"=>$step4['total_payment']
+
+            ];
+
+            // echo "Before Burial Notification<br>";
 
             // Generate request notification 
             $this->sendBurialBookingNotification($service_type, $booking_code, $funeral_service_id);
 
+            // var_dump($result);
+            
             unset($_SESSION['booking']); // Clear session data after database insertion
 
             return [
                 "status" => "success",
-                "booking_code" => $booking_code
+                "booking_code" => $booking_code,
+                "payment_id" => $payment_id
             ];
             
         }
@@ -695,7 +732,8 @@ class BookingController extends MainController{
 
                 echo "<tr>";
 
-                echo "<td>".$rec['booking_code']."</td>";
+                echo "<td><span class='badge bg-light text-dark border px-3 py-2 fw-semibold'>{$rec['booking_code']}</span></td>";
+
 
                 echo "<td>".$rec['deceased_name']."</td>";
 
@@ -954,6 +992,120 @@ class BookingController extends MainController{
         $stmt->bind_param("i", $id);
 
         return $stmt->execute();
+    }
+
+    public function loadMyBookings($user_id) {
+        
+        $user_id = $_SESSION['user_id'];
+
+        $sqlId = "SELECT member_id FROM member_table WHERE login_table_user_id = ?";
+
+        $stmt = $this->conn->prepare($sqlId);
+        $stmt->bind_param("i",$user_id);
+        $stmt->execute();
+
+        $memberResult = $stmt->get_result();
+
+        if($memberResult->num_rows == 0){
+            return [];
+        }
+
+        $member = $memberResult->fetch_assoc();
+
+        $member_id = $member['member_id'];
+
+        $sql = "SELECT fs.funeral_service_id, fs.booking_code, fs.service_type, fs.booking_status, fs.booking_created_at,
+            d.full_name
+            FROM funeral_service_table fs
+            INNER JOIN deceased_table d ON fs.deceased_table_deceased_id = d.deceased_id
+            INNER JOIN applicant_table a ON fs.applicant_table_applicant_id = a.applicant_id
+            WHERE a.member_table_member_id1 = ?
+            ORDER BY fs.funeral_service_id DESC";
+
+        $stmt = $this->conn->prepare($sql);
+
+        $stmt->bind_param("i", $member_id);
+
+        $stmt->execute();
+
+        $result = $stmt->get_result();
+
+        if($result->num_rows == 0){
+            return "
+                <tr>
+                    <td colspan='5' class='text-center'>No bookings found.</td>
+                </tr>
+            ";
+        }
+
+        $output="";
+
+        while($row=$result->fetch_assoc()){
+
+            $statusClass="";
+
+            if($row['booking_status']=="Confirmed"){
+                $statusClass="bg-success";
+            }
+            else if($row['booking_status']=="Pending"){
+                $statusClass="bg-warning text-dark";
+            }
+            else{
+                $statusClass="bg-secondary";
+            }
+
+            $output.="
+                <tr>
+                    <td>{$row['booking_code']}</td>
+
+                    <td>{$row['service_type']}</td>
+
+                    <td>".date("Y-m-d",strtotime($row['booking_created_at']))."</td>
+
+                    <td>
+                        <span class='badge {$statusClass}'>{$row['booking_status']}</span>
+                    </td>
+
+                    <td>
+                        <button class='btn btn-sm btn-outline-warning viewBooking' data-id='".$row['funeral_service_id']."'>
+                            <i class='fa-solid fa-eye'></i>
+                        </button>
+                    </td>
+                </tr>
+            ";
+        }
+        return $output;
+    }
+
+    public function viewBookingDetails($funeral_service_id){
+
+        $sql = "SELECT fs.funeral_service_id, fs.booking_code, fs.service_type, fs.booking_status, fs.booking_created_at,
+            d.full_name, d.nic, d.gender, d.religion, d.deceased_address,
+            a.applicant_name, a.relationship_to_deceased, a.contact_number, a.email,
+            doc.death_certificate_number, doc.date_of_death, doc.cause_of_death, doc.registrar_name,
+            b.burial_date, b.area_type, b.grave_type, 
+            s.section_name, p.plot_number, p.row_number, p.block_number,
+            c.cremation_date, c.area_type, c.collect_ash, c.ash_collection_method, c.notes,
+            pay.payment_code, pay.payment_method, pay.payment_status, pay.total_payment, pay.paid_amount, pay.payment_date
+            FROM funeral_service_table fs
+            INNER JOIN deceased_table d ON fs.deceased_table_deceased_id=d.deceased_id
+            INNER JOIN applicant_table a ON fs.applicant_table_applicant_id=a.applicant_id
+            LEFT JOIN document_table doc ON fs.document_table_document_set_id=doc.document_id
+            LEFT JOIN burial_request_table b ON fs.funeral_service_id=b.funeral_service_table_funeral_service_id
+            LEFT JOIN plot_table p ON b.plot_table_plot_id=p.plot_id
+            LEFT JOIN burial_plot_section_table s ON p.burial_plot_section_table_cem_section_id=s.cem_section_id
+            LEFT JOIN cremation_table c ON fs.funeral_service_id=c.funeral_service_table_funeral_service_id
+            LEFT JOIN payment_table pay ON fs.funeral_service_id = pay.funeral_service_table_funeral_service_id
+            WHERE fs.funeral_service_id=?";
+
+        $stmt=$this->conn->prepare($sql);
+
+        $stmt->bind_param("i",$funeral_service_id);
+
+        $stmt->execute();
+
+        return $stmt->get_result()->fetch_assoc();
+
     }
 
 }

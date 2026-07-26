@@ -425,6 +425,57 @@ class MemberController extends MainController {
         ];
     }
 
+    public function changePassword($user_id,$current,$new) {
+
+        $sql="SELECT login_password FROM login_table WHERE user_id=?";
+
+        $stmt=$this->conn->prepare($sql);
+
+        $stmt->bind_param("i",$user_id);
+
+        $stmt->execute();
+
+        $result=$stmt->get_result();
+
+        $user=$result->fetch_assoc();
+
+        if(!$user){
+            return [
+                "status"=>"error",
+                "message"=>"User not found"
+            ];
+        }
+
+        if(!password_verify($current,$user['login_password'])){
+            return [
+                "status"=>"error",
+                "message"=>"Current password incorrect"
+            ];
+        }
+
+        $newPassword=password_hash(
+            $new, PASSWORD_DEFAULT
+        );
+
+        $sql2="UPDATE login_table SET login_password=? WHERE user_id=?";
+
+        $stmt2=$this->conn->prepare($sql2);
+
+        $stmt2->bind_param("si", $newPassword, $user_id);
+
+        if($stmt2->execute()){
+            return [
+                "status"=>"success"
+            ];
+        }
+
+        return [
+            "status"=>"error",
+            "message"=>"Password update failed"
+        ];
+
+    }
+
 }
 
 ?>

@@ -1,3 +1,7 @@
+<?php
+session_start();
+?>
+
 <style>
 :root {
     --gold-main: #c9a44c;
@@ -455,11 +459,14 @@ h6 {
                 return;
             }
 
-            let route = "<?php echo (strpos($_SERVER['PHP_SELF'], 'admin.php') !== false) 
+            let formData = new FormData(this);
+
+            let route = "<?php echo (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin')
                 ? '../routes/funeral_booking/add_burial_info_route.php'
                 : 'lib/routes/funeral_booking/add_burial_info_route.php'; ?>";
 
-            let formData = new FormData(this);
+            console.log("Role:", <?= json_encode($_SESSION['role'] ?? '') ?>);
+            console.log("Route:", route);
 
             $.ajax({
                 url: route,
@@ -514,10 +521,13 @@ h6 {
         setAreaTypeAutomatically();
 
         function loadBurialView(bookingCode) {
-            let route = "<?php echo (strpos($_SERVER['PHP_SELF'], 'admin.php') !== false) 
+            let route = "<?php echo (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin')
                 ? '../routes/funeral_booking/get_funeral_booking_info_route.php'
                 : 'lib/routes/funeral_booking/get_funeral_booking_info_route.php'; ?>";
 
+            console.log("Role:", <?= json_encode($_SESSION['role'] ?? '') ?>);
+            console.log("Route:", route);
+            
             $.ajax({
                 url: route,
                 type: "GET",
@@ -559,9 +569,12 @@ h6 {
         }
 
         function loadBurialSections(selectedSection = ""){
-            let route = "<?php echo (strpos($_SERVER['PHP_SELF'], 'admin.php') !== false) 
-                ? 'routes/funeral_booking/load_burial_sections_route.php'
+            let route = "<?php echo (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin')
+                ? '../routes/funeral_booking/load_burial_sections_route.php'
                 : 'lib/routes/funeral_booking/load_burial_sections_route.php'; ?>";
+
+            console.log("Role:", <?= json_encode($_SESSION['role'] ?? '') ?>);
+            console.log("Route:", route);
 
             $.ajax({
                 url: route,

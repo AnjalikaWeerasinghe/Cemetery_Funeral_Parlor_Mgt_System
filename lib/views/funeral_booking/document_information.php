@@ -1,3 +1,7 @@
+<?php
+session_start();
+?>
+
 <style>
 :root {
     --gold-main: #c9a44c;
@@ -548,11 +552,14 @@ input[type="file"]:hover {
 
             if(mode !== "create") return;
 
-            let route = "<?php echo (strpos($_SERVER['PHP_SELF'], 'admin.php') !== false) 
+            var formData = new FormData(this);
+
+            let route = "<?php echo (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin')
                 ? '../routes/funeral_booking/add_document_info_route.php'
                 : 'lib/routes/funeral_booking/add_document_info_route.php'; ?>";
 
-            var formData = new FormData(this);
+            console.log("Role:", <?= json_encode($_SESSION['role'] ?? '') ?>);
+            console.log("Route:", route);
 
             $.ajax({
                 url: route,

@@ -157,7 +157,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             <div class="d-flex align-items-center gap-2 flex-wrap mt-3 mt-lg-0">
 
-                <form class="search-form">
+                <!-- <form class="search-form">
                     <div class="input-group">
 
                         <input class="form-control border-end-0" type="search" placeholder="Search">
@@ -166,7 +166,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         </button>
 
                     </div>
-                </form>
+                </form> -->
 
                 <div class="dropdown">
 
@@ -404,7 +404,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 <script>
     document.getElementById("menu-toggle").addEventListener("click", function () {
-        window.userMode = "admin";
+        // window.userMode = "admin";
 
         const sidebar = document.getElementById("sidebar-wrapper");
 

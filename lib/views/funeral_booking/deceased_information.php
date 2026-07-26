@@ -1,4 +1,8 @@
 <!-- Step 1 - Deceased and Applicant Information -->
+<?php
+session_start();
+?>
+
 <?php 
 $bookingId = $_GET['booking_id'] ?? null;
 $mode = $_GET['mode'] ?? 'create';
@@ -239,8 +243,13 @@ button {
     transform:translateY(-2px);
     box-shadow:0 8px 20px rgba(201,164,76,.30);
 }
-
 </style>
+<!-- 
+<?php
+echo "<pre>";
+print_r($_SESSION);
+echo "</pre>";
+?> -->
 
 <div class="container-fluid">
     <div class="card shadow-sm border-0">
@@ -770,25 +779,12 @@ button {
 
             var formData = new FormData(this);
 
-            // let route;
-
-            // if(window.userMode === "admin"){
-            //     route = "routes/funeral_booking/add_deceased_info_route.php";
-            // }
-            // else if(window.userMode === "staff"){
-            //     route = "../routes/funeral_booking/add_deceased_info_route.php";
-            // }
-            // else{
-            //     route = "lib/routes/funeral_booking/add_deceased_info_route.php";
-            // }
-
-            let route = "<?php echo strpos($_SERVER['PHP_SELF'], 'admin.php') !== false 
+            let route = "<?php echo (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin')
                 ? '../routes/funeral_booking/add_deceased_info_route.php'
                 : 'lib/routes/funeral_booking/add_deceased_info_route.php'; ?>";
 
+            console.log("Role:", <?= json_encode($_SESSION['role'] ?? '') ?>);
             console.log("Route:", route);
-
-            console.log("Current PHP:", "<?php echo $_SERVER['PHP_SELF']; ?>");
 
             $.ajax({
                 url: route,

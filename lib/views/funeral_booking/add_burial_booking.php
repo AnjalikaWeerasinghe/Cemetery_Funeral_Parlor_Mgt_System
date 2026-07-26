@@ -327,7 +327,7 @@
 </style>
 
 <?php
-    $isAdmin = (isset($_SESSION['role']) && in_array($_SESSION['role'], ['Admin', 'Staff']));
+    $isAdmin = (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin');
     
     $isBookingAllowed = (isset($_SESSION['role']) && in_array($_SESSION['role'], ['Admin', 'Member', 'Staff']));
 ?>
@@ -411,15 +411,14 @@
 <script>
     let completedStep = 1;
 
-    console.log("Booking Code:", "<?= $bookingCode ?? 'EMPTY' ?>");
-    console.log("Role:", "<?= $_SESSION['role'] ?>");
+    // console.log("Role:", "<?= $_SESSION['role'] ?>");
 
     const baseRoute = "<?php echo (strpos($_SERVER['PHP_SELF'], 'admin.php') !== false)
         ? '../views/' 
         : 'lib/views/'; ?>";
 
     window.mode = "create";
-    window.bookingCode = "<?= $bookingCode ?? '' ?>";
+    window.bookingCode = <?= json_encode($bookingCode ?? '') ?>;
 
     $(document).ready(function(){
 
@@ -482,7 +481,18 @@
             5: baseRoute + "funeral_booking/booking_burial_payment.php"
         };
 
-        $("#bookingContent").load(routes[step]);
+        $("#bookingContent").load(routes[step], function(response, status, xhr){
+
+            console.log("Loaded:", routes[step]);
+            console.log("Status:", status);
+
+            if(status === "error"){
+                console.log(xhr.responseText);
+            }
+
+            console.log(response);
+
+        });
 
         setActiveStep(step);
     }

@@ -110,6 +110,24 @@ document.querySelectorAll(".booking-card").forEach(card => {
 
     card.addEventListener("click", function () {
 
+        if(userRole !== "Admin" && userRole !== "Member"){
+
+            Swal.fire({
+                icon: "warning",
+                title: "Login Required",
+                text: "Please log in first to make a booking.",
+                confirmButtonText: "Go to Login"
+            }).then((result)=>{
+
+                if(result.isConfirmed){
+                    window.location.href = "index.php?page=login";
+                }
+
+            });
+
+            return; // stop execution
+        }
+
         const serviceType = this.getAttribute("data-service-type");
         const bookingPage = this.getAttribute("data-page");
 

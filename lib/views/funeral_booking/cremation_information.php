@@ -1,4 +1,5 @@
 <?php
+    session_start();
     header('Content-Type: text/html; charset=UTF-8');
 ?>
 
@@ -468,8 +469,14 @@ input[type="file"]:hover {
         };
 
         function loadTimeSlots(selectedDate, callback){
+            let route = "<?php echo (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin')
+                ? '../routes/funeral_booking/get_time_slots_route.php'
+                : 'lib/routes/funeral_booking/get_time_slots_route.php'; ?>";
 
-            $.post("../routes/funeral_booking/get_time_slots_route.php", {
+            console.log("Role:", <?= json_encode($_SESSION['role'] ?? '') ?>);
+            console.log("Route:", route);
+
+            $.post(route, {
                 date: selectedDate
             }, function(res) {
                 // console.log("Response:", res);
@@ -632,8 +639,15 @@ input[type="file"]:hover {
                 }
             }
 
+            let route = "<?php echo (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin')
+                ? '../routes/funeral_booking/add_cremation_info_route.php'
+                : 'lib/routes/funeral_booking/add_cremation_info_route.php'; ?>";
+
+            console.log("Role:", <?= json_encode($_SESSION['role'] ?? '') ?>);
+            console.log("Route:", route);
+
             $.ajax({
-                url: "../routes/funeral_booking/add_cremation_info_route.php",
+                url: route,
                 method: "POST",
                 data : formData,
                 processData: false,
@@ -878,9 +892,15 @@ input[type="file"]:hover {
         }
 
         function loadCremationView(bookingCode){
+            let route = "<?php echo (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin')
+                ? '../routes/funeral_booking/get_funeral_booking_info_route.php'
+                : 'lib/routes/funeral_booking/get_funeral_booking_info_route.php'; ?>";
+
+            console.log("Role:", <?= json_encode($_SESSION['role'] ?? '') ?>);
+            console.log("Route:", route);
 
             $.ajax({
-                url: "../routes/funeral_booking/get_funeral_booking_info_route.php",
+                url: route,
                 type: "GET",
                 data: { booking_code: bookingCode },
 

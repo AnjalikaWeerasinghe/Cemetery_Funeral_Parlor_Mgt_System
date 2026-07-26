@@ -1,4 +1,4 @@
-<style>
+.<style>
     body{
         background:#f4f6fb;
     }
@@ -176,29 +176,35 @@
 
     </div>
 
-    <div id="staffTable">
-        <table class="table table-striped table-bordered">
-            <thead class="table-dark">
-                <tr>
-                    <th>Staff Code</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Role</th>
-                    <th>Status</th>
-                    <th width="150">Actions</th>
-                </tr>
-            </thead>
-            <tbody id="emp_data">
-                <!-- Load from database -->
-            </tbody>
-        </table>
+    <div class="card shadow border-0">
+        <div class="card-body p-0">
+            <div class="table">
+                <table id="staffTable" class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Staff Code</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th width="150">Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="emp_data">
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
+
 </div>
 
 
 <script>
     $(document).ready(function(){
         loadStaffMemberDashboardStats();
+        loadStaffMembers();
 
         $(document).on("click", ".addStaffBtn", function(){
             $("#root").load("emp/emp_add.php");
@@ -219,11 +225,39 @@
             });
         }
 
+        function loadStaffMembers(search = ""){
+            $.ajax({
+                url: "../routes/emp/view_emp_route.php",
+                type: "GET",
+                data: {search: search},
+                success: function(data){
+                    if ($.fn.DataTable.isDataTable("#staffTable")) {
+                        $("#staffTable").DataTable().destroy();
+                    }
+
+                    $("#emp_data").html(data);
+
+                    $("#staffTable").DataTable({
+                        pageLength: 10,
+                        dom: "rtip", // Remove the default search box
+                        lengthMenu: [5, 10, 25, 50],
+                        ordering: true,
+                        searching: true,
+                        info: false,
+                        responsive: true
+                    });
+
+                    var table = $("#staffTable").DataTable();
+
+                    $("#searchStaff").on("keyup", function(){
+                        table.search(this.value).draw();
+                    });
+                }
+            });
+        }
+
     });
     
-
-    
-
     $(document).ready(function(){
         $.get('../routes/emp/view_emp_route.php', function(data){
 

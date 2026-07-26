@@ -239,7 +239,7 @@
         let funeralServiceId = $("#funeral_service_id").val();
 
         loadBookingDetails();
-        loadAvailablePlots();
+        // loadAvailablePlots();
         loadSections();
         
 
@@ -370,6 +370,16 @@
             $("#selectedSection").text("Section : " + section);
 
             $("#allocatePlotBtn").prop("disabled",false).data("plot",plotId);
+
+        });
+
+        $("#section").change(function(){
+
+            let sectionId = $(this).val();
+
+            console.log("Section ID:", sectionId);
+
+            loadAvailablePlots(sectionId);
 
         });
 

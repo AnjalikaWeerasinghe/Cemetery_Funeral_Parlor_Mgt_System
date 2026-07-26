@@ -19,7 +19,7 @@ class NotificationController extends MainController{
     public function getNotifications($receiver_id, $receiver_role){
 
         $sql = "SELECT * FROM notification_table WHERE receiver_id = ? AND receiver_role = ?
-            ORDER BY created_at DESC";
+            ORDER BY created_at DESC LIMIT 5";
 
         $result = $this->conn->prepare($sql);
 

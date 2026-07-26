@@ -15,8 +15,8 @@ if (isset($_SESSION['login_success'])) {
     unset($_SESSION['login_success']);
 ?>
 <script>
-    window.userMode = "member";
-    
+    // window.userMode = "member";
+
     document.addEventListener("DOMContentLoaded", function () {
         Swal.fire({
             icon: "success",
@@ -248,7 +248,7 @@ if (isset($_SESSION['login_success'])) {
                 </ul>
             </div>
 
-            <?php if(isset($_SESSION['username']) && $_SESSION['role'] == "Member"): ?>
+            <!-- <?php if(isset($_SESSION['username']) && $_SESSION['role'] == "Member"): ?>
 
                 <div class="dropdown me-2">
 
@@ -308,7 +308,7 @@ if (isset($_SESSION['login_success'])) {
 
                 </div>
 
-            <?php endif; ?>
+            <?php endif; ?> -->
 
             <div class="d-flex ms-auto">
 
@@ -381,12 +381,24 @@ if (isset($_SESSION['login_success'])) {
                 include 'lib/views/main_pages/contact.php';
                 break;
 
+            case 'search_deceased':
+                include 'lib/views/main_pages/search_deceased.php';
+                break;
+
+            case 'search_grave':
+                include 'lib/views/main_pages/search_grave.php';
+                break;
+
             case 'signup':
                 include 'signup.php';
                 break;
 
             case 'login':
                 include 'login.php';
+                break;
+
+            case 'profile':
+                include 'lib/views/profile.php';
                 break;
 
             case 'selectbookingtype':

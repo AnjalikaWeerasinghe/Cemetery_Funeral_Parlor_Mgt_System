@@ -328,6 +328,8 @@
 
 <?php
     $isAdmin = (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin');
+
+    $isBookingAllowed = (isset($_SESSION['role']) && in_array($_SESSION['role'], ['Admin', 'Member', 'Staff']));
 ?>
 
 <div class="booking-wrapper mt-4">
@@ -414,8 +416,36 @@
     $(document).ready(function(){
 
         loadStep(1);
+        if(window.bookingCode === ""){
+            generateBookingCode("Cremation");
+        }
 
     });
+
+    function generateBookingCode(serviceType){
+
+        let route = "<?php echo strpos($_SERVER['PHP_SELF'], 'admin.php') !== false 
+            ? '../routes/funeral_booking/generate_booking_code.php'
+            : 'lib/routes/funeral_booking/generate_booking_code.php'; ?>";
+
+        console.log("Calling URL:", route);
+
+        $.post(route,
+            {
+                service_type: serviceType
+            },
+            function(response){
+                window.bookingCode = response;
+                console.log("Generated Code:", window.bookingCode);
+
+                sessionStorage.setItem("booking_code", window.bookingCode);
+            }
+        ).fail(function(xhr){
+            console.log("Failed URL:", url);
+            console.log(xhr.responseText);
+        });
+
+    }
 
     function setActiveStep(step) {
 
@@ -449,7 +479,18 @@
             </div>
         `);
 
-        $("#bookingContent").load(routes[step]);
+        $("#bookingContent").load(routes[step], function(response, status, xhr){
+
+            console.log("Loaded:", routes[step]);
+            console.log("Status:", status);
+
+            if(status === "error"){
+                console.log(xhr.responseText);
+            }
+
+            console.log(response);
+
+        });
 
         setActiveStep(step);
     }

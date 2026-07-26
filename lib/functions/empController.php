@@ -97,7 +97,7 @@ class EmpController extends MainController{
             while($rec = $resultView->fetch_assoc()){
 
                 echo "<tr>";
-                echo "<td>".$rec['staff_code']."</td>";
+                echo "<td><span class='badge bg-light text-dark border px-3 py-2 fw-semibold'>{$rec['staff_code']}</span></td>";
                 echo "<td>".$rec['first_name']." ".$rec['last_name']."</td>";
                 echo "<td>".$rec['email']."</td>";
                 echo "<td>".$rec['system_role']."</td>";

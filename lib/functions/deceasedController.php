@@ -148,6 +148,121 @@ class DeceasedController extends MainController{
         ];
     }
 
+    public function searchDeceased($keyword)  {
+
+        $sql = "SELECT d.deceased_id, d.full_name, d.nic, d.gender, d.date_of_birth, d.religion, d.deceased_address, d.municipal_council,
+            fs.booking_code, fs.service_type, fs.booking_status, fs.booking_created_at,
+            doc.death_certificate_number, doc.registrar_name, doc.date_of_death, doc.cause_of_death,
+            b.burial_date, b.area_type, b.grave_type, b.request_note,
+            c.cremation_date, c.collect_ash, c.ash_collection_method, c.notes,
+            s.section_name,
+            p.plot_number, p.row_number, p.block_number
+            FROM deceased_table d
+            LEFT JOIN funeral_service_table fs ON d.deceased_id = fs.deceased_table_deceased_id
+            LEFT JOIN document_table doc ON fs.document_table_document_set_id = doc.document_id
+            LEFT JOIN burial_request_table b ON fs.funeral_service_id = b.funeral_service_table_funeral_service_id
+            LEFT JOIN cremation_table c ON fs.funeral_service_id = c.funeral_service_table_funeral_service_id
+            LEFT JOIN plot_table p ON b.plot_table_plot_id = p.plot_id
+            LEFT JOIN burial_plot_section_table s ON b.section_id = s.cem_section_id
+            WHERE d.full_name LIKE ? OR d.nic LIKE ?";
+
+        $stmt = $this->conn->prepare($sql);
+
+        if(!$stmt){
+            die("SQL Error: " . $this->conn->error);
+        }
+
+        $search = "%".$keyword."%";
+
+        $stmt->bind_param("ss",
+            $search, $search
+        );
+
+        $stmt->execute();
+
+        return $stmt->get_result();
+    }
+
+    public function searchGrave($keyword){
+
+        $sql = "SELECT d.full_name,d.nic,
+            fs.booking_code,
+            b.burial_date,
+            p.plot_number, p.row_number, p.block_number,
+            s.section_name
+            FROM deceased_table d 
+            INNER JOIN funeral_service_table fs ON d.deceased_id = fs.deceased_table_deceased_id
+            INNER JOIN burial_request_table b ON fs.funeral_service_id = b.funeral_service_table_funeral_service_id
+            LEFT JOIN plot_table p ON b.plot_table_plot_id = p.plot_id
+            LEFT JOIN burial_plot_section_table s ON b.section_id = s.cem_section_id
+            WHERE d.full_name LIKE ? OR d.nic LIKE ? OR fs.booking_code LIKE ? OR p.plot_number LIKE ?
+        ";
+
+        $stmt=$this->conn->prepare($sql);
+
+        $search="%".$keyword."%";
+
+        $stmt->bind_param("ssss",
+            $search, $search, $search, $search
+        );
+
+        $stmt->execute();
+
+        $result=$stmt->get_result();
+
+        if($result->num_rows==0){
+            return "
+            <div class='alert alert-warning mt-3'>
+                No grave records found.
+            </div>";
+        }
+
+        $output="";
+        while($row=$result->fetch_assoc()){
+
+        $output.="
+
+            <div class='result-card'>
+
+                <h5>
+                    <i class='fa-solid fa-cross'></i> {$row['full_name']}
+                </h5>
+
+                <hr>
+
+                <p>
+                    <b>NIC:</b> {$row['nic']}
+                </p>
+
+                <p>
+                    <b>Booking Code:</b> {$row['booking_code']}
+                </p>
+
+                <p>
+                    <b>Burial Date:</b> {$row['burial_date']}
+                </p>
+
+                <p>
+                    <b>Section:</b> {$row['section_name']}
+                </p>
+
+                <p>
+                    <b>Plot Number:</b> {$row['plot_number']}
+                </p>
+
+                <p>
+                    <b>Location:</b> {$row['row_number']} | {$row['block_number']}
+                </p>
+
+            </div>
+
+        ";
+
+        }
+
+        return $output;
+    }
+
 }
 
 ?>

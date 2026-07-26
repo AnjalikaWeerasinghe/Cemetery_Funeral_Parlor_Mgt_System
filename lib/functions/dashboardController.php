@@ -12,7 +12,7 @@ class DashboardController extends MainController{
                 INNER JOIN deceased_table d ON fs.deceased_table_deceased_id = d.deceased_id
                 INNER JOIN schedule_slots_table sch ON c.schedule_slots_table_slot_id = sch.slot_id
                 WHERE c.cremation_date >= CURDATE()
-                ORDER BY c.cremation_date ASC, sch.start_time ASC";
+                ORDER BY c.cremation_date ASC, sch.start_time ASC LIMIT 5";
 
         $result = $this->conn->query($sql);
 
@@ -38,7 +38,7 @@ class DashboardController extends MainController{
                 INNER JOIN funeral_service_table fs ON b.funeral_service_table_funeral_service_id = fs.funeral_service_id
                 INNER JOIN deceased_table d ON fs.deceased_table_deceased_id = d.deceased_id
                 WHERE b.burial_date >= CURDATE()
-                ORDER BY b.burial_date ASC";
+                ORDER BY b.burial_date ASC LIMIT 5";
 
         $result = $this->conn->query($sql);
 

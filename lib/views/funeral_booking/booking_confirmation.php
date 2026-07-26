@@ -1,9 +1,24 @@
 <?php
 session_start();
 
-$bookingCode = $_SESSION['last_booking']['booking_code'] ?? '';
-$paymentCode = $_SESSION['last_booking']['payment_code'] ?? '';
-$paymentMethod = $_SESSION['last_booking']['payment_method'] ?? '';
+$booking = $_SESSION['last_booking'] ?? [];
+
+$bookingCode = $booking['booking_code'] ?? '';
+$paymentCode = $booking['payment_code'] ?? '';
+$paymentMethod = $booking['payment_method'] ?? '';
+
+$transactionReference = $booking['transaction_reference'] ?? '-';
+$paymentDate = $booking['payment_date'] ?? date("Y-m-d");
+
+$fullName = $booking['full_name'] ?? '-';
+$applicantName = $booking['applicant_name'] ?? '-';
+
+$serviceType = $booking['service_type'] ?? 'Cremation';
+
+$serviceCost = $booking['service_cost'] ?? 0;
+$memorialCost = $booking['memorial_cost'] ?? 0;
+$totalPayment = $booking['total_payment'] ?? 0;
+
 ?>
 
 <style>
@@ -41,7 +56,7 @@ $paymentMethod = $_SESSION['last_booking']['payment_method'] ?? '';
         </h2>
 
         <p class="text-muted">
-            Your cremation booking has been successfully submitted.
+            Your <?= $serviceType ?> booking has been successfully submitted.
         </p>
 
         <div class="info-box">
@@ -69,7 +84,7 @@ $paymentMethod = $_SESSION['last_booking']['payment_method'] ?? '';
 
 <div class="invoice-box">
 
-    <h2>Cremation Booking Invoice</h2>
+    <h2>Funeral Booking Confirmation</h2>
 
     <hr>
 
@@ -111,7 +126,11 @@ $paymentMethod = $_SESSION['last_booking']['payment_method'] ?? '';
     </table>
 
     <button onclick="window.print()" class="btn btn-dark">
-        Print Invoice
+        Print Confirmation
+    </button>
+
+    <button onclick="history.back()()" class="btn btn-outline-warning">
+        <i class="fa-solid fa-arrow-left"></i>Back
     </button>
 
 </div>

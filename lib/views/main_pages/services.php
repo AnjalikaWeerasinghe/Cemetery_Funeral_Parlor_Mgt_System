@@ -192,6 +192,59 @@ section {
     transition: opacity 0.3s ease;
 }
 
+.search-service-section{
+    margin-top:40px;
+}
+
+.search-card{
+    background:rgba(30,30,30,0.85);
+    padding:30px;
+    border-radius:18px;
+    border:1px solid rgba(212,175,122,0.3);
+    text-align:center;
+    color:white;
+    transition:.3s;
+    height:100%;
+}
+
+.search-card:hover{
+    transform:translateY(-8px);
+    box-shadow:0 15px 35px rgba(212,175,122,0.3);
+}
+
+.search-card i{
+    font-size:45px;
+    color:#d4af7a;
+    margin-bottom:15px;
+}
+
+.search-card h3{
+    color:#d4af7a;
+    margin-bottom:15px;
+}
+
+.search-card p{
+    color: #ccc;
+    min-height:50px;
+}
+
+.search-btn{
+    display:inline-block;
+    margin-top:15px;
+    padding:10px 30px;
+    border-radius:30px;
+    background: #f0e7da;
+    color: #1a1a1a;
+    text-decoration:none;
+    font-weight:600;
+    transition:.3s;
+}
+
+.search-btn:hover{
+    background: #fff;
+    color: #1a1a1a;
+}
+
 @keyframes fadeUp {
     to {
         opacity: 1;
@@ -222,6 +275,44 @@ section {
     </div>
 </section>
 
+<section class="container search-service-section">
+
+    <div class="row g-4 justify-content-center">
+
+        <div class="col-md-5">
+            <div class="search-card">
+                <i class="fa-solid fa-map-location-dot"></i>
+                <h3>Search Grave</h3>
+
+                <p>
+                    Find burial plot details, section information,
+                    row number, and grave location.
+                </p>
+
+                <a href="index.php?page=search_grave" class="search-btn">
+                    <i class="fa-solid fa-magnifying-glass me-2"></i>Search Grave
+                </a>
+            </div>
+        </div>
+
+        <div class="col-md-5">
+            <div class="search-card">
+                <i class="fa-solid fa-user"></i>
+                <h3>Search Deceased</h3>
+
+                <p>
+                    Search deceased records.
+                </p>
+
+                <a href="index.php?page=search_deceased" class="search-btn">
+                    <i class="fa-solid fa-magnifying-glass me-2"></i>Search Deceased
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+</section>
 
 <section class="container my-5">
 
